@@ -1,0 +1,234 @@
+Perfect 👍 Thanks for clarifying everything.
+Now I’ll expand your draft into a **comprehensive User Manual** for **Saiyaara – Jewelry E-Commerce Web Application**, making sure I don’t remove any of your existing content, but **add missing details**:
+
+* Full **navigation tree** (Home, Shop + dropdowns, Special Offers + dropdowns, Hair Accessories, Contact, About Us).
+* **Customer routes** for every category.
+* **Admin routes** (Dashboard, Product Management, Inventory, Orders, Offers, User Management).
+* **Inventory section** for admin.
+* APIs for **Customer** and **Admin** (detailed endpoints).
+* Styling and design notes (**Ant Design** + **styled-components**).
+* A **sticky WhatsApp icon** on all pages.
+* Support for **Guest Checkout** (no login required).
+
+---
+
+# 📖 User Manual – Saiyaara Jewelry E-Commerce Web Application
+
+## 1. Introduction
+
+**Saiyaara** is an online jewelry store that combines elegance and modern design. Customers can browse jewelry collections, discover special offers, and place orders (with or without an account). Administrators can manage products, track orders, maintain inventory, and create promotions.
+
+The app is built with:
+
+* **Frontend:** React (TypeScript), Redux Toolkit (Slices, Saga, Selectors), Ant Design, styled-components.
+* **Backend:** FastAPI (Python).
+* **Database:** PostgreSQL/MySQL (cloud-hosted) or SQLite (local).
+
+---
+
+## 2. Navigation Structure
+
+### 2.1 Customer Navigation
+
+**Header Menu (Visible on all pages with Ant Design Menu + styled-components styling):**
+
+* **Home**
+* **Shop** ⮟
+
+  * Anklets
+  * Bangles
+  * Bracelets
+  * Combos
+  * Ear Studs
+  * Earrings
+  * Hoops
+  * Pendants
+  * Rings
+  * Wall Frame Designs
+* **Special Offers** ⮟
+
+  * Under 299
+  * Special Deals
+  * Deal of the Month
+* **Hair Accessories**
+* **Contact**
+* **About Us**
+
+**Footer:**
+
+* Quick Links: Home, Shop, Special Offers, Contact, About Us.
+* Social Links: Instagram, Facebook.
+* Copyright & Policies.
+
+**Sticky Element:**
+
+* Floating **WhatsApp Icon** (bottom right) → Direct link to WhatsApp chat with Saiyaara.
+
+---
+
+## 3. Customer View
+
+### 3.1 Home Page
+
+* Banner carousel with featured products & promotions.
+* Highlighted categories (rings, bangles, earrings, etc).
+* Featured deals section.
+* Instagram feed (grid of posts).
+
+### 3.2 Shop (Category Pages)
+
+* Each category has a dedicated route:
+
+  * `/shop/anklets`
+  * `/shop/bangles`
+  * `/shop/bracelets`
+  * `/shop/combos`
+  * `/shop/ear-studs`
+  * `/shop/earrings`
+  * `/shop/hoops`
+  * `/shop/pendants`
+  * `/shop/rings`
+  * `/shop/wall-frames`
+* Product listing grid with filters (price, availability, sort).
+
+### 3.3 Special Offers
+
+* `/offers/under-299` – all products under 299.
+* `/offers/special-deals` – time-limited offers.
+* `/offers/deal-of-month` – monthly highlighted deal.
+
+### 3.4 Product Details Page
+
+* Multiple product images with zoom.
+* Name, description, price, discount, stock.
+* Add to Cart / Buy Now.
+* Related products carousel.
+* Share options (Facebook, Instagram, WhatsApp).
+
+### 3.5 Cart & Checkout
+
+* **Cart Page:** list of selected products, quantity adjustments, subtotal.
+* **Checkout Page:**
+
+  * Guest Checkout (no login required).
+  * Contact info, address, shipping, and payment.
+  * Payment options: Card, COD.
+  * Order confirmation with summary.
+
+### 3.6 Contact & About Us
+
+* `/contact`: contact form, phone, email, store address.
+* `/about`: Saiyaara brand story, vision, and craftsmanship.
+
+---
+
+## 4. Admin View
+
+### 4.1 Dashboard
+
+* Overview: total products, active orders, low stock alerts.
+
+### 4.2 Product Management
+
+* Routes:
+
+  * `/admin/products` – list all products.
+  * `/admin/products/add` – add new product.
+  * `/admin/products/:id/edit` – update product.
+* Features: upload images, set category, add discount, set stock.
+
+### 4.3 Inventory Management
+
+* `/admin/inventory`
+* Tracks stock levels per category.
+* Alerts for low/out-of-stock products.
+* Export CSV/Excel.
+
+### 4.4 Order Management
+
+* `/admin/orders` – view all orders.
+* `/admin/orders/:id` – order details.
+* Change order status (Pending, Processing, Shipped, Delivered).
+
+### 4.5 Special Offers Management
+
+* `/admin/offers` – create/manage offers.
+* Assign products to “Under 299”, “Special Deals”, “Deal of Month”.
+
+### 4.6 User Management
+
+* `/admin/users` – view customer accounts.
+* Enable/disable accounts.
+* Track guest checkout orders.
+
+---
+
+## 5. API Endpoints
+
+### 5.1 Customer APIs
+
+* `POST /api/auth/signup` – create account.
+* `POST /api/auth/login` – login user.
+* `POST /api/orders/guest` – place guest order.
+* `GET /api/products` – fetch all products.
+* `GET /api/products/{id}` – fetch product details.
+* `GET /api/offers/{type}` – fetch offers by type.
+* `POST /api/cart` – add item to cart.
+* `POST /api/checkout` – checkout order.
+
+### 5.2 Admin APIs
+
+* `POST /api/admin/products` – add new product.
+* `PUT /api/admin/products/{id}` – update product.
+* `DELETE /api/admin/products/{id}` – delete product.
+* `GET /api/admin/orders` – list all orders.
+* `PUT /api/admin/orders/{id}` – update order status.
+* `GET /api/admin/inventory` – fetch stock levels.
+* `PUT /api/admin/inventory/{id}` – update stock.
+* `POST /api/admin/offers` – create/update offers.
+
+---
+
+## 6. Design & Styling
+
+* **Ant Design** used for navigation, tables, modals, forms.
+* **styled-components** used for custom branding (gold accents, jewelry theme).
+* Jewelry-focused design:
+
+  * White background with gold highlights.
+  * Modern font with luxury feel.
+  * Product cards styled with soft shadows.
+
+---
+
+## 7. User Workflows
+
+### Customer Workflow
+
+1. Visit Saiyaara homepage.
+2. Browse categories or offers.
+3. Select product → Add to cart.
+4. Checkout as guest or logged-in user.
+5. Enter delivery details → Confirm order.
+
+### Admin Workflow
+
+1. Login to `/admin`.
+2. Manage products & inventory.
+3. Monitor and update orders.
+4. Create/manage offers.
+5. Export reports.
+
+---
+
+## 8. Support
+
+* 📧 Email: \[[support@saiyaara.com](mailto:support@saiyaara.com)]
+* 📞 Phone: \[+91-XXXXXXXXXX]
+* 📱 WhatsApp: Sticky icon available on all pages
+
+---
+
+✅ This is now a **complete and detailed User Manual** for Saiyaara, with **routes, APIs, navigation, design notes, and workflows**.
+
+Would you like me to now **convert this into a branded PDF (A4, gold theme, with Saiyaara branding)** so it looks professional for developers and investors?
