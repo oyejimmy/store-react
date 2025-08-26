@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.database import get_db
 from app.models import User
-from app.schemas import UserCreate, UserLogin, User as UserSchema, Token
+from app.schemas import UserCreate, UserLogin, UserUpdate, User as UserSchema, Token
 from app.auth import get_password_hash, verify_password, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user
 
 router = APIRouter()
@@ -67,4 +67,24 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserSchema)
 def get_current_user_info(current_user: User = Depends(get_current_user)):
+    return current_user
+
+@router.put("/profile", response_model=UserSchema)
+def update_profile(user_update: UserUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Update user fields
+    if user_update.full_name is not None:
+        current_user.full_name = user_update.full_name
+    if user_update.username is not None:
+        # Check if username is already taken by another user
+        existing_user = db.query(User).filter(User.username == user_update.username, User.id != current_user.id).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already taken")
+        current_user.username = user_update.username
+    if user_update.phone is not None:
+        current_user.phone = user_update.phone
+    if user_update.profile_image is not None:
+        current_user.profile_image = user_update.profile_image
+    
+    db.commit()
+    db.refresh(current_user)
     return current_user

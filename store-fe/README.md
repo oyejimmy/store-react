@@ -1,10 +1,10 @@
-# Saiyaara Jewelry Store - Frontend
+# Gem-Heart Jewelry Store - Frontend
 
-A React-based frontend for the Saiyaara jewelry e-commerce platform built with TypeScript, Redux Toolkit, Ant Design, and styled-components.
+A React-based frontend for the Gem-Heart jewelry e-commerce platform built with TypeScript, Redux Toolkit, Material UI, and styled-components.
 
 ## Features
 
-- **Modern UI/UX**: Beautiful jewelry-themed design with Ant Design components
+- **Modern UI/UX**: Beautiful jewelry-themed design with Material UI components
 - **Responsive Design**: Mobile-first approach with responsive layouts
 - **State Management**: Redux Toolkit for global state management
 - **Authentication**: User login/signup with JWT tokens
@@ -19,7 +19,7 @@ A React-based frontend for the Saiyaara jewelry e-commerce platform built with T
 
 - **React 18** with TypeScript
 - **Redux Toolkit** for state management
-- **Ant Design** for UI components
+- **Material UI** for UI components
 - **styled-components** for custom styling
 - **React Router** for navigation
 - **Axios** for API communication
@@ -108,7 +108,7 @@ The application uses a jewelry-themed design system with:
 - **Secondary Color**: Dark Gold (#B8860B)
 - **Background**: Clean white with subtle shadows
 - **Typography**: Modern, readable fonts
-- **Icons**: Ant Design icon set
+- **Icons**: Material UI icon set
 
 ## API Integration
 

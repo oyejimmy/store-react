@@ -1,163 +1,80 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Avatar, Dropdown, Button, Typography, Breadcrumb } from 'antd';
 import {
-  DashboardOutlined,
-  ShoppingOutlined,
-  UserOutlined,
-  ShoppingCartOutlined,
-  BarChartOutlined,
-  GiftOutlined,
-  LogoutOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  CreditCardOutlined,
-  GlobalOutlined,
-  FileTextOutlined,
-} from '@ant-design/icons';
+  Box,
+  Drawer,
+  AppBar,
+  Toolbar,
+  List,
+  Typography,
+  Divider,
+  IconButton,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Avatar,
+  Menu,
+  MenuItem,
+  Breadcrumbs,
+  Link as MuiLink,
+  useTheme,
+  ThemeProvider,
+} from '@mui/material';
+import { adminLightTheme, adminDarkTheme } from '../../admin-theme';
+import {
+  Dashboard,
+  ShoppingBag,
+  Person,
+  ShoppingCart,
+  BarChart,
+  CardGiftcard,
+  Logout,
+  Menu as MenuIcon,
+  ChevronLeft,
+  CreditCard,
+  Public,
+  Description,
+} from '@mui/icons-material';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
 import { RootState } from '../../store';
-import styled from 'styled-components';
 
-const { Header, Sider, Content } = Layout;
-const { Title } = Typography;
 
-const StyledLayout = styled(Layout)`
-  min-height: 100vh;
-  
-  body {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  
-  * {
-    box-sizing: border-box;
-  }
-`;
 
-const StyledHeader = styled(Header)`
-  background: linear-gradient(135deg, #d4af37, #b8860b) !important;
-  padding: 0 24px !important;
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  border-bottom: 2px solid #b8860b !important;
-  height: 64px !important;
-  line-height: 64px !important;
-`;
-
-const StyledSider = styled(Sider)`
-  background: linear-gradient(180deg, #1a1a1a, #2a2a2a) !important;
-  border-right: 2px solid #d4af37 !important;
-  
-  .ant-layout-sider-trigger {
-    background: #d4af37 !important;
-    color: #000 !important;
-  }
-  
-  .ant-menu {
-    background: transparent !important;
-    border: none !important;
-  }
-  
-  .ant-menu-item {
-    color: rgba(255, 255, 255, 0.8) !important;
-    margin: 4px 8px !important;
-    border-radius: 8px !important;
-    
-    &:hover {
-      background: linear-gradient(135deg, #d4af37, #b8860b) !important;
-      color: #000 !important;
-      transform: translateX(4px) !important;
-      transition: all 0.3s ease !important;
-    }
-    
-    &.ant-menu-item-selected {
-      background: linear-gradient(135deg, #d4af37, #b8860b) !important;
-      color: #000 !important;
-      font-weight: 600 !important;
-    }
-  }
-`;
-
-const StyledContent = styled(Content)`
-  background: #f5f5f5;
-  overflow: auto;
-  position: relative;
-`;
-
-const UserDropdown = styled.div`
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 1000;
-`;
-
-const Logo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
+const drawerWidth = 280;
+const collapsedWidth = 64;
 
 const AdminLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('admin-theme') === 'dark';
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
 
+  const toggleAdminTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    localStorage.setItem('admin-theme', !isDarkMode ? 'dark' : 'light');
+  };
+
   const menuItems = [
-    {
-      key: '/admin',
-      icon: <DashboardOutlined />,
-      label: 'Dashboard',
-    },
-    {
-      key: '/admin/products',
-      icon: <ShoppingOutlined />,
-      label: 'Products',
-    },
-    {
-      key: '/admin/inventory',
-      icon: <BarChartOutlined />,
-      label: 'Inventory',
-    },
-    {
-      key: '/admin/orders',
-      icon: <ShoppingCartOutlined />,
-      label: 'Orders',
-    },
-    {
-      key: '/admin/users',
-      icon: <UserOutlined />,
-      label: 'Users',
-    },
-    {
-      key: '/admin/offers',
-      icon: <GiftOutlined />,
-      label: 'Offers',
-    },
-    {
-      key: '/admin/payments',
-      icon: <CreditCardOutlined />,
-      label: 'Payments',
-    },
-    {
-      key: '/admin/sales-channels',
-      icon: <GlobalOutlined />,
-      label: 'Sales Channels',
-    },
-    {
-      key: '/admin/reports',
-      icon: <FileTextOutlined />,
-      label: 'Reports',
-    },
+    { path: '/admin', icon: <Dashboard />, label: 'Dashboard' },
+    { path: '/admin/products', icon: <ShoppingBag />, label: 'Products' },
+    { path: '/admin/inventory', icon: <BarChart />, label: 'Inventory' },
+    { path: '/admin/orders', icon: <ShoppingCart />, label: 'Orders' },
+    { path: '/admin/users', icon: <Person />, label: 'Users' },
+    { path: '/admin/offers', icon: <CardGiftcard />, label: 'Offers' },
+    { path: '/admin/payments', icon: <CreditCard />, label: 'Payments' },
+    { path: '/admin/sales-channels', icon: <Public />, label: 'Sales Channels' },
+    { path: '/admin/reports', icon: <Description />, label: 'Reports' },
   ];
 
-  const handleMenuClick = ({ key }: { key: string }) => {
-    navigate(key);
+  const handleMenuClick = (path: string) => {
+    navigate(path);
   };
 
   const handleLogout = () => {
@@ -165,144 +82,182 @@ const AdminLayout: React.FC = () => {
     navigate('/login');
   };
 
-
+  const getBreadcrumbTitle = () => {
+    const path = location.pathname;
+    if (path === '/admin') return 'Dashboard';
+    if (path === '/admin/products') return 'Products';
+    if (path === '/admin/orders') return 'Orders';
+    if (path === '/admin/inventory') return 'Inventory';
+    if (path === '/admin/users') return 'Users';
+    if (path === '/admin/offers') return 'Offers';
+    if (path === '/admin/payments') return 'Payments';
+    if (path === '/admin/sales-channels') return 'Sales Channels';
+    if (path === '/admin/reports') return 'Reports';
+    return 'Dashboard';
+  };
 
   return (
-    <div style={{ 
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      margin: 0, 
-      padding: 0, 
-      background: '#f5f5f5'
-    }}>
-    <StyledLayout style={{ height: '100vh' }}>
-      <StyledSider trigger={null} collapsible collapsed={collapsed}>
-        <div style={{ 
-          padding: '20px 16px', 
-          textAlign: 'center', 
-          background: 'linear-gradient(135deg, #d4af37, #b8860b)',
-          borderBottom: '2px solid #b8860b'
-        }}>
-          <Title level={4} style={{ color: '#000', margin: 0, fontWeight: 800 }}>
-            {collapsed ? 'S' : 'Saiyaara'}
-          </Title>
+    <ThemeProvider theme={isDarkMode ? adminDarkTheme : adminLightTheme}>
+      <Box sx={{ display: 'flex', height: '100vh' }}>
+      {/* Sidebar */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: collapsed ? collapsedWidth : drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: collapsed ? collapsedWidth : drawerWidth,
+            boxSizing: 'border-box',
+            background: 'linear-gradient(180deg, #1e293b, #334155)',
+            borderRight: '2px solid #6366f1',
+            transition: 'width 0.3s ease',
+          },
+        }}
+      >
+        {/* Logo Section */}
+        <Box
+          sx={{
+            p: 2,
+            textAlign: 'center',
+            background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+            borderBottom: '2px solid #4f46e5',
+          }}
+        >
+          <Typography variant="h5" sx={{ color: '#fff', fontWeight: 800, m: 0 }}>
+            {collapsed ? 'G' : 'Gem-Heart'}
+          </Typography>
           {!collapsed && (
-            <div style={{ color: '#000', fontSize: '12px', fontWeight: 600, opacity: 0.8 }}>Admin Panel</div>
+            <Typography variant="caption" sx={{ color: '#fff', fontWeight: 600, opacity: 0.9 }}>
+              Admin Panel
+            </Typography>
           )}
-        </div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          onClick={handleMenuClick}
-          style={{ borderRight: 0 }}
-        />
-      </StyledSider>
-      
-      <Layout>
-        <StyledHeader>
-          <Logo>
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{ 
-                fontSize: '18px', 
-                color: '#000',
-                marginRight: '16px'
+        </Box>
+
+        {/* Menu Items */}
+        <List sx={{ pt: 1 }}>
+          {menuItems.map((item) => (
+            <ListItem key={item.path} disablePadding sx={{ px: 1 }}>
+              <ListItemButton
+                selected={location.pathname === item.path}
+                onClick={() => handleMenuClick(item.path)}
+                sx={{
+                  borderRadius: 2,
+                  mx: 1,
+                  mb: 0.5,
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                    color: '#fff',
+                    transform: 'translateX(4px)',
+                  },
+                  '&.Mui-selected': {
+                    background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                    color: '#fff',
+                    fontWeight: 600,
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                    },
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ color: 'inherit', minWidth: collapsed ? 0 : 40 }}>
+                  {item.icon}
+                </ListItemIcon>
+                {!collapsed && <ListItemText primary={item.label} />}
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
+
+      {/* Main Content */}
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Header */}
+        <AppBar
+          position="static"
+          sx={{
+            background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+            borderBottom: '2px solid #4f46e5',
+          }}
+        >
+          <Toolbar sx={{ justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <IconButton
+                onClick={() => setCollapsed(!collapsed)}
+                sx={{ color: '#fff' }}
+              >
+                {collapsed ? <MenuIcon /> : <ChevronLeft />}
+              </IconButton>
+              <Typography variant="h5" sx={{ color: '#fff', fontWeight: 800 }}>
+                Admin Dashboard
+              </Typography>
+            </Box>
+
+            <Box
+              onClick={(e) => setUserMenuAnchor(e.currentTarget)}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                cursor: 'pointer',
+                p: 1,
+                borderRadius: 2,
+                background: 'rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': { background: 'rgba(0,0,0,0.2)' },
               }}
-            />
-            <Title level={3} style={{ color: '#000', margin: 0, fontWeight: 800 }}>
-              Admin Dashboard
-            </Title>
-          </Logo>
-          
-          <Dropdown 
-            menu={{ 
-              items: [
-                {
-                  key: 'profile',
-                  icon: <UserOutlined />,
-                  label: 'Profile Settings',
-                },
-                {
-                  type: 'divider',
-                },
-                {
-                  key: 'logout',
-                  icon: <LogoutOutlined />,
-                  label: 'Logout',
-                  danger: true,
-                },
-              ],
-              onClick: ({ key }) => {
-                if (key === 'logout') {
+            >
+              <Avatar sx={{ bgcolor: '#fff', color: '#6366f1', width: 32, height: 32 }}>
+                <Person />
+              </Avatar>
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: '#fff' }}>
+                  {user?.full_name || 'Admin'}
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                  Administrator
+                </Typography>
+              </Box>
+            </Box>
+
+            <Menu
+              anchorEl={userMenuAnchor}
+              open={Boolean(userMenuAnchor)}
+              onClose={() => setUserMenuAnchor(null)}
+            >
+              <MenuItem onClick={() => { navigate('/admin/profile'); setUserMenuAnchor(null); }}>
+                <Person sx={{ mr: 1 }} /> Profile Settings
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                onClick={() => {
                   handleLogout();
-                }
-              }
-            }} 
-            placement="bottomRight"
-            trigger={['click']}
-          >
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '8px', 
-              cursor: 'pointer',
-              padding: '8px 12px',
-              borderRadius: '8px',
-              background: 'rgba(0,0,0,0.1)',
-              transition: 'all 0.3s ease'
-            }}>
-              <Avatar 
-                icon={<UserOutlined />} 
-                style={{ background: '#000', color: '#d4af37' }}
-              />
-              <div>
-                <div style={{ fontWeight: '600', fontSize: '14px', color: '#000' }}>{user?.full_name || 'Admin'}</div>
-                <div style={{ fontSize: '12px', color: 'rgba(0,0,0,0.7)' }}>Administrator</div>
-              </div>
-            </div>
-          </Dropdown>
-        </StyledHeader>
-        
-        <StyledContent>
-          <div style={{ padding: '16px 24px 0 24px' }}>
-            <Breadcrumb
-              style={{ marginBottom: '16px' }}
-              items={[
-                {
-                  title: 'Admin',
-                  href: '/admin',
-                },
-                {
-                  title: (() => {
-                    const path = location.pathname;
-                    if (path === '/admin') return 'Dashboard';
-                    if (path === '/admin/products') return 'Products';
-                    if (path === '/admin/orders') return 'Orders';
-                    if (path === '/admin/inventory') return 'Inventory';
-                    if (path === '/admin/users') return 'Users';
-                    if (path === '/admin/offers') return 'Offers';
-                    if (path === '/admin/payments') return 'Payments';
-                    if (path === '/admin/sales-channels') return 'Sales Channels';
-                    if (path === '/admin/reports') return 'Reports';
-                    return 'Dashboard';
-                  })(),
-                },
-              ]}
-            />
-          </div>
-          
-          <Outlet />
-        </StyledContent>
-      </Layout>
-    </StyledLayout>
-    </div>
+                  setUserMenuAnchor(null);
+                }}
+                sx={{ color: 'error.main' }}
+              >
+                <Logout sx={{ mr: 1 }} /> Logout
+              </MenuItem>
+            </Menu>
+          </Toolbar>
+        </AppBar>
+
+        {/* Content Area */}
+        <Box sx={{ flexGrow: 1, bgcolor: '#f8fafc', overflow: 'hidden' }}>
+          <Box sx={{ p: 3 }}>
+            <Breadcrumbs sx={{ mb: 2 }}>
+              <MuiLink component="button" onClick={() => navigate('/admin')} underline="hover">
+                Admin
+              </MuiLink>
+              <Typography color="text.primary">{getBreadcrumbTitle()}</Typography>
+            </Breadcrumbs>
+            <Outlet />
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+    </ThemeProvider>
   );
 };
 

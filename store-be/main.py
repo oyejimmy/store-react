@@ -11,8 +11,8 @@ from app.models import Base
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Saiyaara Jewelry API",
-    description="E-commerce API for Saiyaara Jewelry Store",
+    title="Gem-Heart Jewelry API",
+    description="E-commerce API for Gem-Heart Jewelry Store",
     version="1.0.0"
 )
 
@@ -39,7 +39,7 @@ app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Saiyaara Jewelry API"}
+    return {"message": "Welcome to Gem-Heart Jewelry API"}
 
 @app.get("/health")
 async def health_check():

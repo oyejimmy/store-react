@@ -1,8 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { ThemeProvider, CssBaseline, Box } from '@mui/material';
 import { AppDispatch, RootState } from "./store";
 import { getCurrentUser } from "./store/slices/authSlice";
+import { lightTheme, darkTheme } from './theme';
 
 // Layout Components
 import Header from "./components/layout/Header";
@@ -24,6 +26,10 @@ import LoginPage from "./pages/customer/LoginPage";
 import SignupPage from "./pages/customer/SignupPage";
 import OrderConfirmationPage from "./pages/customer/OrderConfirmationPage";
 import UserOrdersPage from "./pages/customer/UserOrdersPage";
+import ProfilePage from "./pages/customer/ProfilePage";
+import ForgotPasswordPage from "./pages/customer/ForgotPasswordPage";
+import TermsPage from "./pages/customer/TermsPage";
+import PrivacyPage from "./pages/customer/PrivacyPage";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -41,25 +47,16 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminRoute from "./components/auth/AdminRoute";
 
-// Styled Components
-import styled from "styled-components";
 
-const AppContainer = styled.div`
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-`;
-
-const MainContent = styled.main`
-  flex: 1;
-  padding-top: 64px; // Header height
-`;
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
   const { isAuthenticated, token } = useSelector(
     (state: RootState) => state.auth
   );
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
 
   useEffect(() => {
     if (token && isAuthenticated) {
@@ -67,8 +64,15 @@ function App() {
     }
   }, [dispatch, token, isAuthenticated]);
 
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    localStorage.setItem('theme', !isDarkMode ? 'dark' : 'light');
+  };
+
   return (
-    <Routes>
+    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+      <CssBaseline />
+      <Routes>
       {/* Admin Routes */}
       <Route path="/admin" element={
         <AdminRoute>
@@ -84,13 +88,77 @@ function App() {
         <Route path="payments" element={<AdminPayments />} />
         <Route path="sales-channels" element={<AdminSalesChannels />} />
         <Route path="reports" element={<AdminReports />} />
+        <Route path="profile" element={<ProfilePage />} />
       </Route>
+      
+      {/* Auth Routes without footer */}
+      <Route path="/login" element={
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
+          <Box component="main" sx={{ 
+            flex: 1, 
+            pt: '70px',
+            background: isDarkMode 
+              ? 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)'
+              : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          }}>
+            <LoginPage />
+          </Box>
+        </Box>
+      } />
+      <Route path="/signup" element={
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
+          <Box component="main" sx={{ 
+            flex: 1, 
+            pt: '70px',
+            background: isDarkMode 
+              ? 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)'
+              : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          }}>
+            <SignupPage />
+          </Box>
+        </Box>
+      } />
+      <Route path="/forgot-password" element={
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
+          <Box component="main" sx={{ 
+            flex: 1, 
+            pt: '70px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            background: isDarkMode 
+              ? 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)'
+              : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          }}>
+            <ForgotPasswordPage />
+          </Box>
+        </Box>
+      } />
+      <Route path="/terms" element={
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
+          <Box component="main" sx={{ flex: 1, pt: '70px' }}>
+            <TermsPage />
+          </Box>
+        </Box>
+      } />
+      <Route path="/privacy" element={
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
+          <Box component="main" sx={{ flex: 1, pt: '70px' }}>
+            <PrivacyPage />
+          </Box>
+        </Box>
+      } />
       
       {/* Customer Routes */}
       <Route path="/*" element={
-        <AppContainer>
-          <Header />
-          <MainContent>
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+          <Box component="main" sx={{ flex: 1, pt: '70px' }}>
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<HomePage />} />
@@ -101,18 +169,26 @@ function App() {
               <Route path="/offers/:type" element={<OffersPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/about" element={<AboutPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
+
+
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
               
               {/* Protected Customer Routes */}
               <Route
-                path="/my-orders"
+                path="my-orders"
                 element={
                   <ProtectedRoute>
                     <UserOrdersPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
                   </ProtectedRoute>
                 }
               />
@@ -120,12 +196,13 @@ function App() {
               {/* 404 Route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </MainContent>
+          </Box>
           <Footer />
           <WhatsAppButton />
-        </AppContainer>
+        </Box>
       } />
-    </Routes>
+      </Routes>
+    </ThemeProvider>
   );
 }
 

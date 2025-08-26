@@ -1,6 +1,6 @@
-# Saiyaara Jewelry Store - Backend
+# Gem-Heart Jewelry Store - Backend
 
-A FastAPI-based backend for the Saiyaara jewelry e-commerce platform.
+A FastAPI-based backend for the Gem-Heart jewelry e-commerce platform.
 
 ## Features
 

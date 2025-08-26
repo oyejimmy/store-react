@@ -1,46 +1,36 @@
 import React, { useEffect, useState } from "react";
 import {
+  Box,
   Card,
-  Row,
-  Col,
+  CardContent,
+  Grid,
   Typography,
-  Statistic,
   Table,
-  Tag,
-  Progress,
-  Spin,
-  message,
-} from "antd";
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  LinearProgress,
+  CircularProgress,
+  Paper,
+  Alert
+} from "@mui/material";
 import {
-  ShoppingOutlined,
-  UserOutlined,
-  DollarOutlined,
-  RiseOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
+  ShoppingBag,
+  Person,
+  AttachMoney,
+  TrendingUp,
+  Visibility,
+  Warning
+} from "@mui/icons-material";
+import { useTheme } from '@mui/material/styles';
 import { adminAPI } from "../../services/api";
-import styled from "styled-components";
-
-
-const { Title, Text } = Typography;
-
-const DashboardContainer = styled.div`
-  padding: 24px;
-  background: #f5f5f5;
-  min-height: 100vh;
-`;
-
-const StatCard = styled(Card)`
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: none;
-  
-  .ant-card-body {
-    padding: 20px;
-  }
-`;
 
 const AdminDashboard: React.FC = () => {
+  const theme = useTheme();
+
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalOrders: 0,
@@ -66,7 +56,6 @@ const AdminDashboard: React.FC = () => {
         adminAPI.getAllOrders()
       ]);
       
-      // Calculate low stock items (stock < 10)
       const lowStock = products.filter((product: any) => 
         (product.stock_quantity || product.stock || 0) < 10
       ).map((product: any) => ({
@@ -77,13 +66,11 @@ const AdminDashboard: React.FC = () => {
       }));
       
       setLowStockItems(lowStock);
-      // Sort orders by creation date and get latest 3
       const sortedOrders = orders.sort((a: any, b: any) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
       setRecentOrders(sortedOrders.slice(0, 3));
       
-      // Calculate category statistics
       const categories = ['Anklets', 'Bangles', 'Bracelets', 'Combos', 'Ear Studs', 'Earrings', 'Hoops', 'Pendants', 'Rings', 'Wall Frame Design', 'Hair Accessories'];
       const categoryData = categories.map(category => {
         const categoryProducts = products.filter((product: any) => 
@@ -108,7 +95,7 @@ const AdminDashboard: React.FC = () => {
         pendingOrders: orders.filter((order: any) => order.status === 'pending').length,
       });
     } catch (error) {
-      message.error('Failed to fetch dashboard data');
+      alert('Failed to fetch dashboard data');
     } finally {
       setLoading(false);
     }
@@ -117,246 +104,238 @@ const AdminDashboard: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "orange";
+        return "warning";
       case "processing":
-        return "blue";
+        return "info";
       case "shipped":
-        return "purple";
+        return "secondary";
       case "delivered":
-        return "green";
+        return "success";
       default:
         return "default";
     }
   };
 
-  const orderColumns = [
-    {
-      title: "Order ID",
-      dataIndex: "order_number",
-      key: "order_number",
-    },
-    {
-      title: "Customer",
-      dataIndex: "customer_name",
-      key: "customer_name",
-    },
-    {
-      title: "Amount",
-      dataIndex: "total_amount",
-      key: "total_amount",
-      render: (amount: number) => `PKR ${amount || 0}`,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => (
-        <Tag color={getStatusColor(status)}>{status?.toUpperCase() || 'PENDING'}</Tag>
-      ),
-    },
-    {
-      title: "Date",
-      dataIndex: "created_at",
-      key: "created_at",
-      render: (date: string) => new Date(date).toLocaleDateString(),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: () => (
-        <EyeOutlined style={{ color: "#1890ff", cursor: "pointer" }} />
-      ),
-    },
-  ];
-
-  const stockColumns = [
-    {
-      title: "Product",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Current Stock",
-      dataIndex: "stock",
-      key: "stock",
-      render: (stock: number) => (
-        <Tag color={stock === 0 ? 'red' : stock < 5 ? 'orange' : 'green'}>
-          {stock}
-        </Tag>
-      ),
-    },
-    {
-      title: "Stock Level",
-      key: "stockLevel",
-      render: (_: any, record: any) => (
-        <Progress
-          percent={Math.round((record.stock / record.threshold) * 100)}
-          size="small"
-          status={record.stock === 0 ? "exception" : record.stock < 5 ? "active" : "normal"}
-        />
-      ),
-    },
-  ];
+  const StatCard = ({ title, value, icon, color }: any) => (
+    <Card sx={{ height: '100%' }}>
+      <CardContent>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box>
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              {title}
+            </Typography>
+            <Typography variant="h4" sx={{ color, fontWeight: 'bold' }}>
+              {value}
+            </Typography>
+          </Box>
+          <Box sx={{ color, fontSize: 40 }}>
+            {icon}
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
 
   if (loading) {
     return (
-      <DashboardContainer>
-        <div style={{ textAlign: 'center', padding: '50px' }}>
-          <Spin size="large" />
-        </div>
-      </DashboardContainer>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <CircularProgress size={60} />
+      </Box>
     );
   }
 
   return (
-    <DashboardContainer>
-      <Title level={2} style={{ color: '#d4af37', marginBottom: '24px' }}>Admin Dashboard</Title>
+    <Box sx={{ p: 0, backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+      <Typography variant="h4" sx={{ color: theme.palette.primary.main, mb: 0, fontWeight: 'bold' }}>
+        Admin Dashboard
+      </Typography>
 
       {/* Statistics Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
-        <Col xs={24} sm={12} lg={6}>
-          <StatCard>
-            <Statistic
-              title="Total Products"
-              value={stats.totalProducts}
-              prefix={<ShoppingOutlined />}
-              valueStyle={{ color: "#1890ff" }}
-            />
-          </StatCard>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <StatCard>
-            <Statistic
-              title="Total Orders"
-              value={stats.totalOrders}
-              prefix={<ShoppingOutlined />}
-              valueStyle={{ color: "#52c41a" }}
-            />
-          </StatCard>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <StatCard>
-            <Statistic
-              title="Total Revenue"
-              value={stats.totalRevenue}
-              prefix={<DollarOutlined />}
-              suffix="PKR"
-              valueStyle={{ color: "#d4af37" }}
-            />
-          </StatCard>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <StatCard>
-            <Statistic
-              title="Total Customers"
-              value={stats.totalCustomers}
-              prefix={<UserOutlined />}
-              valueStyle={{ color: "#722ed1" }}
-            />
-          </StatCard>
-        </Col>
-      </Row>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6} lg={3}>
+          <StatCard
+            title="Total Products"
+            value={stats.totalProducts}
+            icon={<ShoppingBag />}
+            color={theme.palette.info.main}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} lg={3}>
+          <StatCard
+            title="Total Orders"
+            value={stats.totalOrders}
+            icon={<ShoppingBag />}
+            color={theme.palette.success.main}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} lg={3}>
+          <StatCard
+            title="Total Revenue"
+            value={`PKR ${stats.totalRevenue}`}
+            icon={<AttachMoney />}
+            color={theme.palette.primary.main}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} lg={3}>
+          <StatCard
+            title="Total Customers"
+            value={stats.totalCustomers}
+            icon={<Person />}
+            color={theme.palette.secondary.main}
+          />
+        </Grid>
+      </Grid>
 
       {/* Alerts */}
-      <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
-        <Col xs={24} lg={12}>
-          <StatCard>
-            <Title level={4}>
-              <RiseOutlined style={{ marginRight: "8px" }} />
-              Low Stock Alerts
-            </Title>
-            <Text type="secondary">
-              {stats.lowStockProducts} products need restocking
-            </Text>
-            <Table
-              columns={stockColumns}
-              dataSource={lowStockItems}
-              pagination={false}
-              size="small"
-              style={{ marginTop: "16px" }}
-            />
-          </StatCard>
-        </Col>
-        <Col xs={24} lg={12}>
-          <StatCard>
-            <Title level={4}>
-              <ShoppingOutlined style={{ marginRight: "8px" }} />
-              Pending Orders
-            </Title>
-            <Text type="secondary">
-              {stats.pendingOrders} orders awaiting processing
-            </Text>
-            <div style={{ marginTop: "16px" }}>
-              <Progress
-                percent={Math.round(
-                  (stats.pendingOrders / stats.totalOrders) * 100
-                )}
-                status="active"
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} lg={6}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <TrendingUp sx={{ mr: 1, color: theme.palette.warning.main }} />
+                <Typography variant="h6">Low Stock Alerts</Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {stats.lowStockProducts} products need restocking
+              </Typography>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Product</TableCell>
+                      <TableCell>Stock</TableCell>
+                      <TableCell>Level</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {lowStockItems.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={item.stock}
+                            color={item.stock === 0 ? 'error' : item.stock < 5 ? 'warning' : 'success'}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <LinearProgress
+                            variant="determinate"
+                            value={Math.min((item.stock / item.threshold) * 100, 100)}
+                            color={item.stock === 0 ? 'error' : item.stock < 5 ? 'warning' : 'success'}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} lg={6}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <ShoppingBag sx={{ mr: 1, color: theme.palette.info.main }} />
+                <Typography variant="h6">Pending Orders</Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {stats.pendingOrders} orders awaiting processing
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={stats.totalOrders > 0 ? (stats.pendingOrders / stats.totalOrders) * 100 : 0}
+                sx={{ height: 8, borderRadius: 4 }}
               />
-            </div>
-          </StatCard>
-        </Col>
-      </Row>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Category Statistics */}
-      <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
-        <Col span={24}>
-          <StatCard>
-            <Title level={4}>📊 Category Statistics</Title>
-            <Table
-              columns={[
-                {
-                  title: 'Category',
-                  dataIndex: 'category',
-                  key: 'category',
-                  render: (category: string) => (
-                    <Tag color="gold">{category}</Tag>
-                  ),
-                },
-                {
-                  title: 'Total Products',
-                  dataIndex: 'totalProducts',
-                  key: 'totalProducts',
-                },
-                {
-                  title: 'Stock Available',
-                  dataIndex: 'totalStock',
-                  key: 'totalStock',
-                  render: (stock: number) => (
-                    <Tag color={stock > 50 ? 'green' : stock > 20 ? 'orange' : 'red'}>
-                      {stock}
-                    </Tag>
-                  ),
-                },
-                {
-                  title: 'Total Sold',
-                  dataIndex: 'totalSold',
-                  key: 'totalSold',
-                  render: (sold: number) => (
-                    <Tag color="blue">{sold}</Tag>
-                  ),
-                },
-              ]}
-              dataSource={categoryStats}
-              pagination={false}
-              size="small"
-              rowKey="category"
-            />
-          </StatCard>
-        </Col>
-      </Row>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>📊 Category Statistics</Typography>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Category</TableCell>
+                      <TableCell>Total Products</TableCell>
+                      <TableCell>Stock Available</TableCell>
+                      <TableCell>Total Sold</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {categoryStats.map((category) => (
+                      <TableRow key={category.category}>
+                        <TableCell>
+                          <Chip label={category.category} color="primary" />
+                        </TableCell>
+                        <TableCell>{category.totalProducts}</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={category.totalStock}
+                            color={category.totalStock > 50 ? 'success' : category.totalStock > 20 ? 'warning' : 'error'}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Chip label={category.totalSold} color="info" />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Recent Orders */}
-      <StatCard>
-        <Title level={4}>Recent Orders</Title>
-        <Table
-          columns={orderColumns}
-          dataSource={recentOrders}
-          pagination={false}
-          size="small"
-        />
-      </StatCard>
-    </DashboardContainer>
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>Recent Orders</Typography>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Order ID</TableCell>
+                  <TableCell>Customer</TableCell>
+                  <TableCell>Amount</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {recentOrders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell>{order.order_number}</TableCell>
+                    <TableCell>{order.customer_name}</TableCell>
+                    <TableCell>PKR {order.total_amount || 0}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={order.status?.toUpperCase() || 'PENDING'}
+                        color={getStatusColor(order.status) as any}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Visibility sx={{ color: theme.palette.info.main, cursor: 'pointer' }} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

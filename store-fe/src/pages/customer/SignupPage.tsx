@@ -1,202 +1,310 @@
-import React from 'react';
-import { Form, Input, Button, Typography, Card, message, Divider, Checkbox } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  Typography,
+  Divider,
+  FormControlLabel,
+  Checkbox,
+  Grid,
+  Alert,
+  CircularProgress,
+  InputAdornment
+} from '@mui/material';
+import {
+  Person,
+  Email,
+  Phone,
+  Lock
+} from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../store';
 import { signup } from '../../store/slices/authSlice';
-import styled from 'styled-components';
-
-const { Title, Text } = Typography;
-
-const SignupContainer = styled.div`
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 20px;
-`;
-
-const SignupCard = styled(Card)`
-  width: 100%;
-  max-width: 500px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-`;
+import { useTheme } from '@mui/material/styles';
 
 const SignupPage: React.FC = () => {
+  const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.auth);
-  const [form] = Form.useForm();
+  
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    agreement: false
+  });
+  const [errors, setErrors] = useState<any>({});
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleSubmit = async (values: any) => {
+  const validateForm = () => {
+    const newErrors: any = {};
+    
+    if (!formData.firstName) newErrors.firstName = 'First name is required';
+    if (!formData.lastName) newErrors.lastName = 'Last name is required';
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email';
+    }
+    if (!formData.phone) newErrors.phone = 'Phone number is required';
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    if (!formData.agreement) {
+      newErrors.agreement = 'Please accept the terms and conditions';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       const signupData = {
-        email: values.email,
-        username: values.email.split('@')[0], // Use email prefix as username
-        full_name: `${values.first_name} ${values.last_name}`,
-        phone: values.phone,
-        password: values.password
+        email: formData.email,
+        username: formData.email.split('@')[0],
+        full_name: `${formData.firstName} ${formData.lastName}`,
+        phone: formData.phone,
+        password: formData.password
       };
       await dispatch(signup(signupData)).unwrap();
-      message.success('Account created successfully! Please log in.');
-      navigate('/login');
+      setShowSuccess(true);
+      setTimeout(() => navigate('/login'), 2000);
     } catch (error: any) {
-      message.error(error.message || 'Registration failed. Please try again.');
+      setErrors({ submit: error.message || 'Registration failed. Please try again.' });
+    }
+  };
+
+  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: '' });
     }
   };
 
   return (
-    <SignupContainer>
-      <SignupCard>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <Title level={2} style={{ color: '#d4af37', marginBottom: '8px' }}>
-            Join Saiyaara
-          </Title>
-          <Text type="secondary">Create your account to start shopping</Text>
-        </div>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        // Background handled by App.tsx
+        p: 3,
+        overflow: 'hidden',
+      }}
+    >
+      <Card sx={{ width: '100%', maxWidth: 500, borderRadius: 3, boxShadow: 3 }}>
+        <CardContent sx={{ p: 4 }}>
+          <Box textAlign="center" mb={4}>
+            <Typography variant="h4" sx={{ color: theme.palette.primary.main, mb: 1, fontWeight: 'bold' }}>
+              Join Gem-Heart
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Create your account to start shopping
+            </Typography>
+          </Box>
 
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          size="large"
-        >
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <Form.Item
-              name="first_name"
-              label="First Name"
-              rules={[{ required: true, message: 'Please enter your first name' }]}
-              style={{ flex: 1 }}
-            >
-              <Input 
-                prefix={<UserOutlined />} 
-                placeholder="First name"
-              />
-            </Form.Item>
+          {showSuccess && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              Account created successfully! Redirecting to login...
+            </Alert>
+          )}
 
-            <Form.Item
-              name="last_name"
-              label="Last Name"
-              rules={[{ required: true, message: 'Please enter your last name' }]}
-              style={{ flex: 1 }}
-            >
-              <Input 
-                prefix={<UserOutlined />} 
-                placeholder="Last name"
-              />
-            </Form.Item>
-          </div>
+          {errors.submit && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {errors.submit}
+            </Alert>
+          )}
 
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: 'Please enter your email' },
-              { type: 'email', message: 'Please enter a valid email' }
-            ]}
-          >
-            <Input 
-              prefix={<MailOutlined />} 
-              placeholder="Enter your email"
+          <Box component="form" onSubmit={handleSubmit}>
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="First Name"
+                  placeholder="Enter your first name"
+                  value={formData.firstName}
+                  onChange={handleChange('firstName')}
+                  error={!!errors.firstName}
+                  helperText={errors.firstName}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Person />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Last Name"
+                  placeholder="Enter your last name"
+                  value={formData.lastName}
+                  onChange={handleChange('lastName')}
+                  error={!!errors.lastName}
+                  helperText={errors.lastName}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Person />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+            </Grid>
+
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+              placeholder="Enter your email address"
+              value={formData.email}
+              onChange={handleChange('email')}
+              error={!!errors.email}
+              helperText={errors.email}
+              sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email />
+                  </InputAdornment>
+                )
+              }}
             />
-          </Form.Item>
 
-          <Form.Item
-            name="phone"
-            label="Phone Number"
-            rules={[{ required: true, message: 'Please enter your phone number' }]}
-          >
-            <Input 
-              prefix={<PhoneOutlined />} 
+            <TextField
+              fullWidth
+              label="Phone Number"
               placeholder="Enter your phone number"
+              value={formData.phone}
+              onChange={handleChange('phone')}
+              error={!!errors.phone}
+              helperText={errors.phone}
+              sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Phone />
+                  </InputAdornment>
+                )
+              }}
             />
-          </Form.Item>
 
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[
-              { required: true, message: 'Please enter your password' },
-              { min: 6, message: 'Password must be at least 6 characters' }
-            ]}
-          >
-            <Input.Password 
-              prefix={<LockOutlined />} 
+            <TextField
+              fullWidth
+              label="Password"
+              type="password"
               placeholder="Create a password"
+              value={formData.password}
+              onChange={handleChange('password')}
+              error={!!errors.password}
+              helperText={errors.password}
+              sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock />
+                  </InputAdornment>
+                )
+              }}
             />
-          </Form.Item>
 
-          <Form.Item
-            name="confirm_password"
-            label="Confirm Password"
-            dependencies={['password']}
-            rules={[
-              { required: true, message: 'Please confirm your password' },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue('password') === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('Passwords do not match'));
-                },
-              }),
-            ]}
-          >
-            <Input.Password 
-              prefix={<LockOutlined />} 
+            <TextField
+              fullWidth
+              label="Confirm Password"
+              type="password"
               placeholder="Confirm your password"
+              value={formData.confirmPassword}
+              onChange={handleChange('confirmPassword')}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword}
+              sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock />
+                  </InputAdornment>
+                )
+              }}
             />
-          </Form.Item>
 
-          <Form.Item
-            name="agreement"
-            valuePropName="checked"
-            rules={[
-              {
-                validator: (_, value) =>
-                  value ? Promise.resolve() : Promise.reject(new Error('Please accept the terms and conditions')),
-              },
-            ]}
-          >
-            <Checkbox>
-              I agree to the{' '}
-              <Link to="/terms" style={{ color: '#d4af37' }}>
-                Terms and Conditions
-              </Link>{' '}
-              and{' '}
-              <Link to="/privacy" style={{ color: '#d4af37' }}>
-                Privacy Policy
-              </Link>
-            </Checkbox>
-          </Form.Item>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.agreement}
+                  onChange={handleChange('agreement')}
+                  sx={{ color: errors.agreement ? 'error.main' : 'inherit' }}
+                />
+              }
+              label={
+                <Typography variant="body2">
+                  I agree to the{' '}
+                  <Link to="/terms" style={{ color: theme.palette.primary.main }}>
+                    Terms and Conditions
+                  </Link>{' '}
+                  and{' '}
+                  <Link to="/privacy" style={{ color: theme.palette.primary.main }}>
+                    Privacy Policy
+                  </Link>
+                </Typography>
+              }
+              sx={{ mb: 2 }}
+            />
+            {errors.agreement && (
+              <Typography variant="caption" color="error" sx={{ display: 'block', mt: -1, mb: 2 }}>
+                {errors.agreement}
+              </Typography>
+            )}
 
-          <Form.Item>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              loading={loading}
-              style={{ width: '100%', height: '48px' }}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              size="large"
+              disabled={loading}
+              sx={{ height: 48, mb: 2 }}
             >
-              Create Account
+              {loading ? <CircularProgress size={24} /> : 'Create Account'}
             </Button>
-          </Form.Item>
-        </Form>
+          </Box>
 
-        <Divider>
-          <Text type="secondary">or</Text>
-        </Divider>
+          <Divider sx={{ my: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              or
+            </Typography>
+          </Divider>
 
-        <div style={{ textAlign: 'center' }}>
-          <Text type="secondary">Already have an account? </Text>
-          <Link to="/login" style={{ color: '#d4af37', fontWeight: 'bold' }}>
-            Sign in here
-          </Link>
-        </div>
-      </SignupCard>
-    </SignupContainer>
+          <Box textAlign="center">
+            <Typography variant="body2" color="text.secondary">
+              Already have an account?{' '}
+              <Link to="/login" style={{ color: theme.palette.primary.main, fontWeight: 'bold', textDecoration: 'none' }}>
+                Sign in here
+              </Link>
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

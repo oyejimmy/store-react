@@ -1,40 +1,59 @@
-import React from 'react';
-import { Form, Input, Button, Typography, Card, message, Divider } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  Typography,
+  Divider,
+  Alert,
+  InputAdornment,
+  useTheme,
+} from '@mui/material';
+import { Person, Lock, Email } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../store';
 import { login } from '../../store/slices/authSlice';
-import styled from 'styled-components';
 
-const { Title, Text } = Typography;
 
-const LoginContainer = styled.div`
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 20px;
-`;
-
-const LoginCard = styled(Card)`
-  width: 100%;
-  max-width: 400px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-`;
 
 const LoginPage: React.FC = () => {
+  const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.auth);
-  const [form] = Form.useForm();
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formErrors, setFormErrors] = useState({ email: '', password: '' });
 
-  const handleSubmit = async (values: any) => {
+  const validateForm = () => {
+    const errors = { email: '', password: '' };
+    let isValid = true;
+
+    if (!formData.email) {
+      errors.email = 'Please enter your email';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Please enter a valid email';
+      isValid = false;
+    }
+
+    if (!formData.password) {
+      errors.password = 'Please enter your password';
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
     try {
-      const result = await dispatch(login(values)).unwrap();
-      message.success('Login successful!');
+      const result = await dispatch(login(formData)).unwrap();
       
       // Redirect admin users to admin panel
       if (result.user && result.user.is_admin) {
@@ -43,81 +62,160 @@ const LoginPage: React.FC = () => {
         navigate('/');
       }
     } catch (error: any) {
-      message.error(error.message || 'Login failed. Please try again.');
+      // Error is handled by the error state
+    }
+  };
+
+  const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [field]: e.target.value });
+    if (formErrors[field as keyof typeof formErrors]) {
+      setFormErrors({ ...formErrors, [field]: '' });
     }
   };
 
   return (
-    <LoginContainer>
-      <LoginCard>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <Title level={2} style={{ color: '#d4af37', marginBottom: '8px' }}>
-            Welcome Back
-          </Title>
-          <Text type="secondary">Sign in to your Saiyaara account</Text>
-        </div>
-
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          size="large"
-        >
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: 'Please enter your email' },
-              { type: 'email', message: 'Please enter a valid email' }
-            ]}
-          >
-            <Input 
-              prefix={<MailOutlined />} 
-              placeholder="Enter your email"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: true, message: 'Please enter your password' }]}
-          >
-            <Input.Password 
-              prefix={<LockOutlined />} 
-              placeholder="Enter your password"
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              loading={loading}
-              style={{ width: '100%', height: '48px' }}
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        // Background handled by App.tsx
+        p: 2.5,
+        overflow: 'hidden',
+      }}
+    >
+      <Card
+        sx={{
+          width: '100%',
+          maxWidth: 400,
+          borderRadius: 3,
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+        }}
+      >
+        <CardContent sx={{ p: 4 }}>
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Typography
+              variant="h4"
+              sx={{
+                color: theme.palette.primary.main,
+                mb: 1,
+                fontWeight: 600,
+              }}
             >
-              Sign In
+              Welcome Back
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Sign in to your Saiyaara account
+            </Typography>
+          </Box>
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
+
+          <Box component="form" onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange('email')}
+              error={!!formErrors.email}
+              helperText={formErrors.email}
+              placeholder="Enter your email"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ mb: 3 }}
+            />
+
+            <TextField
+              fullWidth
+              label="Password"
+              type="password"
+              value={formData.password}
+              onChange={handleInputChange('password')}
+              error={!!formErrors.password}
+              helperText={formErrors.password}
+              placeholder="Enter your password"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ mb: 3 }}
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              size="large"
+              disabled={loading}
+              sx={{
+                height: 48,
+                mb: 3,
+              }}
+            >
+              {loading ? 'Signing In...' : 'Sign In'}
             </Button>
-          </Form.Item>
-        </Form>
+          </Box>
 
-        <Divider>
-          <Text type="secondary">or</Text>
-        </Divider>
+          <Divider sx={{ mb: 3 }}>
+            <Typography variant="body2" color="text.secondary">
+              or
+            </Typography>
+          </Divider>
 
-        <div style={{ textAlign: 'center' }}>
-          <Text type="secondary">Don't have an account? </Text>
-          <Link to="/signup" style={{ color: '#d4af37', fontWeight: 'bold' }}>
-            Sign up here
-          </Link>
-        </div>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
+              Don't have an account?{' '}
+              <Typography
+                component={Link}
+                to="/signup"
+                variant="body2"
+                sx={{
+                  color: theme.palette.primary.main,
+                  fontWeight: 'bold',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                  },
+                }}
+              >
+                Sign up here
+              </Typography>
+            </Typography>
+          </Box>
 
-        <div style={{ textAlign: 'center', marginTop: '16px' }}>
-          <Link to="/forgot-password" style={{ color: '#666' }}>
-            Forgot your password?
-          </Link>
-        </div>
-      </LoginCard>
-    </LoginContainer>
+          <Box sx={{ textAlign: 'center', mt: 2 }}>
+            <Typography
+              component={Link}
+              to="/forgot-password"
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              Forgot your password?
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

@@ -4,220 +4,275 @@ import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { removeFromCart, updateQuantity, clearCart } from '../../store/slices/cartSlice';
 import { 
-  Card, 
-  Row, 
-  Col, 
-  Button, 
-  InputNumber, 
-  Typography, 
-  Empty, 
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Button,
+  TextField,
+  Typography,
   Divider,
-  message,
-  Popconfirm
-} from 'antd';
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Paper
+} from '@mui/material';
 import { 
-  DeleteOutlined, 
-  ShoppingOutlined,
-  ArrowLeftOutlined
-} from '@ant-design/icons';
-import styled from 'styled-components';
-
-const { Title, Text } = Typography;
-
-const CartContainer = styled.div`
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const CartItemCard = styled(Card)`
-  margin-bottom: 16px;
-  border-radius: 8px;
-  
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const ProductImage = styled.img`
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 4px;
-`;
-
-const PriceText = styled(Text)`
-  font-size: 18px;
-  font-weight: bold;
-  color: #d4af37;
-`;
-
-const SummaryCard = styled(Card)`
-  position: sticky;
-  top: 24px;
-`;
+  Delete,
+  ShoppingBag,
+  ArrowBack,
+  Add,
+  Remove
+} from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
   const { items } = useSelector((state: RootState) => state.cart);
+  const [clearDialogOpen, setClearDialogOpen] = React.useState(false);
+  const [removeDialogOpen, setRemoveDialogOpen] = React.useState(false);
+  const [itemToRemove, setItemToRemove] = React.useState<number | null>(null);
 
   const handleQuantityChange = (productId: number, quantity: number) => {
     if (quantity > 0) {
-              dispatch(updateQuantity({ itemId: productId, quantity }));
+      dispatch(updateQuantity({ itemId: productId, quantity }));
     }
   };
 
   const handleRemoveItem = (productId: number) => {
     dispatch(removeFromCart(productId));
-    message.success('Item removed from cart');
+    alert('Item removed from cart');
+    setRemoveDialogOpen(false);
+    setItemToRemove(null);
   };
 
   const handleClearCart = () => {
     dispatch(clearCart());
-    message.success('Cart cleared');
+    alert('Cart cleared');
+    setClearDialogOpen(false);
   };
 
   const handleCheckout = () => {
     if (items.length > 0) {
       navigate('/checkout');
     } else {
-      message.warning('Your cart is empty');
+      alert('Your cart is empty');
     }
   };
 
   const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shipping = subtotal > 0 ? 50 : 0; // Free shipping over certain amount
+  const shipping = subtotal > 0 ? 50 : 0;
   const total = subtotal + shipping;
 
   if (items.length === 0) {
     return (
-      <CartContainer>
-        <div style={{ textAlign: 'center', padding: '50px' }}>
-          <Empty
-            image={<ShoppingOutlined style={{ fontSize: '64px', color: '#d4af37' }} />}
-            description="Your cart is empty"
-          >
-            <Button type="primary" onClick={() => navigate('/shop')}>
-              Start Shopping
-            </Button>
-          </Empty>
-        </div>
-      </CartContainer>
+      <Box sx={{ textAlign: 'center', py: 8, px: 3 }}>
+        <ShoppingBag sx={{ fontSize: 80, color: theme.palette.primary.main, mb: 2 }} />
+        <Typography variant="h4" gutterBottom>
+          Your cart is empty
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          Looks like you haven't added anything to your cart yet
+        </Typography>
+        <Button variant="contained" size="large" onClick={() => navigate('/shop')}>
+          Start Shopping
+        </Button>
+      </Box>
     );
   }
 
   return (
-    <CartContainer>
-      <div style={{ marginBottom: '24px' }}>
+    <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+      <Box sx={{ mb: 3 }}>
         <Button 
-          icon={<ArrowLeftOutlined />} 
+          startIcon={<ArrowBack />} 
           onClick={() => navigate(-1)}
-          style={{ marginBottom: '16px' }}
+          sx={{ mb: 2 }}
         >
           Continue Shopping
         </Button>
-        <Title level={2}>Shopping Cart ({items.length} items)</Title>
-      </div>
+        <Typography variant="h4" gutterBottom>
+          Shopping Cart ({items.length} items)
+        </Typography>
+      </Box>
 
-      <Row gutter={[24, 24]}>
-        <Col xs={24} lg={16}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} lg={8}>
           {items.map((item) => (
-            <CartItemCard key={item.id}>
-              <Row gutter={16} align="middle">
-                <Col xs={24} sm={4}>
-                  <ProductImage src={item.image_url} alt={item.name} />
-                </Col>
-                <Col xs={24} sm={8}>
-                  <Title level={5}>{item.name}</Title>
-                  <Text type="secondary">Premium Quality</Text>
-                </Col>
-                <Col xs={12} sm={4}>
-                  <PriceText>₹{item.price}</PriceText>
-                </Col>
-                <Col xs={12} sm={4}>
-                  <InputNumber
-                    min={1}
-                    max={99}
-                    value={item.quantity}
-                    onChange={(value) => handleQuantityChange(item.id, value || 1)}
-                    style={{ width: '80px' }}
-                  />
-                </Col>
-                <Col xs={12} sm={2}>
-                  <PriceText>₹{item.price * item.quantity}</PriceText>
-                </Col>
-                <Col xs={12} sm={2}>
-                  <Popconfirm
-                    title="Remove this item?"
-                    onConfirm={() => handleRemoveItem(item.id)}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <Button 
-                      type="text" 
-                      danger 
-                      icon={<DeleteOutlined />}
+            <Card key={item.id} sx={{ mb: 2 }}>
+              <CardContent>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={3}>
+                    <Box
+                      component="img"
+                      src={item.image_url}
+                      alt={item.name}
+                      sx={{
+                        width: '100%',
+                        height: 100,
+                        objectFit: 'cover',
+                        borderRadius: 1
+                      }}
                     />
-                  </Popconfirm>
-                </Col>
-              </Row>
-            </CartItemCard>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Typography variant="h6" gutterBottom>
+                      {item.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Premium Quality
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} sm={2}>
+                    <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+                      ₹{item.price}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} sm={2}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                        disabled={item.quantity <= 1}
+                      >
+                        <Remove />
+                      </IconButton>
+                      <TextField
+                        size="small"
+                        value={item.quantity}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 1;
+                          if (value >= 1 && value <= 99) {
+                            handleQuantityChange(item.id, value);
+                          }
+                        }}
+                        inputProps={{ 
+                          style: { textAlign: 'center', width: '40px' },
+                          min: 1,
+                          max: 99
+                        }}
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                        disabled={item.quantity >= 99}
+                      >
+                        <Add />
+                      </IconButton>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6} sm={1}>
+                    <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+                      ₹{item.price * item.quantity}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} sm={1}>
+                    <IconButton
+                      color="error"
+                      onClick={() => {
+                        setItemToRemove(item.id);
+                        setRemoveDialogOpen(true);
+                      }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
           ))}
 
-          <div style={{ textAlign: 'right', marginTop: '16px' }}>
-            <Popconfirm
-              title="Clear all items?"
-              onConfirm={handleClearCart}
-              okText="Yes"
-              cancelText="No"
+          <Box sx={{ textAlign: 'right', mt: 2 }}>
+            <Button 
+              color="error" 
+              variant="outlined"
+              onClick={() => setClearDialogOpen(true)}
             >
-              <Button danger>Clear Cart</Button>
-            </Popconfirm>
-          </div>
-        </Col>
+              Clear Cart
+            </Button>
+          </Box>
+        </Grid>
 
-        <Col xs={24} lg={8}>
-          <SummaryCard>
-            <Title level={3}>Order Summary</Title>
-            <Divider />
+        <Grid item xs={12} lg={4}>
+          <Paper sx={{ p: 3, position: 'sticky', top: 24 }}>
+            <Typography variant="h5" gutterBottom>
+              Order Summary
+            </Typography>
+            <Divider sx={{ my: 2 }} />
             
-            <Row justify="space-between" style={{ marginBottom: '8px' }}>
-              <Text>Subtotal ({items.length} items):</Text>
-              <Text>₹{subtotal}</Text>
-            </Row>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography>Subtotal ({items.length} items):</Typography>
+              <Typography>₹{subtotal}</Typography>
+            </Box>
             
-            <Row justify="space-between" style={{ marginBottom: '8px' }}>
-              <Text>Shipping:</Text>
-              <Text>{shipping === 0 ? 'Free' : `₹${shipping}`}</Text>
-            </Row>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography>Shipping:</Typography>
+              <Typography>{shipping === 0 ? 'Free' : `₹${shipping}`}</Typography>
+            </Box>
             
-            <Divider />
+            <Divider sx={{ my: 2 }} />
             
-            <Row justify="space-between" style={{ marginBottom: '16px' }}>
-              <Text strong style={{ fontSize: '18px' }}>Total:</Text>
-              <PriceText>₹{total}</PriceText>
-            </Row>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+              <Typography variant="h6">Total:</Typography>
+              <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+                ₹{total}
+              </Typography>
+            </Box>
             
             <Button 
-              type="primary" 
-              size="large" 
-              block
+              variant="contained"
+              size="large"
+              fullWidth
               onClick={handleCheckout}
-              icon={<ShoppingOutlined />}
+              startIcon={<ShoppingBag />}
+              sx={{ mb: 2 }}
             >
               Proceed to Checkout
             </Button>
             
-            <div style={{ marginTop: '16px', textAlign: 'center' }}>
-              <Text type="secondary">
-                Secure checkout with SSL encryption
-              </Text>
-            </div>
-          </SummaryCard>
-        </Col>
-      </Row>
-    </CartContainer>
+            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+              Secure checkout with SSL encryption
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      {/* Remove Item Dialog */}
+      <Dialog open={removeDialogOpen} onClose={() => setRemoveDialogOpen(false)}>
+        <DialogTitle>Remove Item</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to remove this item from your cart?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRemoveDialogOpen(false)}>Cancel</Button>
+          <Button 
+            onClick={() => itemToRemove && handleRemoveItem(itemToRemove)} 
+            color="error"
+            variant="contained"
+          >
+            Remove
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Clear Cart Dialog */}
+      <Dialog open={clearDialogOpen} onClose={() => setClearDialogOpen(false)}>
+        <DialogTitle>Clear Cart</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to clear all items from your cart?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setClearDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleClearCart} color="error" variant="contained">
+            Clear All
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 

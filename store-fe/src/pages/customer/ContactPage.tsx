@@ -1,183 +1,251 @@
-import React from 'react';
-import { Form, Input, Button, Typography, Row, Col, Card, message } from 'antd';
-import { MailOutlined, PhoneOutlined, EnvironmentOutlined, SendOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
-
-const { Title, Text, Paragraph } = Typography;
-const { TextArea } = Input;
-
-const ContactContainer = styled.div`
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const ContactCard = styled(Card)`
-  margin-bottom: 24px;
-  border-radius: 8px;
-`;
+import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  Paper,
+  Alert
+} from '@mui/material';
+import {
+  Email,
+  Phone,
+  LocationOn,
+  Send
+} from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 
 const ContactPage: React.FC = () => {
-  const [form] = Form.useForm();
+  const theme = useTheme();
 
-  const handleSubmit = async (values: any) => {
+  
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+  const [errors, setErrors] = useState<any>({});
+
+  const validateForm = () => {
+    const newErrors: any = {};
+    
+    if (!formData.firstName) newErrors.firstName = 'First name is required';
+    if (!formData.lastName) newErrors.lastName = 'Last name is required';
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email';
+    }
+    if (!formData.phone) newErrors.phone = 'Phone number is required';
+    if (!formData.subject) newErrors.subject = 'Subject is required';
+    if (!formData.message) newErrors.message = 'Message is required';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       // Here you would typically send the form data to your backend
-      console.log('Contact form submitted:', values);
-      message.success('Thank you for your message! We\'ll get back to you soon.');
-      form.resetFields();
+      console.log('Contact form submitted:', formData);
+      alert("Thank you for your message! We'll get back to you soon.");
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: ''
+      });
     } catch (error) {
-      message.error('Failed to send message. Please try again.');
+      alert('Failed to send message. Please try again.');
+    }
+  };
+
+  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [field]: e.target.value });
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: '' });
     }
   };
 
   return (
-    <ContactContainer>
-      <Title level={1} style={{ textAlign: 'center', marginBottom: '32px' }}>
+    <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+      <Typography variant="h3" sx={{ textAlign: 'center', mb: 4, fontWeight: 'bold' }}>
         Contact Us
-      </Title>
+      </Typography>
       
-      <Row gutter={[32, 32]}>
-        <Col xs={24} lg={16}>
-          <ContactCard>
-            <Title level={3}>Send us a Message</Title>
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={handleSubmit}
-            >
-              <Row gutter={16}>
-                <Col xs={24} sm={12}>
-                  <Form.Item
-                    name="firstName"
-                    label="First Name"
-                    rules={[{ required: true, message: 'Please enter your first name' }]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} sm={12}>
-                  <Form.Item
-                    name="lastName"
-                    label="Last Name"
-                    rules={[{ required: true, message: 'Please enter your last name' }]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-              </Row>
-              
-              <Row gutter={16}>
-                <Col xs={24} sm={12}>
-                  <Form.Item
-                    name="email"
-                    label="Email"
-                    rules={[
-                      { required: true, message: 'Please enter your email' },
-                      { type: 'email', message: 'Please enter a valid email' }
-                    ]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} sm={12}>
-                  <Form.Item
-                    name="phone"
-                    label="Phone Number"
-                    rules={[{ required: true, message: 'Please enter your phone number' }]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-              </Row>
-              
-              <Form.Item
-                name="subject"
-                label="Subject"
-                rules={[{ required: true, message: 'Please enter a subject' }]}
-              >
-                <Input />
-              </Form.Item>
-              
-              <Form.Item
-                name="message"
-                label="Message"
-                rules={[{ required: true, message: 'Please enter your message' }]}
-              >
-                <TextArea rows={6} />
-              </Form.Item>
-              
-              <Form.Item>
-                <Button 
-                  type="primary" 
-                  htmlType="submit" 
-                  size="large"
-                  icon={<SendOutlined />}
-                >
-                  Send Message
-                </Button>
-              </Form.Item>
-            </Form>
-          </ContactCard>
-        </Col>
+      <Grid container spacing={4}>
+        <Grid item xs={12} lg={8}>
+          <Card>
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="h4" gutterBottom>
+                Send us a Message
+              </Typography>
+              <Box component="form" onSubmit={handleSubmit}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="First Name"
+                      value={formData.firstName}
+                      onChange={handleChange('firstName')}
+                      error={!!errors.firstName}
+                      helperText={errors.firstName}
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Last Name"
+                      value={formData.lastName}
+                      onChange={handleChange('lastName')}
+                      error={!!errors.lastName}
+                      helperText={errors.lastName}
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange('email')}
+                      error={!!errors.email}
+                      helperText={errors.email}
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Phone Number"
+                      value={formData.phone}
+                      onChange={handleChange('phone')}
+                      error={!!errors.phone}
+                      helperText={errors.phone}
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Subject"
+                      value={formData.subject}
+                      onChange={handleChange('subject')}
+                      error={!!errors.subject}
+                      helperText={errors.subject}
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Message"
+                      multiline
+                      rows={6}
+                      value={formData.message}
+                      onChange={handleChange('message')}
+                      error={!!errors.message}
+                      helperText={errors.message}
+                      sx={{ mb: 3 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      size="large"
+                      startIcon={<Send />}
+                    >
+                      Send Message
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
         
-        <Col xs={24} lg={8}>
-          <ContactCard>
-            <Title level={3}>Get in Touch</Title>
-            <Paragraph>
-              We'd love to hear from you! Send us a message and we'll respond as soon as possible.
-            </Paragraph>
-            
-            <div style={{ marginBottom: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-                <MailOutlined style={{ fontSize: '20px', color: '#d4af37', marginRight: '12px' }} />
-                <div>
-                  <Text strong>Email</Text>
-                  <br />
-                  <Text>support@saiyaara.com</Text>
-                </div>
-              </div>
+        <Grid item xs={12} lg={4}>
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h5" gutterBottom>
+                Get in Touch
+              </Typography>
+              <Typography variant="body1" paragraph>
+                We'd love to hear from you! Send us a message and we'll respond as soon as possible.
+              </Typography>
               
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-                <PhoneOutlined style={{ fontSize: '20px', color: '#d4af37', marginRight: '12px' }} />
-                <div>
-                  <Text strong>Phone</Text>
-                  <br />
-                  <Text>+91-XXXXXXXXXX</Text>
-                </div>
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <EnvironmentOutlined style={{ fontSize: '20px', color: '#d4af37', marginRight: '12px' }} />
-                <div>
-                  <Text strong>Address</Text>
-                  <br />
-                  <Text>
-                    Saiyaara Jewelry Store<br />
-                    123 Jewelry Street<br />
-                    Mumbai, Maharashtra 400001<br />
-                    India
-                  </Text>
-                </div>
-              </div>
-            </div>
-          </ContactCard>
+              <Box sx={{ mb: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Email sx={{ fontSize: 20, color: theme.palette.primary.main, mr: 1.5 }} />
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight="bold">Email</Typography>
+                    <Typography variant="body2">support@saiyaara.com</Typography>
+                  </Box>
+                </Box>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Phone sx={{ fontSize: 20, color: theme.palette.primary.main, mr: 1.5 }} />
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight="bold">Phone</Typography>
+                    <Typography variant="body2">+91-XXXXXXXXXX</Typography>
+                  </Box>
+                </Box>
+                
+                <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                  <LocationOn sx={{ fontSize: 20, color: theme.palette.primary.main, mr: 1.5, mt: 0.5 }} />
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight="bold">Address</Typography>
+                    <Typography variant="body2">
+                      Saiyaara Jewelry Store<br />
+                      123 Jewelry Street<br />
+                      Mumbai, Maharashtra 400001<br />
+                      India
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
           
-          <ContactCard>
-            <Title level={4}>Business Hours</Title>
-            <div style={{ marginBottom: '8px' }}>
-              <Text strong>Monday - Friday:</Text> 9:00 AM - 8:00 PM
-            </div>
-            <div style={{ marginBottom: '8px' }}>
-              <Text strong>Saturday:</Text> 10:00 AM - 6:00 PM
-            </div>
-            <div>
-              <Text strong>Sunday:</Text> 11:00 AM - 5:00 PM
-            </div>
-          </ContactCard>
-        </Col>
-      </Row>
-    </ContactContainer>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Business Hours
+              </Typography>
+              <Box sx={{ mb: 1 }}>
+                <Typography variant="body2">
+                  <strong>Monday - Friday:</strong> 9:00 AM - 8:00 PM
+                </Typography>
+              </Box>
+              <Box sx={{ mb: 1 }}>
+                <Typography variant="body2">
+                  <strong>Saturday:</strong> 10:00 AM - 6:00 PM
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="body2">
+                  <strong>Sunday:</strong> 11:00 AM - 5:00 PM
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

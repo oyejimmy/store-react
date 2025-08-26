@@ -1,224 +1,137 @@
 import React from "react";
-import { Layout, Row, Col, Typography, Space } from "antd";
+import { Box, Grid, Typography, Link as MuiLink, useTheme, Container, IconButton } from '@mui/material';
 import { Link } from "react-router-dom";
 import {
-  InstagramOutlined,
-  FacebookOutlined,
-  PhoneOutlined,
-  MailOutlined,
-  EnvironmentOutlined,
-} from "@ant-design/icons";
-import styled from "styled-components";
-
-const { Footer: AntFooter } = Layout;
-const { Title, Text } = Typography;
-
-const StyledFooter = styled(AntFooter)`
-  padding: 48px 10% 24px;
-  margin-top: auto;
-  transition: all 0.3s ease;
-  
-  .light-theme & {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    color: #333;
-    border-top: 2px solid #e8e8e8;
-  }
-  
-  .dark-theme & {
-    background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
-    color: #ffffff;
-    border-top: 2px solid #333;
-  }
-  
-  @media (max-width: 768px) {
-    padding: 48px 5% 24px;
-  }
-`;
-
-const FooterSection = styled.div`
-  margin-bottom: 24px;
-`;
-
-const FooterTitle = styled(Title)`
-  font-size: 20px !important;
-  margin-bottom: 16px !important;
-  font-weight: 600 !important;
-  
-  .light-theme & {
-    color: #d4af37 !important;
-  }
-  
-  .dark-theme & {
-    color: #d4af37 !important;
-  }
-`;
-
-const FooterLink = styled(Link)`
-  text-decoration: none;
-  display: block;
-  margin-bottom: 8px;
-  transition: all 0.3s ease;
-  
-  .light-theme & {
-    color: #666;
-  }
-  
-  .dark-theme & {
-    color: #ccc;
-  }
-
-  &:hover {
-    color: #d4af37;
-    transform: translateX(5px);
-  }
-`;
-
-const SocialLink = styled.a`
-  font-size: 24px;
-  margin-right: 16px;
-  transition: all 0.3s ease;
-  
-  .light-theme & {
-    color: #666;
-  }
-  
-  .dark-theme & {
-    color: #ccc;
-  }
-
-  &:hover {
-    color: #d4af37;
-    transform: translateY(-3px) scale(1.2);
-  }
-`;
-
-const ContactInfo = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  transition: all 0.3s ease;
-  
-  .light-theme & {
-    color: #666;
-  }
-  
-  .dark-theme & {
-    color: #ccc;
-  }
-
-  .anticon {
-    margin-right: 12px;
-    color: #d4af37;
-    font-size: 16px;
-  }
-`;
-
-const Copyright = styled.div`
-  text-align: center;
-  padding-top: 24px;
-  
-  .light-theme & {
-    border-top: 1px solid #e8e8e8;
-    color: #666;
-  }
-  
-  .dark-theme & {
-    border-top: 1px solid #333;
-    color: #999;
-  }
-`;
+  Instagram,
+  Facebook,
+  Diamond,
+} from '@mui/icons-material';
 
 const Footer: React.FC = () => {
+  const theme = useTheme();
+
   return (
-    <StyledFooter>
-      <Row gutter={[24, 24]}>
-        <Col xs={24} sm={12} md={6}>
-          <FooterSection>
-            <FooterTitle level={4}>Saiyaara</FooterTitle>
-            <Text className="footer-description">
-              Elegant jewelry for every occasion. Discover our beautiful
-              collection of anklets, bangles, bracelets, earrings, rings and
-              more.
-            </Text>
-          </FooterSection>
-        </Col>
+    <Box
+      component="footer"
+      sx={{
+        bgcolor: theme.palette.mode === 'light' ? '#2c3e50' : '#1a1a1a',
+        color: 'white',
+        mt: 'auto',
+        py: 4,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Grid container spacing={4} alignItems="flex-start">
+          {/* Brand Section */}
+          <Grid item xs={12} md={4}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Diamond sx={{ color: theme.palette.primary.main, mr: 1, fontSize: 32 }} />
+              <Typography variant="h5" sx={{ color: 'white', fontWeight: 700 }}>
+                Gem-Heart
+              </Typography>
+            </Box>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', mb: 3, lineHeight: 1.6 }}>
+              True treasure handpicked from the most exceptional sources around the globe.
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton
+                component={MuiLink}
+                href="https://instagram.com/gem-heart"
+                target="_blank"
+                sx={{ color: 'rgba(255,255,255,0.8)', '&:hover': { color: 'white' } }}
+              >
+                <Instagram />
+              </IconButton>
+              <IconButton
+                component={MuiLink}
+                href="https://facebook.com/gem-heart"
+                target="_blank"
+                sx={{ color: 'rgba(255,255,255,0.8)', '&:hover': { color: 'white' } }}
+              >
+                <Facebook />
+              </IconButton>
+            </Box>
+          </Grid>
 
-        <Col xs={24} sm={12} md={6}>
-          <FooterSection>
-            <FooterTitle level={4}>Quick Links</FooterTitle>
-            <FooterLink to="/">Home</FooterLink>
-            <FooterLink to="/shop">Shop</FooterLink>
-            <FooterLink to="/offers/under-299">Special Offers</FooterLink>
-            <FooterLink to="/contact">Contact</FooterLink>
-            <FooterLink to="/about">About Us</FooterLink>
-          </FooterSection>
-        </Col>
+          {/* Links Sections */}
+          <Grid item xs={6} md={2}>
+            <Typography variant="h6" sx={{ color: 'white', mb: 2, fontSize: '1rem' }}>
+              Products
+            </Typography>
+            {['Rings', 'Earrings', 'Bangles', 'Pendants'].map((item) => (
+              <Typography
+                key={item}
+                component={Link}
+                to={`/shop/${item.toLowerCase()}`}
+                variant="body2"
+                sx={{
+                  display: 'block',
+                  color: 'rgba(255,255,255,0.8)',
+                  textDecoration: 'none',
+                  mb: 1,
+                  '&:hover': { color: 'white' },
+                }}
+              >
+                {item}
+              </Typography>
+            ))}
+          </Grid>
 
-        <Col xs={24} sm={12} md={6}>
-          <FooterSection>
-            <FooterTitle level={4}>Categories</FooterTitle>
-            <FooterLink to="/shop/anklets">Anklets</FooterLink>
-            <FooterLink to="/shop/bangles">Bangles</FooterLink>
-            <FooterLink to="/shop/bracelets">Bracelets</FooterLink>
-            <FooterLink to="/shop/earrings">Earrings</FooterLink>
-            <FooterLink to="/shop/rings">Rings</FooterLink>
-            <FooterLink to="/shop/pendants">Pendants</FooterLink>
-          </FooterSection>
-        </Col>
+          <Grid item xs={6} md={2}>
+            <Typography variant="h6" sx={{ color: 'white', mb: 2, fontSize: '1rem' }}>
+              Services
+            </Typography>
+            {['Shop', 'Contact', 'About Us', 'Cart'].map((item) => (
+              <Typography
+                key={item}
+                component={Link}
+                to={item === 'Shop' ? '/shop' : item === 'Contact' ? '/contact' : item === 'About Us' ? '/about' : '/cart'}
+                variant="body2"
+                sx={{
+                  display: 'block',
+                  color: 'rgba(255,255,255,0.8)',
+                  textDecoration: 'none',
+                  mb: 1,
+                  '&:hover': { color: 'white' },
+                }}
+              >
+                {item}
+              </Typography>
+            ))}
+          </Grid>
 
-        <Col xs={24} sm={12} md={6}>
-          <FooterSection>
-            <FooterTitle level={4}>Contact Info</FooterTitle>
-            <ContactInfo>
-              <PhoneOutlined />
-              <Text className="contact-text">+91-XXXXXXXXXX</Text>
-            </ContactInfo>
-            <ContactInfo>
-              <MailOutlined />
-              <Text className="contact-text">support@saiyaara.com</Text>
-            </ContactInfo>
-            <ContactInfo>
-              <EnvironmentOutlined />
-              <Text className="contact-text">
-                Saiyaara Store
-                <br />
-                Jewelry District
-                <br />
-                City, State - PIN
-              </Text>
-            </ContactInfo>
+          <Grid item xs={12} md={4}>
+            <Typography variant="h6" sx={{ color: 'white', mb: 2, fontSize: '1rem' }}>
+              About Us
+            </Typography>
+            {['Contact Us', 'Blogs', 'Privacy Policy', 'Terms and Conditions'].map((item) => (
+              <Typography
+                key={item}
+                component={Link}
+                to={item === 'Contact Us' ? '/contact' : item === 'Privacy Policy' ? '/privacy' : item === 'Terms and Conditions' ? '/terms' : '/about'}
+                variant="body2"
+                sx={{
+                  display: 'block',
+                  color: 'rgba(255,255,255,0.8)',
+                  textDecoration: 'none',
+                  mb: 1,
+                  '&:hover': { color: 'white' },
+                }}
+              >
+                {item}
+              </Typography>
+            ))}
+          </Grid>
+        </Grid>
 
-            <Space style={{ marginTop: 16 }}>
-              <SocialLink href="https://instagram.com/saiyaara" target="_blank">
-                <InstagramOutlined />
-              </SocialLink>
-              <SocialLink href="https://facebook.com/saiyaara" target="_blank">
-                <FacebookOutlined />
-              </SocialLink>
-            </Space>
-          </FooterSection>
-        </Col>
-      </Row>
-
-      <Copyright>
-        <Text>
-          © {new Date().getFullYear()} Saiyaara. All rights reserved. |
-          <FooterLink
-            to="/privacy"
-            style={{ display: "inline", margin: "0 8px" }}
-          >
-            Privacy Policy
-          </FooterLink>
-          |
-          <FooterLink
-            to="/terms"
-            style={{ display: "inline", margin: "0 8px" }}
-          >
-            Terms of Service
-          </FooterLink>
-        </Text>
-      </Copyright>
-    </StyledFooter>
+        {/* Copyright */}
+        <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.2)', pt: 3, mt: 3, textAlign: 'center' }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+            {new Date().getFullYear()} ©Ceylon. All Rights Reserved
+          </Typography>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 

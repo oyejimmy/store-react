@@ -12,6 +12,12 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    username: Optional[str] = None
+    phone: Optional[str] = None
+    profile_image: Optional[str] = None
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
@@ -21,6 +27,7 @@ class User(UserBase):
     is_admin: bool
     is_active: bool
     created_at: datetime
+    profile_image: Optional[str] = None
     
     class Config:
         from_attributes = True

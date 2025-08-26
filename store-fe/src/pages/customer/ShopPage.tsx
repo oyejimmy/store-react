@@ -9,123 +9,45 @@ import {
 } from "../../store/slices/productSlice";
 import { addToCart } from "../../store/slices/cartSlice";
 import {
+  Box,
   Card,
-  Row,
-  Col,
+  CardContent,
+  CardMedia,
+  CardActions,
+  Grid,
+  FormControl,
+  InputLabel,
   Select,
-  Input,
+  MenuItem,
+  TextField,
   Button,
   Pagination,
-  Empty,
-  Spin,
-  message,
-  Tag,
+  Typography,
+  CircularProgress,
+  Chip,
   Checkbox,
+  FormControlLabel,
   Slider,
   Divider,
-} from "antd";
+  Alert,
+  InputAdornment,
+  Paper
+} from "@mui/material";
 import {
-  SearchOutlined,
-  FilterOutlined,
-  ShoppingCartOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
-import styled from "styled-components";
-
-
-const { Option } = Select;
-const { Search } = Input;
-
-const ShopContainer = styled.div`
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const FilterSection = styled.div`
-  background: white;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-`;
-
-const ProductCard = styled(Card)`
-  margin-bottom: 16px;
-  transition: all 0.3s ease;
-  border-radius: 12px;
-  overflow: hidden;
-
-  &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(212, 175, 55, 0.2);
-  }
-
-  .ant-card-actions {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    display: flex;
-    justify-content: center;
-    padding: 8px;
-    gap: 8px;
-
-    > li {
-      flex: 1;
-      margin: 0 !important;
-      
-      .ant-btn {
-        border-radius: 4px;
-        font-weight: 500;
-        font-size: 11px;
-        width: 100%;
-        height: 28px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0 8px;
-
-        .anticon {
-          font-size: 10px;
-          margin-right: 3px;
-        }
-
-        &.ant-btn-primary {
-          background: linear-gradient(135deg, #d4af37, #b8860b);
-          border: none;
-
-          &:hover {
-            background: linear-gradient(135deg, #b8860b, #d4af37);
-            transform: translateY(-1px);
-          }
-        }
-      }
-    }
-  }
-`;
-
-const ProductImage = styled.img`
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 4px;
-`;
-
-const Price = styled.div`
-  font-size: 18px;
-  font-weight: bold;
-  color: #d4af37;
-`;
-
-const OriginalPrice = styled.span`
-  text-decoration: line-through;
-  color: #999;
-  margin-right: 8px;
-`;
+  Search as SearchIcon,
+  ShoppingCart,
+  Visibility,
+  FilterList
+} from "@mui/icons-material";
+import { useTheme } from '@mui/material/styles';
 
 const ShopPage: React.FC = () => {
   const { category } = useParams<{ category?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
+
   const { products, loading, filters } = useSelector(
     (state: RootState) => state.products
   );
@@ -147,7 +69,7 @@ const ShopPage: React.FC = () => {
 
   const handleAddToCart = (product: any) => {
     dispatch(addToCart({ product, quantity: 1 }));
-    message.success(`${product.name} added to cart!`);
+    alert(`${product.name} added to cart!`);
   };
 
   const handleViewDetails = (productId: number) => {
@@ -212,11 +134,9 @@ const ShopPage: React.FC = () => {
 
   if (loading) {
     return (
-      <ShopContainer>
-        <div style={{ textAlign: "center", padding: "50px" }}>
-          <Spin size="large" />
-        </div>
-      </ShopContainer>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <CircularProgress size={60} />
+      </Box>
     );
   }
 
@@ -227,186 +147,231 @@ const ShopPage: React.FC = () => {
     : "All Products";
 
   return (
-    <ShopContainer>
-      <h1
-        style={{
+    <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+      <Typography
+        variant="h3"
+        sx={{
           textAlign: "center",
-          color: "#d4af37",
-          fontSize: "48px",
-          marginBottom: "40px",
+          color: theme.palette.primary.main,
+          mb: 5,
+          fontWeight: 'bold'
         }}
       >
         {pageTitle}
-      </h1>
+      </Typography>
 
-      <Row gutter={24}>
-        <Col xs={24} md={6}>
-          <FilterSection>
-            <h4 style={{ color: '#d4af37', marginBottom: '16px' }}>Filter:</h4>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={3}>
+          <Paper sx={{ p: 2, mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+                Filters
+              </Typography>
+              <Button size="small" onClick={resetFilters}>
+                Reset
+              </Button>
+            </Box>
             
-            <div style={{ marginBottom: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <span style={{ fontWeight: '600' }}>Availability</span>
-                <Button type="link" size="small" onClick={resetFilters}>Reset</Button>
-              </div>
-              <Checkbox.Group value={availabilityFilter} onChange={setAvailabilityFilter}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <Checkbox value="in_stock">
-                    In stock ({products.filter(p => (p.stock_quantity || p.stock || 0) > 0).length})
-                  </Checkbox>
-                  <Checkbox value="out_of_stock">
-                    Out of stock ({products.filter(p => (p.stock_quantity || p.stock || 0) === 0).length})
-                  </Checkbox>
-                </div>
-              </Checkbox.Group>
-            </div>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                Availability
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={availabilityFilter.includes('in_stock')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setAvailabilityFilter([...availabilityFilter, 'in_stock']);
+                      } else {
+                        setAvailabilityFilter(availabilityFilter.filter(f => f !== 'in_stock'));
+                      }
+                    }}
+                  />
+                }
+                label={`In stock (${products.filter(p => (p.stock_quantity || p.stock || 0) > 0).length})`}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={availabilityFilter.includes('out_of_stock')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setAvailabilityFilter([...availabilityFilter, 'out_of_stock']);
+                      } else {
+                        setAvailabilityFilter(availabilityFilter.filter(f => f !== 'out_of_stock'));
+                      }
+                    }}
+                  />
+                }
+                label={`Out of stock (${products.filter(p => (p.stock_quantity || p.stock || 0) === 0).length})`}
+              />
+            </Box>
             
-            <Divider />
+            <Divider sx={{ my: 2 }} />
             
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <span style={{ fontWeight: '600' }}>Price</span>
-                <Button type="link" size="small" onClick={() => setPriceRange([0, 799])}>Reset</Button>
-              </div>
-              <p style={{ fontSize: '12px', color: '#666', marginBottom: '16px' }}>The highest price is PKR 799.00</p>
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                Price Range
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+                The highest price is PKR 799.00
+              </Typography>
               <Slider
-                range
+                value={priceRange}
+                onChange={(_, value) => setPriceRange(value as [number, number])}
+                valueLabelDisplay="auto"
                 min={0}
                 max={799}
-                value={priceRange}
-                onChange={(value: number | number[]) => setPriceRange(value as [number, number])}
-                tooltip={{ formatter: (value) => `PKR ${value}` }}
+                valueLabelFormat={(value) => `PKR ${value}`}
+                sx={{ mb: 2 }}
               />
-              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                <Input
-                  prefix="PKR"
-                  value={priceRange[0]}
-                  onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
-                  placeholder="From"
-                  size="small"
-                />
-                <Input
-                  prefix="PKR"
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 799])}
-                  placeholder="To"
-                  size="small"
-                />
-              </div>
-            </div>
-          </FilterSection>
-        </Col>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <TextField
+                    size="small"
+                    label="From"
+                    value={priceRange[0]}
+                    onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">PKR</InputAdornment>
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    size="small"
+                    label="To"
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 799])}
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">PKR</InputAdornment>
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          </Paper>
+        </Grid>
         
-        <Col xs={24} md={18}>
-          <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Select
-              value={sortBy}
-              onChange={handleSort}
-              style={{ width: '300px' }}
-              placeholder="Sort by"
-            >
-              <Option value="featured">Featured</Option>
-              <Option value="alphabetical_az">Alphabetically, A-Z</Option>
-              <Option value="alphabetical_za">Alphabetically, Z-A</Option>
-              <Option value="price_low">Price, low to high</Option>
-              <Option value="price_high">Price, high to low</Option>
-              <Option value="best_selling">Best selling</Option>
-            </Select>
-            <span style={{ color: '#666' }}>{sortedProducts.length} products</span>
-          </div>
+        <Grid item xs={12} md={9}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <FormControl sx={{ minWidth: 300 }}>
+              <InputLabel>Sort by</InputLabel>
+              <Select
+                value={sortBy}
+                onChange={(e) => handleSort(e.target.value)}
+                label="Sort by"
+              >
+                <MenuItem value="featured">Featured</MenuItem>
+                <MenuItem value="alphabetical_az">Alphabetically, A-Z</MenuItem>
+                <MenuItem value="alphabetical_za">Alphabetically, Z-A</MenuItem>
+                <MenuItem value="price_low">Price, low to high</MenuItem>
+                <MenuItem value="price_high">Price, high to low</MenuItem>
+                <MenuItem value="best_selling">Best selling</MenuItem>
+              </Select>
+            </FormControl>
+            <Typography variant="body2" color="text.secondary">
+              {sortedProducts.length} products
+            </Typography>
+          </Box>
 
           {paginatedProducts.length === 0 ? (
-            <Empty description="No products found" />
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <Typography variant="h6" color="text.secondary">
+                No products found
+              </Typography>
+            </Box>
           ) : (
             <>
-              <Row gutter={[16, 16]}>
-            {paginatedProducts.map((product) => (
-              <Col xs={24} sm={12} md={8} lg={6} key={product.id}>
-                <ProductCard
-                  hoverable
-                  cover={
-                    <ProductImage
-                      src={product.images[0] || ""}
-                      alt={product.name}
-                    />
-                  }
-                  actions={[
-                    <Button
-                      type="primary"
-                      size="small"
-                      icon={<ShoppingCartOutlined />}
-                      onClick={() => handleAddToCart(product)}
-                      disabled={
-                        (product.stock_quantity || product.stock || 0) === 0
-                      }
-                    >
-                      Add to Cart
-                    </Button>,
-                    <Button
-                      size="small"
-                      icon={<EyeOutlined />}
-                      onClick={() => handleViewDetails(product.id)}
-                    >
-                      View Details
-                    </Button>,
-                  ]}
-                >
-                  <Card.Meta
-                    title={product.name}
-                    description={
-                      <div>
-                        <p style={{ marginBottom: "8px", color: "#666" }}>
+              <Grid container spacing={2}>
+                {paginatedProducts.map((product) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                      <CardMedia
+                        component="img"
+                        height="200"
+                        image={product.images[0] || ""}
+                        alt={product.name}
+                        sx={{ objectFit: 'cover' }}
+                      />
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Typography variant="h6" component="h3" gutterBottom>
+                          {product.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                           {product.description?.substring(0, 60)}...
-                        </p>
-                        <div style={{ marginBottom: "8px" }}>
-                          <Tag color="gold">
-                            {product.category || "Jewelry"}
-                          </Tag>
-                          {(product.stock_quantity || product.stock || 0) ===
-                            0 && <Tag color="red">Out of Stock</Tag>}
-                        </div>
-                        <Price>
+                        </Typography>
+                        <Box sx={{ mb: 1 }}>
+                          <Chip label={product.category || "Jewelry"} size="small" color="primary" />
+                          {(product.stock_quantity || product.stock || 0) === 0 && (
+                            <Chip label="Out of Stock" size="small" color="error" sx={{ ml: 1 }} />
+                          )}
+                        </Box>
+                        <Box>
                           {(() => {
-                            const originalPrice =
-                              product.original_price || product.retail_price;
-                            const currentPrice =
-                              product.offer_price ||
-                              product.price ||
-                              product.retail_price;
+                            const originalPrice = product.original_price || product.retail_price;
+                            const currentPrice = product.offer_price || product.price || product.retail_price;
                             return (
-                              originalPrice &&
-                              currentPrice &&
-                              originalPrice > currentPrice && (
-                                <OriginalPrice>PKR {originalPrice}</OriginalPrice>
+                              originalPrice && currentPrice && originalPrice > currentPrice && (
+                                <Typography
+                                  variant="body2"
+                                  sx={{ textDecoration: 'line-through', color: 'text.secondary', mr: 1 }}
+                                  component="span"
+                                >
+                                  PKR {originalPrice}
+                                </Typography>
                               )
                             );
                           })()}
-                          PKR {product.offer_price ||
-                            product.price ||
-                            product.retail_price}
-                        </Price>
-                      </div>
-                    }
-                  />
-                </ProductCard>
-              </Col>
-            ))}
-          </Row>
+                          <Typography
+                            variant="h6"
+                            sx={{ color: theme.palette.primary.main, fontWeight: 'bold' }}
+                            component="span"
+                          >
+                            PKR {product.offer_price || product.price || product.retail_price}
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                      <CardActions sx={{ p: 1 }}>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          startIcon={<ShoppingCart />}
+                          onClick={() => handleAddToCart(product)}
+                          disabled={(product.stock_quantity || product.stock || 0) === 0}
+                          sx={{ flex: 1, mr: 1 }}
+                        >
+                          Add to Cart
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<Visibility />}
+                          onClick={() => handleViewDetails(product.id)}
+                          sx={{ flex: 1 }}
+                        >
+                          View
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
 
-              <div style={{ textAlign: "center", marginTop: "24px" }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                 <Pagination
-                  current={currentPage}
-                  total={sortedProducts.length}
-                  pageSize={pageSize}
-                  onChange={setCurrentPage}
-                  showSizeChanger={false}
+                  count={Math.ceil(sortedProducts.length / pageSize)}
+                  page={currentPage}
+                  onChange={(_, page) => setCurrentPage(page)}
+                  color="primary"
                 />
-              </div>
+              </Box>
             </>
           )}
-        </Col>
-      </Row>
-    </ShopContainer>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

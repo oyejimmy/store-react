@@ -1,4 +1,4 @@
-# Saiyaara Jewelry Store - Complete E-commerce Platform
+# Gem-Heart Jewelry Store - Complete E-commerce Platform
 
 A complete jewelry e-commerce website with both backend (FastAPI) and frontend (React) applications. This platform provides a full-featured online jewelry store with customer and admin interfaces.
 
@@ -248,7 +248,7 @@ This project is licensed under the MIT License.
 
 For support and questions:
 
-- 📧 Email: support@saiyaara.com
+- 📧 Email: support@gem-heart.com
 - 📱 WhatsApp: Use the floating WhatsApp button
 - 📞 Phone: +91-XXXXXXXXXX
 

@@ -1,5 +1,17 @@
 import React, { useEffect } from "react";
-import { Carousel, Row, Col, Card, Button, Typography, Tag } from "antd";
+import {
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  CardActions,
+  Button,
+  Typography,
+  Chip,
+  Container,
+  useTheme,
+} from '@mui/material';
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
@@ -7,229 +19,12 @@ import {
   fetchProducts,
 } from "../../store/slices/productSlice";
 import { fetchOffersByType } from "../../store/slices/offerSlice";
-import styled from "styled-components";
 
 
-const { Title, Paragraph } = Typography;
 
-const HomeContainer = styled.div`
-  padding: 0;
-  min-height: 100vh;
-  transition: all 0.3s ease;
-  
-  .dark-theme & {
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
-    color: #ffffff;
-  }
-  
-  .light-theme & {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #f1f3f4 100%);
-    color: #333;
-  }
-`;
-
-const BannerSection = styled.div`
-  margin-bottom: 80px;
-`;
-
-const BannerSlide = styled.div<{ bgImage: string }>`
-  height: 80vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)),
-    url(${(props) => props.bgImage});
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  text-align: center;
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #d4af37, transparent);
-  }
-`;
-
-const SectionTitle = styled(Title)`
-  text-align: center;
-  margin-bottom: 60px !important;
-  font-weight: 300;
-  font-size: 48px !important;
-  letter-spacing: 2px;
-  position: relative;
-  
-  .light-theme & {
-    color: #d4af37 !important;
-  }
-  
-  .dark-theme & {
-    color: #ffffff !important;
-  }
-  
-  &::after {
-    content: "";
-    display: block;
-    width: 100px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #d4af37, transparent);
-    margin: 20px auto 0;
-    box-shadow: 0 2px 10px rgba(212, 175, 55, 0.4);
-  }
-`;
-
-const ProductCard = styled(Card)`
-  height: 100%;
-  border-radius: 20px;
-  transition: all 0.4s ease;
-  overflow: hidden;
-  
-  .dark-theme & {
-    background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
-    border: 1px solid #333;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    
-    .ant-card-body {
-      background: transparent;
-      color: #fff;
-    }
-  }
-  
-  .light-theme & {
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-    border: 1px solid #e8e8e8;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    
-    .ant-card-body {
-      background: transparent;
-      color: #333;
-    }
-  }
-
-  &:hover {
-    transform: translateY(-12px) scale(1.02);
-    
-    .dark-theme & {
-      box-shadow: 0 20px 40px rgba(212, 175, 55, 0.3);
-      border-color: #d4af37;
-    }
-    
-    .light-theme & {
-      box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
-      border-color: #d4af37;
-    }
-  }
-
-  .ant-card-cover img {
-    height: 280px;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-  }
-  
-  &:hover .ant-card-cover img {
-    transform: scale(1.05);
-  }
-  
-  .ant-card-meta-title {
-    color: #d4af37 !important;
-    font-weight: 600;
-    font-size: 18px !important;
-  }
-`;
-
-const CategoryCard = styled.div`
-  position: relative;
-  height: 320px;
-  border-radius: 25px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.5s ease;
-  
-  .dark-theme & {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    border: 2px solid #333;
-  }
-  
-  .light-theme & {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    border: 2px solid #e8e8e8;
-  }
-
-  &:hover {
-    transform: translateY(-15px) scale(1.03);
-    
-    .dark-theme & {
-      box-shadow: 0 25px 50px rgba(212, 175, 55, 0.4);
-      border-color: #d4af37;
-    }
-    
-    .light-theme & {
-      box-shadow: 0 25px 50px rgba(212, 175, 55, 0.3);
-      border-color: #d4af37;
-    }
-    
-    .category-overlay {
-      background: linear-gradient(45deg, rgba(212, 175, 55, 0.85), rgba(184, 134, 11, 0.85));
-    }
-    
-    .category-title {
-      transform: translateY(-15px) scale(1.1);
-      color: #ffffff !important;
-    }
-  }
-`;
-
-const OfferCard = styled(Card)`
-  text-align: center;
-  border-radius: 25px;
-  transition: all 0.5s ease;
-  overflow: hidden;
-  
-  .dark-theme & {
-    background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
-    border: 2px solid #d4af37;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    
-    .ant-typography {
-      color: #ffffff !important;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.8) !important;
-    }
-  }
-  
-  .light-theme & {
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-    border: 2px solid #d4af37;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    
-    .ant-typography {
-      color: #333 !important;
-      text-shadow: none !important;
-    }
-  }
-  
-  &:hover {
-    transform: translateY(-10px) scale(1.03);
-    
-    .dark-theme & {
-      box-shadow: 0 20px 40px rgba(212, 175, 55, 0.4);
-    }
-    
-    .light-theme & {
-      box-shadow: 0 20px 40px rgba(212, 175, 55, 0.3);
-    }
-  }
-
-  .ant-card-body {
-    padding: 40px 24px;
-  }
-`;
 
 const HomePage: React.FC = () => {
+  const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const { products, loading } = useSelector(
     (state: RootState) => state.products
@@ -320,383 +115,529 @@ const HomePage: React.FC = () => {
 
 
   return (
-    <HomeContainer>
-      {/* Banner Carousel */}
-      <BannerSection>
-        <Carousel autoplay effect="fade">
-          {bannerSlides.map((slide, index) => (
-            <div key={index}>
-              <BannerSlide bgImage={slide.image}>
-                <div>
-                  <Title level={1} style={{ 
-                    color: "#ffffff", 
-                    marginBottom: 16
-                  }}>
-                    {slide.title}
-                  </Title>
-                  <Paragraph
-                    style={{ 
-                      color: "#ffffff", 
-                      fontSize: 18, 
-                      marginBottom: 24
-                    }}
-                  >
-                    {slide.subtitle}
-                  </Paragraph>
-                  <Link to={slide.link}>
-                    <Button type="primary" size="large">
-                      {slide.cta}
-                    </Button>
-                  </Link>
-                </div>
-              </BannerSlide>
-            </div>
-          ))}
-        </Carousel>
-      </BannerSection>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: theme.palette.mode === 'light'
+          ? 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #f1f3f4 100%)'
+          : 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%)',
+      }}
+    >
+      {/* Banner Section */}
+      <Box sx={{ mb: 10 }}>
+        <Box
+          sx={{
+            height: '80vh',
+            background: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url(${bannerSlides[0].image})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            textAlign: 'center',
+            position: 'relative',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: '2px',
+              background: 'linear-gradient(90deg, transparent, #d4af37, transparent)',
+            },
+          }}
+        >
+          <Box>
+            <Typography
+              variant="h1"
+              sx={{
+                color: '#ffffff',
+                mb: 2,
+                fontSize: { xs: '2rem', md: '3.5rem' },
+                fontWeight: 300,
+              }}
+            >
+              {bannerSlides[0].title}
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#ffffff',
+                mb: 3,
+                fontSize: { xs: '1rem', md: '1.25rem' },
+              }}
+            >
+              {bannerSlides[0].subtitle}
+            </Typography>
+            <Button
+              component={Link}
+              to={bannerSlides[0].link}
+              variant="contained"
+              size="large"
+              sx={{
+                px: 4,
+                py: 1.5,
+                fontSize: '1.1rem',
+              }}
+            >
+              {bannerSlides[0].cta}
+            </Button>
+          </Box>
+        </Box>
+      </Box>
 
       {/* Categories */}
-      <section style={{ marginBottom: 100, padding: '80px 40px' }}>
-        <SectionTitle level={2} style={{ color: '#d4af37 !important' }}>Shop by Category →</SectionTitle>
-        <div style={{ padding: '0 10%' }}>
-          <Row gutter={[32, 32]}>
-            {categories.slice(0, 6).map((category) => (
-              <Col xs={24} sm={12} md={8} key={category.name}>
-              <Link to={category.link}>
-                <CategoryCard>
-                  <img
-                    alt={category.name}
-                    src={category.image}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0
-                    }}
-                  />
-                  <div className="category-overlay" style={{
+      <Container maxWidth="lg" sx={{ mb: 12, py: 10 }}>
+        <Typography
+          variant="h2"
+          sx={{
+            textAlign: 'center',
+            mb: 8,
+            fontWeight: 300,
+            fontSize: { xs: '2rem', md: '3rem' },
+            letterSpacing: '2px',
+            color: theme.palette.primary.main,
+            position: 'relative',
+            '&::after': {
+              content: '""',
+              display: 'block',
+              width: '100px',
+              height: '2px',
+              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
+              margin: '20px auto 0',
+              boxShadow: `0 2px 10px ${theme.palette.primary.main}40`,
+            },
+          }}
+        >
+          Shop by Category →
+        </Typography>
+        <Grid container spacing={4}>
+          {categories.slice(0, 6).map((category) => (
+            <Grid item xs={12} sm={6} md={4} key={category.name}>
+              <Box
+                component={Link}
+                to={category.link}
+                sx={{
+                  position: 'relative',
+                  height: '320px',
+                  borderRadius: '25px',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  transition: 'all 0.5s ease',
+                  display: 'block',
+                  textDecoration: 'none',
+                  boxShadow: theme.palette.mode === 'light'
+                    ? '0 10px 30px rgba(0, 0, 0, 0.1)'
+                    : '0 10px 30px rgba(0, 0, 0, 0.4)',
+                  border: theme.palette.mode === 'light'
+                    ? '2px solid #e8e8e8'
+                    : '2px solid #333',
+                  '&:hover': {
+                    transform: 'translateY(-15px) scale(1.03)',
+                    boxShadow: `0 25px 50px ${theme.palette.primary.main}40`,
+                    borderColor: theme.palette.primary.main,
+                    '& .category-overlay': {
+                      background: `linear-gradient(45deg, ${theme.palette.primary.main}d9, ${theme.palette.primary.dark}d9)`,
+                    },
+                    '& .category-title': {
+                      transform: 'translateY(-15px) scale(1.1)',
+                      color: '#ffffff !important',
+                    },
+                  },
+                }}
+              >
+                <Box
+                  component="img"
+                  src={category.image}
+                  alt={category.name}
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                  }}
+                />
+                <Box
+                  className="category-overlay"
+                  sx={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     right: 0,
                     bottom: 0,
                     background: 'linear-gradient(45deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4))',
-                    transition: 'all 0.4s ease'
-                  }} />
-                  <div style={{
+                    transition: 'all 0.4s ease',
+                  }}
+                />
+                <Box
+                  sx={{
                     position: 'absolute',
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    padding: '20px',
-                    zIndex: 2
-                  }}>
-                    <Title className="category-title" level={4} style={{
+                    p: 2.5,
+                    zIndex: 2,
+                  }}
+                >
+                  <Typography
+                    className="category-title"
+                    variant="h5"
+                    sx={{
                       margin: 0,
-                      color: '#d4af37',
+                      color: theme.palette.primary.main,
                       fontWeight: 400,
-                      fontSize: '20px',
                       letterSpacing: '1px',
-                      transition: 'all 0.4s ease'
-                    }}>
-                      {category.name} →
-                    </Title>
-                  </div>
-                </CategoryCard>
-              </Link>
-              </Col>
-            ))}
-          </Row>
-        </div>
-        <div style={{ textAlign: 'center', marginTop: '60px' }}>
-          <Link to="/categories">
-            <Button style={{ 
-              background: 'transparent',
-              border: '2px solid #d4af37',
+                      transition: 'all 0.4s ease',
+                    }}
+                  >
+                    {category.name} →
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+        <Box sx={{ textAlign: 'center', mt: 8 }}>
+          <Button
+            component={Link}
+            to="/categories"
+            variant="outlined"
+            size="large"
+            sx={{
               borderRadius: '50px',
-              padding: '0 60px',
-              height: '60px',
+              px: 8,
+              py: 2,
               fontSize: '16px',
-              fontWeight: '400',
-              color: '#d4af37',
+              fontWeight: 400,
               letterSpacing: '1px',
-              transition: 'all 0.4s ease'
+              borderWidth: '2px',
+              '&:hover': {
+                borderWidth: '2px',
+                background: theme.palette.primary.main,
+                color: '#000',
+              },
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#d4af37';
-              e.currentTarget.style.color = '#000';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = '#d4af37';
-            }}>
-              EXPLORE COLLECTION
-            </Button>
-          </Link>
-        </div>
-      </section>
+          >
+            EXPLORE COLLECTION
+          </Button>
+        </Box>
+      </Container>
 
       {/* Featured Products */}
-      <section style={{ marginBottom: 100, padding: '80px 40px' }}>
-        <SectionTitle level={2} style={{ color: '#d4af37 !important' }}>Featured Products →</SectionTitle>
-        <div style={{ padding: '0 10%' }}>
-          <Row gutter={[32, 32]}>
-            {products.slice(0, 6).map((product) => (
-              <Col xs={24} sm={12} md={8} key={product.id}>
-                <Link to={`/product/${product.id}`}>
-                  <ProductCard
-                    hoverable
-                    cover={
-                      <img
-                        alt={product.name}
-                        src={
-                          product.images[0] ||
-                          "https://via.placeholder.com/300x200?text=Product+Image"
-                        }
-                      />
-                    }
-                    actions={[
-                      <Button style={{
-                        background: 'transparent',
-                        border: '1px solid #d4af37',
-                        color: '#d4af37',
-                        borderRadius: '25px'
-                      }}>
-                        View Details
-                      </Button>,
-                    ]}
+      <Container maxWidth="lg" sx={{ mb: 12, py: 10 }}>
+        <Typography
+          variant="h2"
+          sx={{
+            textAlign: 'center',
+            mb: 8,
+            fontWeight: 300,
+            fontSize: { xs: '2rem', md: '3rem' },
+            letterSpacing: '2px',
+            color: theme.palette.primary.main,
+            position: 'relative',
+            '&::after': {
+              content: '""',
+              display: 'block',
+              width: '100px',
+              height: '2px',
+              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
+              margin: '20px auto 0',
+              boxShadow: `0 2px 10px ${theme.palette.primary.main}40`,
+            },
+          }}
+        >
+          Featured Products →
+        </Typography>
+        <Grid container spacing={4}>
+          {products.slice(0, 6).map((product) => (
+            <Grid item xs={12} sm={6} md={4} key={product.id}>
+              <Card
+                component={Link}
+                to={`/product/${product.id}`}
+                sx={{
+                  height: '100%',
+                  borderRadius: '20px',
+                  transition: 'all 0.4s ease',
+                  overflow: 'hidden',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  background: theme.palette.mode === 'light'
+                    ? 'linear-gradient(145deg, #ffffff, #f8f9fa)'
+                    : 'linear-gradient(145deg, #1e1e1e, #2a2a2a)',
+                  border: theme.palette.mode === 'light'
+                    ? '1px solid #e8e8e8'
+                    : '1px solid #333',
+                  boxShadow: theme.palette.mode === 'light'
+                    ? '0 8px 25px rgba(0, 0, 0, 0.08)'
+                    : '0 8px 25px rgba(0, 0, 0, 0.3)',
+                  '&:hover': {
+                    transform: 'translateY(-12px) scale(1.02)',
+                    boxShadow: `0 20px 40px ${theme.palette.primary.main}30`,
+                    borderColor: theme.palette.primary.main,
+                    '& .product-image': {
+                      transform: 'scale(1.05)',
+                    },
+                  },
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  className="product-image"
+                  height="280"
+                  image={
+                    product.images[0] ||
+                    "https://via.placeholder.com/300x200?text=Product+Image"
+                  }
+                  alt={product.name}
+                  sx={{
+                    objectFit: 'cover',
+                    transition: 'transform 0.4s ease',
+                  }}
+                />
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: theme.palette.primary.main,
+                      fontWeight: 600,
+                      mb: 1.5,
+                    }}
                   >
-                    <Card.Meta
-                      title={product.name}
-                      description={
-                        <div>
-                          <div style={{ marginBottom: 12 }}>
-                            <span style={{
-                              fontSize: 20,
-                              fontWeight: "600",
-                              color: "#d4af37",
-                              letterSpacing: '0.5px'
-                            }}>
-                              PKR {product.offer_price || product.price || product.retail_price}
-                            </span>
-                            {(product.original_price || product.retail_price) > (product.offer_price || product.price || product.retail_price) && (
-                              <span style={{
-                                textDecoration: "line-through",
-                                marginLeft: 12,
-                                color: "#666",
-                                fontSize: 16
-                              }}>
-                                PKR {product.original_price || product.retail_price}
-                              </span>
-                            )}
-                          </div>
-                          <Tag color="gold">{product.category}</Tag>
-                        </div>
-                      }
-                    />
-                  </ProductCard>
-                </Link>
-              </Col>
-            ))}
-          </Row>
-        </div>
-      </section>
+                    {product.name}
+                  </Typography>
+                  <Box sx={{ mb: 1.5 }}>
+                    <Typography
+                      variant="h6"
+                      component="span"
+                      sx={{
+                        fontSize: '1.25rem',
+                        fontWeight: 600,
+                        color: theme.palette.primary.main,
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      PKR {product.offer_price || product.price || product.retail_price}
+                    </Typography>
+                    {(product.original_price || product.retail_price) > (product.offer_price || product.price || product.retail_price) && (
+                      <Typography
+                        component="span"
+                        sx={{
+                          textDecoration: 'line-through',
+                          ml: 1.5,
+                          color: 'text.secondary',
+                          fontSize: '1rem',
+                        }}
+                      >
+                        PKR {product.original_price || product.retail_price}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Chip
+                    label={product.category}
+                    sx={{
+                      backgroundColor: theme.palette.primary.main,
+                      color: '#000',
+                      fontWeight: 500,
+                    }}
+                  />
+                </CardContent>
+                <CardActions>
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      borderRadius: '25px',
+                      mx: 'auto',
+                      px: 3,
+                    }}
+                  >
+                    View Details
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
 
       {/* Special Offers */}
-      <section style={{ marginBottom: 100, padding: '80px 40px' }}>
-        <SectionTitle level={2} style={{ color: '#d4af37 !important' }}>Special Offers</SectionTitle>
-        <div style={{ padding: '0 10%' }}>
-          <Row gutter={[16, 16]}>
-          <Col xs={24} md={8}>
-            <Link to="/offers/under-299">
-              <OfferCard
-                cover={
-                  <div style={{
+      <Container maxWidth="lg" sx={{ mb: 12, py: 10 }}>
+        <Typography
+          variant="h2"
+          sx={{
+            textAlign: 'center',
+            mb: 8,
+            fontWeight: 300,
+            fontSize: { xs: '2rem', md: '3rem' },
+            letterSpacing: '2px',
+            color: theme.palette.primary.main,
+            position: 'relative',
+            '&::after': {
+              content: '""',
+              display: 'block',
+              width: '100px',
+              height: '2px',
+              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
+              margin: '20px auto 0',
+              boxShadow: `0 2px 10px ${theme.palette.primary.main}40`,
+            },
+          }}
+        >
+          Special Offers
+        </Typography>
+        <Grid container spacing={2}>
+          {[
+            {
+              title: 'Under PKR 299',
+              description: 'Beautiful jewelry pieces at unbeatable prices',
+              cta: 'SHOP NOW ✨',
+              link: '/offers/under-299',
+              image: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=400&h=200&fit=crop',
+            },
+            {
+              title: 'Special Deals',
+              description: 'Limited time offers on premium collections',
+              cta: 'GRAB DEALS 🔥',
+              link: '/offers/special-deals',
+              image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop',
+            },
+            {
+              title: 'Deal of the Month',
+              description: 'Exclusive monthly offers on trending pieces',
+              cta: 'EXPLORE NOW 💎',
+              link: '/offers/deal-of-month',
+              image: 'https://images.unsplash.com/photo-1549062572-544a64fb0c56?w=400&h=200&fit=crop',
+            },
+          ].map((offer, index) => (
+            <Grid item xs={12} md={4} key={index}>
+              <Card
+                component={Link}
+                to={offer.link}
+                sx={{
+                  textAlign: 'center',
+                  borderRadius: '25px',
+                  transition: 'all 0.5s ease',
+                  overflow: 'hidden',
+                  textDecoration: 'none',
+                  background: theme.palette.mode === 'light'
+                    ? 'linear-gradient(145deg, #ffffff, #f8f9fa)'
+                    : 'linear-gradient(145deg, #1e1e1e, #2a2a2a)',
+                  border: `2px solid ${theme.palette.primary.main}`,
+                  boxShadow: theme.palette.mode === 'light'
+                    ? '0 10px 30px rgba(0, 0, 0, 0.1)'
+                    : '0 10px 30px rgba(0, 0, 0, 0.3)',
+                  '&:hover': {
+                    transform: 'translateY(-10px) scale(1.03)',
+                    boxShadow: `0 20px 40px ${theme.palette.primary.main}40`,
+                  },
+                }}
+              >
+                <Box
+                  sx={{
                     height: '200px',
-                    backgroundImage: 'url(https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=400&h=200&fit=crop)',
+                    backgroundImage: `url(${offer.image})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    position: 'relative'
-                  }}>
-                    <div style={{
+                    position: 'relative',
+                    '&::after': {
+                      content: '""',
                       position: 'absolute',
                       top: 0,
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      background: 'linear-gradient(45deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6))'
-                    }} />
-                  </div>
-                }
-              >
-                <Title level={3}>
-                  Under PKR 299
-                </Title>
-                <Paragraph>
-                  Beautiful jewelry pieces at unbeatable prices
-                </Paragraph>
-                <Button size="large" style={{
-                  background: 'linear-gradient(135deg, #d4af37, #b8860b)',
-                  border: 'none',
-                  color: '#000',
-                  fontWeight: 'bold',
-                  borderRadius: '25px',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(212, 175, 55, 0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.3)';
-                }}>
-                  SHOP NOW ✨
-                </Button>
-              </OfferCard>
-            </Link>
-          </Col>
-          <Col xs={24} md={8}>
-            <Link to="/offers/special-deals">
-              <OfferCard
-                cover={
-                  <div style={{
-                    height: '200px',
-                    backgroundImage: 'url(https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    position: 'relative'
-                  }}>
-                    <div style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background: 'linear-gradient(45deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6))'
-                    }} />
-                  </div>
-                }
-              >
-                <Title level={3}>
-                  Special Deals
-                </Title>
-                <Paragraph>
-                  Limited time offers on premium collections
-                </Paragraph>
-                <Button size="large" style={{
-                  background: 'linear-gradient(135deg, #d4af37, #b8860b)',
-                  border: 'none',
-                  color: '#000',
-                  fontWeight: 'bold',
-                  borderRadius: '25px',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(212, 175, 55, 0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.3)';
-                }}>
-                  GRAB DEALS 🔥
-                </Button>
-              </OfferCard>
-            </Link>
-          </Col>
-          <Col xs={24} md={8}>
-            <Link to="/offers/deal-of-month">
-              <OfferCard
-                cover={
-                  <div style={{
-                    height: '200px',
-                    backgroundImage: 'url(https://images.unsplash.com/photo-1549062572-544a64fb0c56?w=400&h=200&fit=crop)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    position: 'relative'
-                  }}>
-                    <div style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background: 'linear-gradient(45deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6))'
-                    }} />
-                  </div>
-                }
-              >
-                <Title level={3}>
-                  Deal of the Month
-                </Title>
-                <Paragraph>
-                  Exclusive monthly offers on trending pieces
-                </Paragraph>
-                <Button size="large" style={{
-                  background: 'linear-gradient(135deg, #d4af37, #b8860b)',
-                  border: 'none',
-                  color: '#000',
-                  fontWeight: 'bold',
-                  borderRadius: '25px',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(212, 175, 55, 0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.3)';
-                }}>
-                  EXPLORE NOW 💎
-                </Button>
-              </OfferCard>
-            </Link>
-          </Col>
-          </Row>
-        </div>
-      </section>
+                      background: 'linear-gradient(45deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6))',
+                    },
+                  }}
+                />
+                <CardContent sx={{ p: 5 }}>
+                  <Typography variant="h4" sx={{ mb: 2 }}>
+                    {offer.title}
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 3 }}>
+                    {offer.description}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    sx={{
+                      borderRadius: '25px',
+                      fontWeight: 'bold',
+                      px: 4,
+                      py: 1.5,
+                      '&:hover': {
+                        transform: 'translateY(-3px)',
+                      },
+                    }}
+                  >
+                    {offer.cta}
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
 
-      {/* Instagram Feed */}
-      <section style={{ padding: '80px 40px' }}>
-        <SectionTitle level={2} style={{ color: '#d4af37 !important' }}>Follow Us on TikTok →</SectionTitle>
-        <div style={{ padding: '0 10%' }}>
-          <Carousel arrows dots={false} slidesToShow={7} slidesToScroll={1} autoplay>
-            {[
-              'https://www.tiktok.com/@jewelry_store/video/1',
-              'https://www.tiktok.com/@jewelry_store/video/2',
-              'https://www.tiktok.com/@jewelry_store/video/3',
-              'https://www.tiktok.com/@jewelry_store/video/4',
-              'https://www.tiktok.com/@jewelry_store/video/5',
-              'https://www.tiktok.com/@jewelry_store/video/6'
-            ].map((videoUrl, index) => (
-              <div key={index} style={{ padding: '0 5px' }}>
-                <div style={{
-                  height: 500,
-                  width: 200,
-                  margin: '0 auto',
-                  borderRadius: 20,
+      {/* Social Media Feed */}
+      <Container maxWidth="lg" sx={{ py: 10 }}>
+        <Typography
+          variant="h2"
+          sx={{
+            textAlign: 'center',
+            mb: 8,
+            fontWeight: 300,
+            fontSize: { xs: '2rem', md: '3rem' },
+            letterSpacing: '2px',
+            color: theme.palette.primary.main,
+            position: 'relative',
+            '&::after': {
+              content: '""',
+              display: 'block',
+              width: '100px',
+              height: '2px',
+              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
+              margin: '20px auto 0',
+              boxShadow: `0 2px 10px ${theme.palette.primary.main}40`,
+            },
+          }}
+        >
+          Follow Us on TikTok →
+        </Typography>
+        <Grid container spacing={2} justifyContent="center">
+          {Array.from({ length: 6 }, (_, index) => (
+            <Grid item key={index}>
+              <Box
+                sx={{
+                  height: 400,
+                  width: 180,
+                  borderRadius: '20px',
                   overflow: 'hidden',
                   boxShadow: '0 12px 30px rgba(0, 0, 0, 0.15)',
                   background: '#000',
                   position: 'relative',
-                  cursor: 'pointer'
-                }}>
-                  <div style={{
+                  cursor: 'pointer',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                  },
+                }}
+              >
+                <Box
+                  sx={{
                     width: '100%',
                     height: '100%',
-                    background: `url(https://picsum.photos/200/500?random=${index}) center/cover`,
+                    background: `url(https://picsum.photos/180/400?random=${index}) center/cover`,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <div style={{
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Box
+                    sx={{
                       width: 60,
                       height: 60,
                       borderRadius: '50%',
@@ -706,30 +647,32 @@ const HomePage: React.FC = () => {
                       justifyContent: 'center',
                       fontSize: 24,
                       color: '#ff0050',
-                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)'
-                    }}>
-                      ▶
-                    </div>
-                  </div>
-                  <div style={{
+                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
+                    }}
+                  >
+                    ▶
+                  </Box>
+                </Box>
+                <Box
+                  sx={{
                     position: 'absolute',
                     bottom: 10,
                     left: 10,
                     color: 'white',
                     fontSize: 12,
                     background: 'rgba(0, 0, 0, 0.5)',
-                    padding: '4px 8px',
-                    borderRadius: 8
-                  }}>
-                    @jewelry_store
-                  </div>
-                </div>
-              </div>
-            ))}
-          </Carousel>
-        </div>
-      </section>
-    </HomeContainer>
+                    p: 0.5,
+                    borderRadius: 1,
+                  }}
+                >
+                  @jewelry_store
+                </Box>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </Box>
   );
 };
 
