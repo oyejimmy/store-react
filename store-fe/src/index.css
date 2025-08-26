@@ -9,8 +9,66 @@ body {
     "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #fafafa;
+  background: linear-gradient(135deg, #fafafa 0%, #f0f2f5 100%);
   color: #333;
+  min-height: 100vh;
+  padding-top: 96px;
+}
+
+/* Smooth transitions for all elements */
+* {
+  transition: all 0.3s ease;
+}
+
+/* Beautiful gradient backgrounds */
+.gradient-gold {
+  background: linear-gradient(135deg, #d4af37, #b8860b);
+}
+
+.gradient-gold-light {
+  background: linear-gradient(135deg, #f4e4bc, #d4af37);
+}
+
+/* Floating animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.pulse-animation {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Glow effect */
+.glow {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+.glow:hover {
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
 }
 
 code {
@@ -25,15 +83,16 @@ code {
 
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4af37;
+  background: linear-gradient(135deg, #d4af37, #b8860b);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b8860b;
+  background: linear-gradient(135deg, #b8860b, #d4af37);
 }
 
 /* Global utility classes */
@@ -123,6 +182,309 @@ code {
 
 .jewelry-light-gold {
   color: #f4e4bc;
+}
+
+/* Enhanced button styles */
+.ant-btn-primary {
+  background: linear-gradient(135deg, #d4af37, #b8860b) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3) !important;
+  font-weight: 600 !important;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #b8860b, #d4af37) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4) !important;
+}
+
+/* Card enhancements */
+.ant-card {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
+}
+
+.ant-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Input enhancements */
+.ant-input, .ant-select-selector {
+  border-radius: 8px !important;
+  border: 2px solid #f0f0f0 !important;
+}
+
+.ant-input:focus, .ant-select-focused .ant-select-selector {
+  border-color: #d4af37 !important;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2) !important;
+}
+
+/* Carousel enhancements */
+.ant-carousel .slick-dots li button {
+  background: #d4af37 !important;
+}
+
+.ant-carousel .slick-dots li.slick-active button {
+  background: #b8860b !important;
+}
+
+/* Theme Styles */
+.light-theme {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+  color: #333 !important;
+}
+
+.dark-theme {
+  background: #0a0a0a !important;
+  color: #ffffff !important;
+}
+
+/* Layout */
+.light-theme .ant-layout {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+}
+
+.dark-theme .ant-layout {
+  background: #0a0a0a !important;
+}
+
+/* Cards */
+.light-theme .ant-card {
+  background: #ffffff !important;
+  color: #333 !important;
+  border-color: #e0e0e0 !important;
+}
+
+.dark-theme .ant-card {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+  border-color: #333 !important;
+}
+
+.light-theme .ant-card-meta-title {
+  color: #333 !important;
+}
+
+.dark-theme .ant-card-meta-title {
+  color: #d4af37 !important;
+}
+
+.dark-theme .ant-card-meta-description {
+  color: #ffffff !important;
+}
+
+/* Headers */
+.light-theme .ant-layout-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.dark-theme .ant-layout-header {
+  background: #1a1a1a !important;
+  border-bottom: 1px solid #333 !important;
+}
+
+/* Inputs */
+.light-theme .ant-input,
+.light-theme .ant-select-selector {
+  background: #ffffff !important;
+  color: #333 !important;
+  border-color: #d9d9d9 !important;
+}
+
+.dark-theme .ant-input,
+.dark-theme .ant-select-selector {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+  border-color: #444 !important;
+}
+
+/* Tables */
+.light-theme .ant-table {
+  background: #ffffff !important;
+}
+
+.dark-theme .ant-table {
+  background: #1a1a1a !important;
+}
+
+.light-theme .ant-table-thead > tr > th {
+  background: #fafafa !important;
+  color: #333 !important;
+}
+
+.dark-theme .ant-table-thead > tr > th {
+  background: #2a2a2a !important;
+  color: #d4af37 !important;
+}
+
+.light-theme .ant-table-tbody > tr > td {
+  background: #ffffff !important;
+  color: #333 !important;
+  border-color: #f0f0f0 !important;
+}
+
+.dark-theme .ant-table-tbody > tr > td {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+  border-color: #333 !important;
+}
+
+/* Modals */
+.light-theme .ant-modal-content {
+  background: #ffffff !important;
+}
+
+.dark-theme .ant-modal-content {
+  background: #1a1a1a !important;
+}
+
+.light-theme .ant-modal-header {
+  background: #ffffff !important;
+  border-color: #f0f0f0 !important;
+}
+
+.dark-theme .ant-modal-header {
+  background: #1a1a1a !important;
+  border-color: #333 !important;
+}
+
+.light-theme .ant-modal-title {
+  color: #333 !important;
+}
+
+.dark-theme .ant-modal-title {
+  color: #d4af37 !important;
+}
+
+/* Typography */
+.light-theme h1, .light-theme h2, .light-theme h3, .light-theme h4, .light-theme h5, .light-theme h6 {
+  color: #d4af37 !important;
+}
+
+.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4, .dark-theme h5, .dark-theme h6 {
+  color: #ffffff !important;
+}
+
+.light-theme .ant-typography h1,
+.light-theme .ant-typography h2,
+.light-theme .ant-typography h3,
+.light-theme .ant-typography h4,
+.light-theme .ant-typography h5,
+.light-theme .ant-typography h6 {
+  color: #d4af37 !important;
+}
+
+.dark-theme .ant-typography h1,
+.dark-theme .ant-typography h2,
+.dark-theme .ant-typography h3,
+.dark-theme .ant-typography h4,
+.dark-theme .ant-typography h5,
+.dark-theme .ant-typography h6 {
+  color: #ffffff !important;
+}
+
+.light-theme .ant-typography p {
+  color: #d4af37 !important;
+}
+
+.dark-theme .ant-typography p {
+  color: #ffffff !important;
+}
+
+/* Carousel Text Override */
+.ant-carousel .ant-typography h1,
+.ant-carousel .ant-typography p {
+  color: #ffffff !important;
+}
+
+.light-theme .ant-typography {
+  color: #333 !important;
+}
+
+.dark-theme .ant-typography {
+  color: #ffffff !important;
+}
+
+.light-theme .ant-typography h1,
+.light-theme .ant-typography h2,
+.light-theme .ant-typography h3,
+.light-theme .ant-typography h4,
+.light-theme .ant-typography h5,
+.light-theme .ant-typography h6 {
+  color: #d4af37 !important;
+  text-shadow: 2px 2px 8px rgba(212, 175, 55, 0.3) !important;
+}
+
+.dark-theme .ant-typography h1,
+.dark-theme .ant-typography h2,
+.dark-theme .ant-typography h3,
+.dark-theme .ant-typography h4,
+.dark-theme .ant-typography h5,
+.dark-theme .ant-typography h6 {
+  color: #d4af37 !important;
+  text-shadow: 2px 2px 8px rgba(212, 175, 55, 0.5) !important;
+}
+
+/* Menus */
+.light-theme .ant-menu {
+  background: #ffffff !important;
+}
+
+.dark-theme .ant-menu {
+  background: #1a1a1a !important;
+}
+
+.light-theme .ant-menu-item {
+  color: #333 !important;
+}
+
+.dark-theme .ant-menu-item {
+  color: #ffffff !important;
+}
+
+.dark-theme .ant-menu-item:hover {
+  color: #d4af37 !important;
+}
+
+/* Forms */
+.light-theme .ant-form-item-label > label {
+  color: #333 !important;
+}
+
+.dark-theme .ant-form-item-label > label {
+  color: #d4af37 !important;
+}
+
+/* Pagination */
+.light-theme .ant-pagination-item {
+  background: #ffffff !important;
+  border-color: #d9d9d9 !important;
+}
+
+.dark-theme .ant-pagination-item {
+  background: #2a2a2a !important;
+  border-color: #444 !important;
+}
+
+.light-theme .ant-pagination-item a {
+  color: #333 !important;
+}
+
+.dark-theme .ant-pagination-item a {
+  color: #ffffff !important;
+}
+
+/* Footer Text */
+.light-theme .footer-description,
+.light-theme .contact-text {
+  color: #666 !important;
+}
+
+.dark-theme .footer-description,
+.dark-theme .contact-text {
+  color: #ccc !important;
 }
 
 /* Responsive utilities */

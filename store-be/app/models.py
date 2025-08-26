@@ -18,22 +18,51 @@ class User(Base):
     
     orders = relationship("Order", back_populates="user")
 
+class Category(Base):
+    __tablename__ = "categories"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
+    description = Column(Text)
+    icon = Column(String)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    products = relationship("Product", back_populates="category")
+
 class Product(Base):
     __tablename__ = "products"
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
+    full_name = Column(String)
+    type = Column(String)
+    retail_price = Column(Float)
+    offer_price = Column(Float)
+    buy_price = Column(Float, nullable=True)  # Cost price
+    sell_price = Column(Float, nullable=True)  # Selling price
+    currency = Column(String, default="PKR")
     description = Column(Text)
+    delivery_charges = Column(Float, default=0.0)
+    stock = Column(Integer, default=0)
+    total_qty = Column(Integer, default=0)  # Total quantity
+    location = Column(String, default="Store")  # Storage location
+    status = Column(String, default="available")
+    images = Column(JSON)  # List of image URLs
+    available = Column(Integer, default=0)
+    sold = Column(Integer, default=0)
+    category_id = Column(Integer, ForeignKey("categories.id"))
+    
+    # Legacy fields for backward compatibility
     price = Column(Float)
     original_price = Column(Float)
-    category = Column(String, index=True)
     subcategory = Column(String, index=True)
-    images = Column(JSON)  # List of image URLs
     stock_quantity = Column(Integer, default=0)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
+    category = relationship("Category", back_populates="products")
     order_items = relationship("OrderItem", back_populates="product")
 
 class Order(Base):
@@ -50,11 +79,13 @@ class Order(Base):
     status = Column(String, default="pending")  # pending, processing, shipped, delivered, cancelled
     payment_method = Column(String)
     payment_status = Column(String, default="pending")
+    transaction_id = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     user = relationship("User", back_populates="orders")
     items = relationship("OrderItem", back_populates="order")
+    payments = relationship("Payment", back_populates="order")
 
 class OrderItem(Base):
     __tablename__ = "order_items"
@@ -89,3 +120,40 @@ class ProductOffer(Base):
     product_id = Column(Integer, ForeignKey("products.id"))
     offer_id = Column(Integer, ForeignKey("offers.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class HairAccessory(Base):
+    __tablename__ = "hair_accessories"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    description = Column(Text)
+    price = Column(Float)
+    original_price = Column(Float, nullable=True)
+    currency = Column(String, default="PKR")
+    stock = Column(Integer, default=0)
+    status = Column(String, default="available")  # available, out_of_stock, discontinued
+    images = Column(JSON)  # List of image URLs
+    category = Column(String)  # hair_clips, headbands, hair_claws, hairpins, etc.
+    material = Column(String)  # pearl, rhinestone, gold, silver, etc.
+    color = Column(String)
+    is_featured = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+class Payment(Base):
+    __tablename__ = "payments"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey("orders.id"))
+    payment_method = Column(String)  # cod, card, bank_transfer, etc.
+    payment_gateway = Column(String, nullable=True)  # stripe, paypal, etc.
+    transaction_id = Column(String, nullable=True)
+    amount = Column(Float)
+    currency = Column(String, default="PKR")
+    status = Column(String, default="pending")  # pending, completed, failed, refunded
+    payment_date = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    order = relationship("Order", back_populates="payments")

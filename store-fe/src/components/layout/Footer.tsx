@@ -14,10 +14,25 @@ const { Footer: AntFooter } = Layout;
 const { Title, Text } = Typography;
 
 const StyledFooter = styled(AntFooter)`
-  background: #1a1a1a;
-  color: white;
-  padding: 48px 24px 24px;
+  padding: 48px 10% 24px;
   margin-top: auto;
+  transition: all 0.3s ease;
+  
+  .light-theme & {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    color: #333;
+    border-top: 2px solid #e8e8e8;
+  }
+  
+  .dark-theme & {
+    background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
+    color: #ffffff;
+    border-top: 2px solid #333;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 48px 5% 24px;
+  }
 `;
 
 const FooterSection = styled.div`
@@ -25,49 +40,92 @@ const FooterSection = styled.div`
 `;
 
 const FooterTitle = styled(Title)`
-  color: #d4af37 !important;
-  font-size: 18px !important;
+  font-size: 20px !important;
   margin-bottom: 16px !important;
+  font-weight: 600 !important;
+  
+  .light-theme & {
+    color: #d4af37 !important;
+  }
+  
+  .dark-theme & {
+    color: #d4af37 !important;
+  }
 `;
 
 const FooterLink = styled(Link)`
-  color: #ccc;
   text-decoration: none;
   display: block;
   margin-bottom: 8px;
+  transition: all 0.3s ease;
+  
+  .light-theme & {
+    color: #666;
+  }
+  
+  .dark-theme & {
+    color: #ccc;
+  }
 
   &:hover {
     color: #d4af37;
+    transform: translateX(5px);
   }
 `;
 
 const SocialLink = styled.a`
-  color: #ccc;
-  font-size: 20px;
+  font-size: 24px;
   margin-right: 16px;
+  transition: all 0.3s ease;
+  
+  .light-theme & {
+    color: #666;
+  }
+  
+  .dark-theme & {
+    color: #ccc;
+  }
 
   &:hover {
     color: #d4af37;
+    transform: translateY(-3px) scale(1.2);
   }
 `;
 
 const ContactInfo = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
-  color: #ccc;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  
+  .light-theme & {
+    color: #666;
+  }
+  
+  .dark-theme & {
+    color: #ccc;
+  }
 
   .anticon {
-    margin-right: 8px;
+    margin-right: 12px;
     color: #d4af37;
+    font-size: 16px;
   }
 `;
 
 const Copyright = styled.div`
   text-align: center;
   padding-top: 24px;
-  border-top: 1px solid #333;
-  color: #999;
+  
+  .light-theme & {
+    border-top: 1px solid #e8e8e8;
+    color: #666;
+  }
+  
+  .dark-theme & {
+    border-top: 1px solid #333;
+    color: #999;
+  }
 `;
 
 const Footer: React.FC = () => {
@@ -77,7 +135,7 @@ const Footer: React.FC = () => {
         <Col xs={24} sm={12} md={6}>
           <FooterSection>
             <FooterTitle level={4}>Saiyaara</FooterTitle>
-            <Text style={{ color: "#ccc" }}>
+            <Text className="footer-description">
               Elegant jewelry for every occasion. Discover our beautiful
               collection of anklets, bangles, bracelets, earrings, rings and
               more.
@@ -113,15 +171,15 @@ const Footer: React.FC = () => {
             <FooterTitle level={4}>Contact Info</FooterTitle>
             <ContactInfo>
               <PhoneOutlined />
-              <Text style={{ color: "#ccc" }}>+91-XXXXXXXXXX</Text>
+              <Text className="contact-text">+91-XXXXXXXXXX</Text>
             </ContactInfo>
             <ContactInfo>
               <MailOutlined />
-              <Text style={{ color: "#ccc" }}>support@saiyaara.com</Text>
+              <Text className="contact-text">support@saiyaara.com</Text>
             </ContactInfo>
             <ContactInfo>
               <EnvironmentOutlined />
-              <Text style={{ color: "#ccc" }}>
+              <Text className="contact-text">
                 Saiyaara Store
                 <br />
                 Jewelry District

@@ -11,25 +11,42 @@ const WhatsAppButtonContainer = styled.div`
 `;
 
 const StyledWhatsAppButton = styled(Button)`
-  width: 60px;
-  height: 60px;
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
-  background: #25d366;
-  border: none;
-  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  border: 3px solid #ffffff;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+  }
 
   &:hover {
-    background: #128c7e !important;
-    transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(37, 211, 102, 0.6);
+    background: linear-gradient(135deg, #128c7e, #25d366) !important;
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.7);
+    border-color: #25d366;
   }
 
   .anticon {
-    font-size: 24px;
+    font-size: 28px;
     color: white;
+    z-index: 1;
+    position: relative;
   }
 `;
 

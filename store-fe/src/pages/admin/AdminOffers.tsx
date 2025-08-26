@@ -8,6 +8,24 @@ const { TextArea } = Input;
 
 const AdminContainer = styled.div`
   padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+`;
+
+const StyledCard = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: none;
+  
+  .ant-card-head {
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    border-radius: 12px 12px 0 0;
+    
+    .ant-card-head-title {
+      color: white;
+      font-weight: 600;
+    }
+  }
 `;
 
 const AdminOffers: React.FC = () => {
@@ -143,10 +161,15 @@ const AdminOffers: React.FC = () => {
 
   return (
     <AdminContainer>
-      <Card
-        title="Offer Management"
+      <StyledCard
+        title="🎁 Offer Management"
         extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            onClick={handleAdd}
+            style={{ background: 'white', color: '#d4af37', borderColor: 'white' }}
+          >
             Add Offer
           </Button>
         }
@@ -161,7 +184,7 @@ const AdminOffers: React.FC = () => {
             showQuickJumper: true,
           }}
         />
-      </Card>
+      </StyledCard>
 
       <Modal
         title={editingOffer ? 'Edit Offer' : 'Add Offer'}
@@ -208,7 +231,10 @@ const AdminOffers: React.FC = () => {
             label="Valid From"
             rules={[{ required: true, message: 'Please select start date' }]}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker 
+              style={{ width: '100%' }} 
+              format="YYYY-MM-DD"
+            />
           </Form.Item>
 
           <Form.Item
@@ -216,7 +242,10 @@ const AdminOffers: React.FC = () => {
             label="Valid Until"
             rules={[{ required: true, message: 'Please select end date' }]}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker 
+              style={{ width: '100%' }} 
+              format="YYYY-MM-DD"
+            />
           </Form.Item>
 
           <Form.Item

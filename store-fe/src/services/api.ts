@@ -138,6 +138,8 @@ export const adminAPI = {
 
   // Users
   getAllUsers: () => api.get("/admin/users").then((res) => res.data),
+  updateUser: (id: number, userData: any) =>
+    api.put(`/admin/users/${id}`, userData).then((res) => res.data),
   toggleUserStatus: (id: number) =>
     api.put(`/admin/users/${id}/toggle`).then((res) => res.data),
 

@@ -4,15 +4,28 @@ import { productAPI } from "../../services/api";
 export interface Product {
   id: number;
   name: string;
-  description: string;
-  price: number;
-  original_price: number;
+  full_name?: string;
+  type?: string;
+  retail_price: number;
+  offer_price?: number;
+  currency: string;
+  description?: string;
+  delivery_charges: number;
+  stock: number;
+  status: string;
   images: string[];
-  stock_quantity: number;
-  category: string;
-  subcategory: string;
-  is_active: boolean;
-  created_at: string;
+  available: number;
+  sold: number;
+  category_id: number;
+  
+  // Legacy fields for backward compatibility
+  price?: number;
+  original_price?: number;
+  category?: string;
+  subcategory?: string;
+  stock_quantity?: number;
+  is_active?: boolean;
+  created_at?: string;
   updated_at?: string;
 }
 

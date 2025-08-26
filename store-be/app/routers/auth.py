@@ -35,14 +35,30 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
+    print(f"Login attempt for email: {user_credentials.email}")
     user = db.query(User).filter(User.email == user_credentials.email).first()
-    if not user or not verify_password(user_credentials.password, user.hashed_password):
+    
+    if not user:
+        print(f"User not found for email: {user_credentials.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
+    print(f"User found: {user.email}, checking password...")
+    password_valid = verify_password(user_credentials.password, user.hashed_password)
+    print(f"Password valid: {password_valid}")
+    
+    if not password_valid:
+        print("Password verification failed")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    print("Login successful, creating token...")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires

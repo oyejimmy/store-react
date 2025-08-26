@@ -1,47 +1,54 @@
-import React, { useState } from 'react';
-import { Card, Table, Tag, Button, Space, Select, Modal, Descriptions, message } from 'antd';
-import { EyeOutlined, EditOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Card, Table, Tag, Button, Space, Select, Modal, Descriptions, message, Spin, Image } from 'antd';
+import { EyeOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
+import { adminAPI } from '../../services/api';
 import styled from 'styled-components';
 
 const { Option } = Select;
 
 const AdminContainer = styled.div`
   padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+`;
+
+const StyledCard = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: none;
+  
+  .ant-card-head {
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    border-radius: 12px 12px 0 0;
+    
+    .ant-card-head-title {
+      color: white;
+      font-weight: 600;
+    }
+  }
 `;
 
 const AdminOrders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Mock data
-  const orders = [
-    {
-      id: 1,
-      orderNumber: 'ORD-001',
-      customer: 'John Doe',
-      email: 'john@example.com',
-      phone: '+91-1234567890',
-      total: 2500,
-      status: 'pending',
-      date: '2024-01-15',
-      items: [
-        { name: 'Gold Ring', quantity: 1, price: 2500 }
-      ]
-    },
-    {
-      id: 2,
-      orderNumber: 'ORD-002',
-      customer: 'Jane Smith',
-      email: 'jane@example.com',
-      phone: '+91-9876543210',
-      total: 1800,
-      status: 'processing',
-      date: '2024-01-14',
-      items: [
-        { name: 'Silver Necklace', quantity: 1, price: 1800 }
-      ]
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const data = await adminAPI.getAllOrders();
+      setOrders(data);
+    } catch (error) {
+      message.error('Failed to fetch orders');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -56,40 +63,91 @@ const AdminOrders: React.FC = () => {
 
   const columns = [
     {
-      title: 'Order ID',
-      dataIndex: 'orderNumber',
+      title: 'Order#',
+      dataIndex: 'order_number',
       key: 'orderNumber',
+      width: 100,
+      render: (orderNumber: string) => (
+        <span style={{ fontWeight: 'bold', color: '#333' }}>{orderNumber}</span>
+      ),
     },
     {
-      title: 'Customer',
-      dataIndex: 'customer',
+      title: 'Customer Name',
+      dataIndex: 'customer_name',
       key: 'customer',
+      width: 150,
     },
     {
-      title: 'Total',
-      dataIndex: 'total',
+      title: 'Total amount',
+      dataIndex: 'total_amount',
       key: 'total',
-      render: (total: number) => `₹${total}`,
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => (
-        <Tag color={getStatusColor(status)}>
-          {status.toUpperCase()}
-        </Tag>
+      width: 120,
+      render: (total: number) => (
+        <span style={{ fontWeight: 'bold' }}>PKR {total || 0}</span>
       ),
     },
     {
       title: 'Date',
-      dataIndex: 'date',
+      dataIndex: 'created_at',
       key: 'date',
-      render: (date: string) => new Date(date).toLocaleDateString(),
+      width: 100,
+      render: (date: string) => new Date(date).toLocaleDateString('en-GB'),
+    },
+    {
+      title: 'Delivery Deadline',
+      key: 'deliveryDeadline',
+      width: 120,
+      render: (_: any, record: any) => {
+        const deliveryDate = new Date(record.created_at);
+        deliveryDate.setDate(deliveryDate.getDate() + 7);
+        return deliveryDate.toLocaleDateString('en-GB');
+      },
+    },
+    {
+      title: 'Status',
+      dataIndex: 'payment_status',
+      key: 'paymentStatus',
+      width: 80,
+      render: (paymentStatus: string) => (
+        <Tag color={paymentStatus === 'paid' ? 'green' : 'red'}>
+          {paymentStatus === 'paid' ? 'Paid' : 'Not Paid'}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Product Availability',
+      dataIndex: 'status',
+      key: 'productStatus',
+      width: 120,
+      render: (status: string) => {
+        const statusMap = {
+          'pending': 'Expected',
+          'processing': 'Picked',
+          'shipped': 'Picked',
+          'delivered': 'Picked'
+        };
+        return statusMap[status as keyof typeof statusMap] || 'Expected';
+      },
+    },
+    {
+      title: 'Delivery',
+      dataIndex: 'status',
+      key: 'deliveryStatus',
+      width: 100,
+      render: (status: string) => {
+        const deliveryMap = {
+          'pending': <span style={{ color: '#ff4d4f' }}>Not Shipped</span>,
+          'processing': <span style={{ color: '#faad14' }}>Packed</span>,
+          'shipped': <span style={{ color: '#52c41a' }}>Packed</span>,
+          'delivered': <span style={{ color: '#52c41a' }}>Packed</span>
+        };
+        return deliveryMap[status as keyof typeof deliveryMap] || 'Packed';
+      },
     },
     {
       title: 'Actions',
       key: 'actions',
+      width: 120,
       render: (_: any, record: any) => (
         <Space>
           <Button 
@@ -97,15 +155,9 @@ const AdminOrders: React.FC = () => {
             size="small" 
             icon={<EyeOutlined />}
             onClick={() => handleViewOrder(record)}
+            style={{ background: '#d4af37', borderColor: '#d4af37' }}
           >
             View
-          </Button>
-          <Button 
-            size="small" 
-            icon={<EditOutlined />}
-            onClick={() => handleUpdateStatus(record)}
-          >
-            Update Status
           </Button>
         </Space>
       ),
@@ -143,18 +195,32 @@ const AdminOrders: React.FC = () => {
 
   return (
     <AdminContainer>
-      <Card title="Order Management">
+      <StyledCard 
+        title="Orders" 
+        extra={
+          <Button 
+            type="primary" 
+            style={{ background: '#ff4d4f', borderColor: '#ff4d4f' }}
+          >
+            New Order
+          </Button>
+        }
+      >
         <Table
           columns={columns}
           dataSource={orders}
           rowKey="id"
+          loading={loading}
+          size="small"
           pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
+            pageSize: 15,
+            showSizeChanger: false,
+            showQuickJumper: false,
+            simple: true,
           }}
+          scroll={{ x: 1000 }}
         />
-      </Card>
+      </StyledCard>
 
       <Modal
         title="Order Details"
@@ -165,41 +231,110 @@ const AdminOrders: React.FC = () => {
             Close
           </Button>
         ]}
-        width={800}
+        width={1000}
       >
         {selectedOrder && (
-          <Descriptions bordered column={2}>
-            <Descriptions.Item label="Order Number" span={2}>
-              {selectedOrder.orderNumber}
-            </Descriptions.Item>
-            <Descriptions.Item label="Customer">
-              {selectedOrder.customer}
-            </Descriptions.Item>
-            <Descriptions.Item label="Email">
-              {selectedOrder.email}
-            </Descriptions.Item>
-            <Descriptions.Item label="Phone">
-              {selectedOrder.phone}
-            </Descriptions.Item>
-            <Descriptions.Item label="Total">
-              ₹{selectedOrder.total}
-            </Descriptions.Item>
-            <Descriptions.Item label="Status" span={2}>
-              <Tag color={getStatusColor(selectedOrder.status)}>
-                {selectedOrder.status.toUpperCase()}
-              </Tag>
-            </Descriptions.Item>
-            <Descriptions.Item label="Order Date" span={2}>
-              {new Date(selectedOrder.date).toLocaleDateString()}
-            </Descriptions.Item>
-            <Descriptions.Item label="Items" span={2}>
-              {selectedOrder.items.map((item: any, index: number) => (
-                <div key={index} style={{ marginBottom: '8px' }}>
-                  {item.name} - Qty: {item.quantity} - ₹{item.price}
-                </div>
-              ))}
-            </Descriptions.Item>
-          </Descriptions>
+          <div>
+            <Descriptions bordered column={2} style={{ marginBottom: '24px' }}>
+              <Descriptions.Item label="Order Number" span={2}>
+                <strong>{selectedOrder.order_number}</strong>
+              </Descriptions.Item>
+              <Descriptions.Item label="Customer Name">
+                {selectedOrder.customer_name}
+              </Descriptions.Item>
+              <Descriptions.Item label="Customer Email">
+                {selectedOrder.customer_email}
+              </Descriptions.Item>
+              <Descriptions.Item label="Customer Phone">
+                {selectedOrder.customer_phone}
+              </Descriptions.Item>
+              <Descriptions.Item label="User ID">
+                {selectedOrder.user_id || 'Guest Order'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Total Amount">
+                <strong>PKR {selectedOrder.total_amount}</strong>
+              </Descriptions.Item>
+              <Descriptions.Item label="Payment Method">
+                {selectedOrder.payment_method}
+              </Descriptions.Item>
+              <Descriptions.Item label="Order Status">
+                <Tag color={getStatusColor(selectedOrder.status)}>
+                  {selectedOrder.status.toUpperCase()}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="Payment Status">
+                <Tag color={selectedOrder.payment_status === 'paid' ? 'green' : 'orange'}>
+                  {selectedOrder.payment_status.toUpperCase()}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="Order Date">
+                {new Date(selectedOrder.created_at).toLocaleString()}
+              </Descriptions.Item>
+              <Descriptions.Item label="Last Updated">
+                {selectedOrder.updated_at ? new Date(selectedOrder.updated_at).toLocaleString() : 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Shipping Address" span={2}>
+                {selectedOrder.shipping_address}
+              </Descriptions.Item>
+            </Descriptions>
+            
+            <Card title="Order Items" style={{ marginTop: '16px' }}>
+              {selectedOrder.items && selectedOrder.items.length > 0 ? (
+                selectedOrder.items.map((item: any, index: number) => (
+                  <Card key={index} type="inner" style={{ marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                      {item.product && item.product.images && item.product.images[0] && (
+                        <img 
+                          src={item.product.images[0]} 
+                          alt={item.product.name}
+                          style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }}
+                        />
+                      )}
+                      <div style={{ flex: 1 }}>
+                        <Descriptions size="small" column={2}>
+                          <Descriptions.Item label="Product ID">
+                            {item.product_id}
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Product Name">
+                            <strong>{item.product ? item.product.name : 'Product not found'}</strong>
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Quantity">
+                            {item.quantity}
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Unit Price">
+                            PKR {item.price}
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Total Price">
+                            <strong>PKR {item.price * item.quantity}</strong>
+                          </Descriptions.Item>
+                          {item.product && (
+                            <>
+                              <Descriptions.Item label="Category">
+                                {item.product.category || item.product.subcategory || 'N/A'}
+                              </Descriptions.Item>
+                              <Descriptions.Item label="Stock Available">
+                                {item.product.stock_quantity || item.product.stock || 0}
+                              </Descriptions.Item>
+                              <Descriptions.Item label="Product Status">
+                                {item.product.status}
+                              </Descriptions.Item>
+                              {item.product.description && (
+                                <Descriptions.Item label="Description" span={2}>
+                                  {item.product.description}
+                                </Descriptions.Item>
+                              )}
+                            </>
+                          )}
+                        </Descriptions>
+                      </div>
+                    </div>
+                  </Card>
+                ))
+              ) : (
+                <p>No items found for this order</p>
+              )}
+            </Card>
+          </div>
         )}
       </Modal>
     </AdminContainer>

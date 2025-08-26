@@ -8,10 +8,12 @@ import { getCurrentUser } from "./store/slices/authSlice";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import WhatsAppButton from "./components/common/WhatsAppButton";
+import AdminLayout from "./components/layout/AdminLayout";
 
 // Customer Pages
 import HomePage from "./pages/customer/HomePage";
 import ShopPage from "./pages/customer/ShopPage";
+import CategoriesPage from "./pages/customer/CategoriesPage";
 import ProductDetailPage from "./pages/customer/ProductDetailPage";
 import CartPage from "./pages/customer/CartPage";
 import CheckoutPage from "./pages/customer/CheckoutPage";
@@ -30,6 +32,10 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminInventory from "./pages/admin/AdminInventory";
 import AdminOffers from "./pages/admin/AdminOffers";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminPayments from "./pages/admin/AdminPayments";
+import AdminSalesChannels from "./pages/admin/AdminSalesChannels";
+import AdminReports from "./pages/admin/AdminReports";
+import NotFound from "./pages/NotFound";
 
 // Protected Route Component
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -62,91 +68,64 @@ function App() {
   }, [dispatch, token, isAuthenticated]);
 
   return (
-    <AppContainer>
-      <Header />
-      <MainContent>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/shop" element={<ShopPage />} />
-          <Route path="/shop/:category" element={<ShopPage />} />
-          <Route path="/product/:id" element={<ProductDetailPage />} />
-          <Route path="/offers/:type" element={<OffersPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route
-            path="/order-confirmation"
-            element={<OrderConfirmationPage />}
-          />
-
-          {/* Protected Customer Routes */}
-          <Route
-            path="/my-orders"
-            element={
-              <ProtectedRoute>
-                <UserOrdersPage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Admin Routes */}
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/products"
-            element={
-              <AdminRoute>
-                <AdminProducts />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/orders"
-            element={
-              <AdminRoute>
-                <AdminOrders />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/inventory"
-            element={
-              <AdminRoute>
-                <AdminInventory />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/offers"
-            element={
-              <AdminRoute>
-                <AdminOffers />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/users"
-            element={
-              <AdminRoute>
-                <AdminUsers />
-              </AdminRoute>
-            }
-          />
-        </Routes>
-      </MainContent>
-      <Footer />
-      <WhatsAppButton />
-    </AppContainer>
+    <Routes>
+      {/* Admin Routes */}
+      <Route path="/admin" element={
+        <AdminRoute>
+          <AdminLayout />
+        </AdminRoute>
+      }>
+        <Route index element={<AdminDashboard />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="orders" element={<AdminOrders />} />
+        <Route path="inventory" element={<AdminInventory />} />
+        <Route path="offers" element={<AdminOffers />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="payments" element={<AdminPayments />} />
+        <Route path="sales-channels" element={<AdminSalesChannels />} />
+        <Route path="reports" element={<AdminReports />} />
+      </Route>
+      
+      {/* Customer Routes */}
+      <Route path="/*" element={
+        <AppContainer>
+          <Header />
+          <MainContent>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/categories" element={<CategoriesPage />} />
+              <Route path="/shop" element={<ShopPage />} />
+              <Route path="/shop/:category" element={<ShopPage />} />
+              <Route path="/product/:id" element={<ProductDetailPage />} />
+              <Route path="/offers/:type" element={<OffersPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+              
+              {/* Protected Customer Routes */}
+              <Route
+                path="/my-orders"
+                element={
+                  <ProtectedRoute>
+                    <UserOrdersPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* 404 Route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </MainContent>
+          <Footer />
+          <WhatsAppButton />
+        </AppContainer>
+      } />
+    </Routes>
   );
 }
 

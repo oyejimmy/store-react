@@ -33,9 +33,15 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = async (values: any) => {
     try {
-      await dispatch(login(values)).unwrap();
+      const result = await dispatch(login(values)).unwrap();
       message.success('Login successful!');
-      navigate('/');
+      
+      // Redirect admin users to admin panel
+      if (result.user && result.user.is_admin) {
+        window.location.href = 'http://localhost:3000/admin';
+      } else {
+        navigate('/');
+      }
     } catch (error: any) {
       message.error(error.message || 'Login failed. Please try again.');
     }

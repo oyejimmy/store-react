@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 
-from app.routers import auth, products, orders, admin, offers
+from app.routers import auth, products, orders, admin, offers, payments
 from app.database import engine
 from app.models import Base
 
@@ -35,6 +35,7 @@ app.include_router(products.router, prefix="/api/products", tags=["Products"])
 app.include_router(orders.router, prefix="/api/orders", tags=["Orders"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(offers.router, prefix="/api/offers", tags=["Offers"])
+app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
 
 @app.get("/")
 async def root():

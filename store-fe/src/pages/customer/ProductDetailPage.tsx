@@ -26,6 +26,7 @@ import {
 } from "@ant-design/icons";
 import styled from "styled-components";
 
+
 const { Title, Text, Paragraph } = Typography;
 
 const ProductDetailContainer = styled.div`
@@ -36,9 +37,15 @@ const ProductDetailContainer = styled.div`
 
 const ProductImage = styled.img`
   width: 100%;
-  height: 400px;
+  height: 500px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.02);
+  }
 `;
 
 const PriceSection = styled.div`
@@ -71,6 +78,31 @@ const ActionButtons = styled.div`
   .ant-btn {
     margin-right: 12px;
     margin-bottom: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    
+    &.ant-btn-primary {
+      background: linear-gradient(135deg, #d4af37, #b8860b);
+      border: none;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+      
+      &:hover {
+        background: linear-gradient(135deg, #b8860b, #d4af37);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
+      }
+    }
+    
+    &:not(.ant-btn-primary) {
+      border: 2px solid #d4af37;
+      color: #d4af37;
+      
+      &:hover {
+        background: #d4af37;
+        color: white;
+        transform: translateY(-2px);
+      }
+    }
   }
 `;
 
@@ -132,29 +164,35 @@ const ProductDetailPage: React.FC = () => {
     );
   }
 
-  const discountedPrice = currentProduct.price;
+  const discountedPrice = currentProduct.offer_price || currentProduct.price || currentProduct.retail_price;
 
-  const images =
-    currentProduct.images.length > 0
-      ? currentProduct.images
-      : ["https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400"];
+  const defaultImages = [
+    "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=500",
+    "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=500",
+    "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500",
+    "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=500",
+    "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=500"
+  ];
+  
+  const images = currentProduct.images && currentProduct.images.length > 0
+    ? currentProduct.images
+    : defaultImages;
 
   return (
     <ProductDetailContainer>
       <Row gutter={[32, 32]}>
         <Col xs={24} md={12}>
-          <Carousel autoplay>
-            {images.map((image, index) => (
-              <div key={index}>
-                <ProductImage src={image} alt={currentProduct.name} />
-              </div>
-            ))}
-          </Carousel>
+          <div style={{ marginBottom: '16px' }}>
+            <ProductImage 
+              src={images[selectedImage]} 
+              alt={currentProduct.name} 
+            />
+          </div>
 
-          <div style={{ marginTop: "16px" }}>
-            <Row gutter={8}>
-              {images.map((image, index) => (
-                <Col span={6} key={index}>
+          <div>
+            <Row gutter={[8, 8]}>
+              {images.slice(0, 5).map((image, index) => (
+                <Col span={4} key={index}>
                   <img
                     src={image}
                     alt={`${currentProduct.name} ${index + 1}`}
@@ -162,14 +200,25 @@ const ProductDetailPage: React.FC = () => {
                       width: "100%",
                       height: "80px",
                       objectFit: "cover",
-                      borderRadius: "4px",
+                      borderRadius: "8px",
                       cursor: "pointer",
-                      border:
-                        selectedImage === index
-                          ? "2px solid #d4af37"
-                          : "1px solid #d9d9d9",
+                      border: selectedImage === index
+                        ? "3px solid #d4af37"
+                        : "2px solid #f0f0f0",
+                      transition: "all 0.3s ease",
+                      boxShadow: selectedImage === index 
+                        ? "0 4px 12px rgba(212, 175, 55, 0.3)"
+                        : "0 2px 8px rgba(0, 0, 0, 0.1)"
                     }}
                     onClick={() => setSelectedImage(index)}
+                    onMouseEnter={(e) => {
+                      if (selectedImage !== index) {
+                        e.currentTarget.style.transform = 'scale(1.05)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
                   />
                 </Col>
               ))}
@@ -182,23 +231,27 @@ const ProductDetailPage: React.FC = () => {
 
           <Space style={{ marginBottom: "16px" }}>
             <Tag color="gold">Premium Quality</Tag>
-            {currentProduct.original_price > currentProduct.price && (
-              <DiscountTag>
-                {Math.round(
-                  ((currentProduct.original_price - currentProduct.price) /
-                    currentProduct.original_price) *
-                    100
-                )}
-                % OFF
-              </DiscountTag>
-            )}
+            {(() => {
+              const originalPrice = currentProduct.original_price || currentProduct.retail_price;
+              const currentPrice = currentProduct.offer_price || currentProduct.price || currentProduct.retail_price;
+              return originalPrice && currentPrice && originalPrice > currentPrice && (
+                <DiscountTag>
+                  {Math.round(((originalPrice - currentPrice) / originalPrice) * 100)}
+                  % OFF
+                </DiscountTag>
+              );
+            })()}
           </Space>
 
           <PriceSection>
-            {currentProduct.original_price > currentProduct.price && (
-              <OriginalPrice>₹{currentProduct.original_price}</OriginalPrice>
-            )}
-            <DiscountedPrice>₹{discountedPrice}</DiscountedPrice>
+            {(() => {
+              const originalPrice = currentProduct.original_price || currentProduct.retail_price;
+              const currentPrice = currentProduct.offer_price || currentProduct.price || currentProduct.retail_price;
+              return originalPrice && currentPrice && originalPrice > currentPrice && (
+                <OriginalPrice>PKR {originalPrice}</OriginalPrice>
+              );
+            })()}
+            <DiscountedPrice>PKR {currentProduct.offer_price || currentProduct.price || currentProduct.retail_price}</DiscountedPrice>
           </PriceSection>
 
           <Paragraph>{currentProduct.description}</Paragraph>
@@ -209,13 +262,13 @@ const ProductDetailPage: React.FC = () => {
             <Text strong>Quantity:</Text>
             <InputNumber
               min={1}
-              max={currentProduct.stock_quantity}
+              max={currentProduct.stock_quantity || currentProduct.stock || 0}
               value={quantity}
               onChange={(value) => setQuantity(value || 1)}
               style={{ marginLeft: "12px", width: "100px" }}
             />
             <Text type="secondary" style={{ marginLeft: "8px" }}>
-              {currentProduct.stock_quantity} available
+              {currentProduct.stock_quantity || currentProduct.stock || 0} available
             </Text>
           </div>
 
@@ -225,7 +278,7 @@ const ProductDetailPage: React.FC = () => {
               size="large"
               icon={<ShoppingCartOutlined />}
               onClick={handleAddToCart}
-              disabled={currentProduct.stock_quantity === 0}
+              disabled={(currentProduct.stock_quantity || currentProduct.stock || 0) === 0}
             >
               Add to Cart
             </Button>
@@ -233,7 +286,7 @@ const ProductDetailPage: React.FC = () => {
             <Button
               size="large"
               onClick={handleBuyNow}
-              disabled={currentProduct.stock_quantity === 0}
+              disabled={(currentProduct.stock_quantity || currentProduct.stock || 0) === 0}
             >
               Buy Now
             </Button>

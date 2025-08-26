@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Card, Button, Table, Tag, Space, Modal, Form, Input, Select, InputNumber, Upload, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Table, Tag, Space, Modal, Form, Input, Select, InputNumber, Upload, message, Spin } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, ReloadOutlined } from '@ant-design/icons';
+import { adminAPI } from '../../services/api';
 import styled from 'styled-components';
 
 const { Option } = Select;
@@ -8,32 +9,48 @@ const { TextArea } = Input;
 
 const AdminContainer = styled.div`
   padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+`;
+
+const StyledCard = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: none;
+  
+  .ant-card-head {
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    border-radius: 12px 12px 0 0;
+    
+    .ant-card-head-title {
+      color: white;
+      font-weight: 600;
+    }
+  }
 `;
 
 const AdminProducts: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
-  // Mock data
-  const products = [
-    {
-      id: 1,
-      name: 'Gold Ring',
-      category: 'Rings',
-      price: 2500,
-      stock: 15,
-      status: 'active'
-    },
-    {
-      id: 2,
-      name: 'Silver Necklace',
-      category: 'Necklaces',
-      price: 1800,
-      stock: 8,
-      status: 'active'
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const data = await adminAPI.getAllProducts();
+      setProducts(data);
+    } catch (error) {
+      message.error('Failed to fetch products');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const columns = [
     {
@@ -50,20 +67,19 @@ const AdminProducts: React.FC = () => {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      render: (price: number) => `₹${price}`,
+      render: (_: any, record: any) => `PKR ${record.offer_price || record.price || record.retail_price}`,
     },
     {
       title: 'Stock',
-      dataIndex: 'stock',
+      dataIndex: 'stock_quantity',
       key: 'stock',
     },
     {
       title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => (
-        <Tag color={status === 'active' ? 'green' : 'red'}>
-          {status.toUpperCase()}
+      key: 'is_active',
+      render: (_: any, record: any) => (
+        <Tag color={record.is_active ? 'green' : 'red'}>
+          {record.is_active ? 'ACTIVE' : 'INACTIVE'}
         </Tag>
       ),
     },
@@ -109,21 +125,40 @@ const AdminProducts: React.FC = () => {
     Modal.confirm({
       title: 'Are you sure you want to delete this product?',
       content: 'This action cannot be undone.',
-      onOk() {
-        message.success('Product deleted successfully');
+      async onOk() {
+        try {
+          await adminAPI.deleteProduct(id);
+          message.success('Product deleted successfully');
+          fetchProducts();
+        } catch (error) {
+          message.error('Failed to delete product');
+        }
       },
     });
   };
 
   const handleSubmit = async (values: any) => {
     try {
+      const productData = {
+        ...values,
+        retail_price: values.price,
+        offer_price: values.price,
+        stock: values.stock,
+        images: [],
+        is_active: true
+      };
+      
       if (editingProduct) {
+        await adminAPI.updateProduct(editingProduct.id, productData);
         message.success('Product updated successfully');
       } else {
+        await adminAPI.createProduct(productData);
         message.success('Product added successfully');
       }
+      
       setIsModalVisible(false);
       form.resetFields();
+      fetchProducts();
     } catch (error) {
       message.error('Failed to save product');
     }
@@ -131,25 +166,42 @@ const AdminProducts: React.FC = () => {
 
   return (
     <AdminContainer>
-      <Card
-        title="Product Management"
+      <StyledCard
+        title="🛍️ Product Management"
         extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            Add Product
-          </Button>
+          <Space>
+            <Button 
+              icon={<ReloadOutlined />} 
+              onClick={fetchProducts}
+              loading={loading}
+            >
+              Refresh
+            </Button>
+            <Button 
+              type="primary" 
+              icon={<PlusOutlined />} 
+              onClick={handleAdd}
+              style={{ background: 'white', color: '#d4af37', borderColor: 'white' }}
+            >
+              Add Product
+            </Button>
+          </Space>
         }
       >
         <Table
           columns={columns}
           dataSource={products}
           rowKey="id"
+          loading={loading}
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
             showQuickJumper: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
           }}
+          scroll={{ x: 800 }}
         />
-      </Card>
+      </StyledCard>
 
       <Modal
         title={editingProduct ? 'Edit Product' : 'Add Product'}
@@ -177,10 +229,13 @@ const AdminProducts: React.FC = () => {
             rules={[{ required: true, message: 'Please select category' }]}
           >
             <Select>
-              <Option value="Rings">Rings</Option>
-              <Option value="Necklaces">Necklaces</Option>
-              <Option value="Earrings">Earrings</Option>
-              <Option value="Bracelets">Bracelets</Option>
+              <Option value="Rings">💍 Rings</Option>
+              <Option value="Earrings">👂 Earrings</Option>
+              <Option value="Bangles">💫 Bangles</Option>
+              <Option value="Anklets">🦶 Anklets</Option>
+              <Option value="Bracelets">💎 Bracelets</Option>
+              <Option value="Pendants">✨ Pendants</Option>
+              <Option value="Hair Accessories">💇 Hair Accessories</Option>
             </Select>
           </Form.Item>
 
@@ -189,7 +244,7 @@ const AdminProducts: React.FC = () => {
             label="Price"
             rules={[{ required: true, message: 'Please enter price' }]}
           >
-            <InputNumber min={0} style={{ width: '100%' }} />
+            <InputNumber min={0} style={{ width: '100%' }} addonBefore="PKR" />
           </Form.Item>
 
           <Form.Item

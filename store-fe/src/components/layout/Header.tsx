@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout, Menu, Button, Badge, Dropdown, Avatar, Space } from "antd";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -12,6 +12,8 @@ import {
   GiftOutlined,
   PhoneOutlined,
   InfoCircleOutlined,
+  SunOutlined,
+  MoonOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import { RootState } from "../../store";
@@ -19,30 +21,106 @@ import { logout } from "../../store/slices/authSlice";
 
 const { Header: AntHeader } = Layout;
 
-const StyledHeader = styled(AntHeader)`
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+const TopBanner = styled.div<{ isVisible: boolean }>`
   position: fixed;
-  top: 0;
+  top: ${props => props.isVisible ? '0' : '-40px'};
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: top 0.3s ease;
+  
+  .light-theme & {
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    color: #000;
+  }
+  
+  .dark-theme & {
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    color: #000;
+  }
+`;
+
+const StyledHeader = styled(AntHeader)<{ bannerVisible: boolean }>`
+  position: fixed;
+  top: ${props => props.bannerVisible ? '32px' : '0'};
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 0 24px;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  height: 70px;
+  
+  .light-theme & {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  }
+  
+  .dark-theme & {
+    background: rgba(26, 26, 26, 0.95);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 0 16px;
+    height: 60px;
+  }
 `;
 
 const Logo = styled(Link)`
-  font-size: 24px;
-  font-weight: bold;
-  color: #d4af37;
+  font-size: 32px;
+  font-weight: 800;
   text-decoration: none;
   display: flex;
   align-items: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: -0.5px;
+  position: relative;
+  
+  .light-theme & {
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 4px rgba(212, 175, 55, 0.3));
+  }
+  
+  .dark-theme & {
+    background: linear-gradient(135deg, #d4af37, #ffd700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.5));
+  }
 
   &:hover {
-    color: #b8860b;
+    transform: scale(1.05) translateY(-1px);
+    
+    .light-theme & {
+      filter: drop-shadow(0 4px 8px rgba(212, 175, 55, 0.4));
+    }
+    
+    .dark-theme & {
+      filter: drop-shadow(0 4px 12px rgba(212, 175, 55, 0.6));
+    }
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 24px;
   }
 `;
 
@@ -51,17 +129,47 @@ const NavMenu = styled(Menu)`
   background: transparent;
   flex: 1;
   justify-content: center;
+  font-weight: 500;
 
-  .ant-menu-item {
-    color: #333;
+  .light-theme & {
+    .ant-menu-item, .ant-menu-submenu-title {
+      color: #333;
+      border-radius: 8px;
+      margin: 0 4px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    &:hover {
-      color: #d4af37;
+      &:hover {
+        color: #d4af37;
+        background: rgba(212, 175, 55, 0.1);
+        transform: translateY(-1px);
+      }
+
+      &.ant-menu-item-selected {
+        color: #d4af37;
+        background: rgba(212, 175, 55, 0.15);
+        border-bottom: 2px solid #d4af37;
+      }
     }
+  }
+  
+  .dark-theme & {
+    .ant-menu-item, .ant-menu-submenu-title {
+      color: #e0e0e0;
+      border-radius: 8px;
+      margin: 0 4px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    &.ant-menu-item-selected {
-      color: #d4af37;
-      border-bottom-color: #d4af37;
+      &:hover {
+        color: #d4af37;
+        background: rgba(212, 175, 55, 0.2);
+        transform: translateY(-1px);
+      }
+
+      &.ant-menu-item-selected {
+        color: #d4af37;
+        background: rgba(212, 175, 55, 0.25);
+        border-bottom: 2px solid #d4af37;
+      }
     }
   }
 `;
@@ -69,7 +177,61 @@ const NavMenu = styled(Menu)`
 const RightSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  
+  .ant-btn {
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+  
+  .light-theme & {
+    .ant-btn-text {
+      color: #333;
+      
+      &:hover {
+        color: #d4af37;
+        background: rgba(212, 175, 55, 0.1);
+      }
+    }
+    
+    .ant-btn-primary {
+      background: linear-gradient(135deg, #d4af37, #b8860b);
+      border: none;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+      
+      &:hover {
+        background: linear-gradient(135deg, #b8860b, #996f0a);
+        box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
+      }
+    }
+  }
+  
+  .dark-theme & {
+    .ant-btn-text {
+      color: #e0e0e0;
+      
+      &:hover {
+        color: #d4af37;
+        background: rgba(212, 175, 55, 0.2);
+      }
+    }
+    
+    .ant-btn-primary {
+      background: linear-gradient(135deg, #d4af37, #ffd700);
+      border: none;
+      color: #000;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+      
+      &:hover {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        box-shadow: 0 6px 16px rgba(212, 175, 55, 0.5);
+      }
+    }
+  }
 `;
 
 const MobileMenuButton = styled(Button)`
@@ -95,6 +257,37 @@ const Header: React.FC = () => {
   );
   const { itemCount } = useSelector((state: RootState) => state.cart);
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+  const [bannerVisible, setBannerVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    document.body.className = isDarkMode ? 'dark-theme' : 'light-theme';
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > 50) {
+        setBannerVisible(false);
+      } else {
+        setBannerVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -214,7 +407,12 @@ const Header: React.FC = () => {
   const selectedKeys = [location.pathname];
 
   return (
-    <StyledHeader>
+    <>
+      <TopBanner isVisible={bannerVisible}>
+        <span style={{ fontSize: '16px' }}>🚚</span>
+        FREE SHIPPING ON ALL ORDERS ABOVE PKR 2999/-
+      </TopBanner>
+      <StyledHeader bannerVisible={bannerVisible}>
       <Logo to="/">Saiyaara</Logo>
 
       <DesktopMenu>
@@ -226,6 +424,22 @@ const Header: React.FC = () => {
       </DesktopMenu>
 
       <RightSection>
+        <Button 
+          type="text" 
+          icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
+          onClick={toggleTheme}
+          style={{ 
+            color: '#d4af37',
+            fontSize: '18px',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        />
+        
         <Link to="/cart">
           <Badge count={itemCount} size="small">
             <Button type="text" icon={<ShoppingCartOutlined />} size="large" />
@@ -260,7 +474,8 @@ const Header: React.FC = () => {
           onClick={() => setMobileMenuVisible(!mobileMenuVisible)}
         />
       </RightSection>
-    </StyledHeader>
+      </StyledHeader>
+    </>
   );
 };
 

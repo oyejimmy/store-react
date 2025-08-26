@@ -22,10 +22,14 @@ def create_guest_order(order: OrderCreate, db: Session = Depends(get_db)):
         if not product:
             raise HTTPException(status_code=404, detail=f"Product {item.product_id} not found")
         
-        if product.stock_quantity < item.quantity:
+        # Check stock using available fields
+        stock_qty = product.stock_quantity or product.stock or 0
+        if stock_qty < item.quantity:
             raise HTTPException(status_code=400, detail=f"Insufficient stock for product {product.name}")
         
-        total_amount += product.price * item.quantity
+        # Use the best available price
+        product_price = product.offer_price or product.price or product.retail_price
+        total_amount += product_price * item.quantity
     
     # Create order
     db_order = Order(
@@ -44,16 +48,20 @@ def create_guest_order(order: OrderCreate, db: Session = Depends(get_db)):
     # Create order items and update stock
     for item in order.items:
         product = db.query(Product).filter(Product.id == item.product_id).first()
+        product_price = product.offer_price or product.price or product.retail_price
         order_item = OrderItem(
             order_id=db_order.id,
             product_id=item.product_id,
             quantity=item.quantity,
-            price=product.price
+            price=product_price
         )
         db.add(order_item)
         
-        # Update stock
-        product.stock_quantity -= item.quantity
+        # Update stock using available fields
+        if product.stock_quantity is not None:
+            product.stock_quantity -= item.quantity
+        elif product.stock is not None:
+            product.stock -= item.quantity
     
     db.commit()
     return db_order
@@ -67,10 +75,14 @@ def create_user_order(order: OrderCreate, current_user: User = Depends(get_curre
         if not product:
             raise HTTPException(status_code=404, detail=f"Product {item.product_id} not found")
         
-        if product.stock_quantity < item.quantity:
+        # Check stock using available fields
+        stock_qty = product.stock_quantity or product.stock or 0
+        if stock_qty < item.quantity:
             raise HTTPException(status_code=400, detail=f"Insufficient stock for product {product.name}")
         
-        total_amount += product.price * item.quantity
+        # Use the best available price
+        product_price = product.offer_price or product.price or product.retail_price
+        total_amount += product_price * item.quantity
     
     db_order = Order(
         user_id=current_user.id,
@@ -88,14 +100,20 @@ def create_user_order(order: OrderCreate, current_user: User = Depends(get_curre
     
     for item in order.items:
         product = db.query(Product).filter(Product.id == item.product_id).first()
+        product_price = product.offer_price or product.price or product.retail_price
         order_item = OrderItem(
             order_id=db_order.id,
             product_id=item.product_id,
             quantity=item.quantity,
-            price=product.price
+            price=product_price
         )
         db.add(order_item)
-        product.stock_quantity -= item.quantity
+        
+        # Update stock using available fields
+        if product.stock_quantity is not None:
+            product.stock_quantity -= item.quantity
+        elif product.stock is not None:
+            product.stock -= item.quantity
     
     db.commit()
     return db_order

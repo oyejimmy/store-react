@@ -33,7 +33,14 @@ const SignupPage: React.FC = () => {
 
   const handleSubmit = async (values: any) => {
     try {
-      await dispatch(signup(values)).unwrap();
+      const signupData = {
+        email: values.email,
+        username: values.email.split('@')[0], // Use email prefix as username
+        full_name: `${values.first_name} ${values.last_name}`,
+        phone: values.phone,
+        password: values.password
+      };
+      await dispatch(signup(signupData)).unwrap();
       message.success('Account created successfully! Please log in.');
       navigate('/login');
     } catch (error: any) {

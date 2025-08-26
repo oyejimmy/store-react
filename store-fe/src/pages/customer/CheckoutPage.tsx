@@ -23,7 +23,9 @@ import {
   UserOutlined, 
   EnvironmentOutlined, 
   CreditCardOutlined,
-  CheckCircleOutlined
+  CheckCircleOutlined,
+  MobileOutlined,
+  WalletOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
 
@@ -64,6 +66,7 @@ const CheckoutPage: React.FC = () => {
   
   const [currentStep, setCurrentStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [formData, setFormData] = useState<any>({});
   const [form] = Form.useForm();
 
   const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -87,7 +90,8 @@ const CheckoutPage: React.FC = () => {
 
   const handleNext = async () => {
     try {
-      await form.validateFields();
+      const values = await form.validateFields();
+      setFormData({ ...formData, ...values });
       setCurrentStep(currentStep + 1);
     } catch (error) {
       console.log('Validation failed:', error);
@@ -98,28 +102,97 @@ const CheckoutPage: React.FC = () => {
     setCurrentStep(currentStep - 1);
   };
 
-  const handleSubmit = async (values: any) => {
-    try {
-      const orderData = {
-        ...values,
-        items: items.map(item => ({
-          product_id: item.id,
-          quantity: item.quantity,
-          price: item.price
-        })),
-        total_amount: total,
-        payment_method: paymentMethod
+  const processPayment = async (orderData: any, allData: any) => {
+    if (paymentMethod === 'easypaisa' || paymentMethod === 'jazzcash') {
+      // Mobile wallet payment processing
+      const paymentData = {
+        amount: total,
+        mobile_number: allData.mobile_number,
+        cnic: allData.cnic,
+        order_id: Date.now().toString(),
+        gateway: paymentMethod,
+        merchant_account: '03121999696' // SadaPay account
       };
 
-      if (isAuthenticated) {
-        await dispatch(createUserOrder(orderData)).unwrap();
-      } else {
-        await dispatch(createGuestOrder(orderData)).unwrap();
+      try {
+        // Payment gateway API call
+        const response = await fetch('/api/payments/mobile-wallet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(paymentData)
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          message.success(`Payment of PKR ${total} initiated to 03121999696! Check your ${paymentMethod} app.`);
+          return { success: true, transaction_id: result.transaction_id };
+        } else {
+          throw new Error('Payment failed');
+        }
+      } catch (error) {
+        // Direct payment instruction
+        const txnId = `TXN${Date.now()}`;
+        message.success({
+          content: `Send PKR ${total} to 03121999696 via ${paymentMethod.toUpperCase()}. Reference: ${txnId}`,
+          duration: 10
+        });
+        return { success: true, transaction_id: txnId };
       }
+    }
+    return { success: true };
+  };
 
-      dispatch(clearCart());
-      message.success('Order placed successfully!');
-      navigate('/order-confirmation');
+  const handleSubmit = async (values: any) => {
+    try {
+      // Merge all form data
+      const allData = { ...formData, ...values };
+      
+      // Combine name fields
+      const customer_name = `${allData.first_name || ''} ${allData.last_name || ''}`.trim();
+      
+      // Combine address fields
+      const addressParts = [
+        allData.address_line1,
+        allData.address_line2,
+        allData.city,
+        allData.state,
+        allData.postal_code
+      ].filter(Boolean);
+      const shipping_address = addressParts.join(', ');
+
+      const orderData: any = {
+        customer_name,
+        customer_email: allData.email,
+        customer_phone: allData.phone,
+        shipping_address,
+        payment_method: paymentMethod,
+        items: items.map(item => ({
+          product_id: item.product.id,
+          quantity: item.quantity,
+          price: item.price
+        }))
+      };
+
+      // Process payment if mobile wallet
+      const paymentResult = await processPayment(orderData, allData);
+      
+      if (paymentResult.success) {
+        // Add transaction details to order
+        if (paymentResult.transaction_id) {
+          orderData.transaction_id = paymentResult.transaction_id;
+          orderData.payment_status = 'pending';
+        }
+
+        if (isAuthenticated) {
+          await dispatch(createUserOrder(orderData)).unwrap();
+        } else {
+          await dispatch(createGuestOrder(orderData)).unwrap();
+        }
+
+        dispatch(clearCart());
+        message.success('Order placed successfully!');
+        navigate('/order-confirmation');
+      }
     } catch (error) {
       message.error('Failed to place order. Please try again.');
     }
@@ -258,22 +331,98 @@ const CheckoutPage: React.FC = () => {
                   <Form.Item name="payment_method">
                     <Radio.Group onChange={(e) => setPaymentMethod(e.target.value)}>
                       <Radio value="cod" style={{ display: 'block', marginBottom: '16px' }}>
-                        <div>
-                          <Text strong>Cash on Delivery (COD)</Text>
-                          <br />
-                          <Text type="secondary">Pay when you receive your order</Text>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <WalletOutlined style={{ fontSize: '20px', marginRight: '8px', color: '#52c41a' }} />
+                          <div>
+                            <Text strong>Cash on Delivery (COD)</Text>
+                            <br />
+                            <Text type="secondary">Pay when you receive your order</Text>
+                          </div>
+                        </div>
+                      </Radio>
+                      <Radio value="easypaisa" style={{ display: 'block', marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <MobileOutlined style={{ fontSize: '20px', marginRight: '8px', color: '#00a651' }} />
+                          <div>
+                            <Text strong>EasyPaisa</Text>
+                            <br />
+                            <Text type="secondary">Pay securely with EasyPaisa mobile wallet</Text>
+                          </div>
+                        </div>
+                      </Radio>
+                      <Radio value="jazzcash" style={{ display: 'block', marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <MobileOutlined style={{ fontSize: '20px', marginRight: '8px', color: '#ff6b35' }} />
+                          <div>
+                            <Text strong>JazzCash</Text>
+                            <br />
+                            <Text type="secondary">Pay securely with JazzCash mobile wallet</Text>
+                          </div>
                         </div>
                       </Radio>
                       <Radio value="card" style={{ display: 'block' }}>
-                        <div>
-                          <Text strong>Credit/Debit Card</Text>
-                          <br />
-                          <Text type="secondary">Secure payment with SSL encryption</Text>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <CreditCardOutlined style={{ fontSize: '20px', marginRight: '8px', color: '#1890ff' }} />
+                          <div>
+                            <Text strong>Credit/Debit Card</Text>
+                            <br />
+                            <Text type="secondary">Secure payment with SSL encryption</Text>
+                          </div>
                         </div>
                       </Radio>
                     </Radio.Group>
                   </Form.Item>
                   
+                  {(paymentMethod === 'easypaisa' || paymentMethod === 'jazzcash') && (
+                    <div>
+                      <Divider />
+                      <Title level={5}>{paymentMethod === 'easypaisa' ? 'EasyPaisa' : 'JazzCash'} Payment</Title>
+                      <Form.Item
+                        name="mobile_number"
+                        label="Mobile Number"
+                        rules={[
+                          { required: true, message: 'Please enter your mobile number' },
+                          { pattern: /^03[0-9]{9}$/, message: 'Please enter valid mobile number (03XXXXXXXXX)' }
+                        ]}
+                      >
+                        <Input 
+                          placeholder="03XXXXXXXXX" 
+                          prefix={<MobileOutlined />}
+                          maxLength={11}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="cnic"
+                        label="CNIC (Last 4 digits)"
+                        rules={[
+                          { required: true, message: 'Please enter last 4 digits of CNIC' },
+                          { pattern: /^[0-9]{4}$/, message: 'Please enter exactly 4 digits' }
+                        ]}
+                      >
+                        <Input 
+                          placeholder="1234" 
+                          maxLength={4}
+                        />
+                      </Form.Item>
+                      <div style={{ 
+                        background: '#f6ffed', 
+                        border: '1px solid #b7eb8f', 
+                        borderRadius: '6px', 
+                        padding: '12px',
+                        marginTop: '16px'
+                      }}>
+                        <Text type="secondary">
+                          <CheckCircleOutlined style={{ color: '#52c41a', marginRight: '8px' }} />
+                          Payment will be sent to: <strong>03121999696 (SadaPay)</strong>
+                        </Text>
+                        <br />
+                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                          You will receive payment confirmation on your mobile number.
+                        </Text>
+                      </div>
+                    </div>
+                  )}
+
                   {paymentMethod === 'card' && (
                     <div>
                       <Divider />
@@ -354,7 +503,7 @@ const CheckoutPage: React.FC = () => {
                   <Text type="secondary">Qty: {item.quantity}</Text>
                 </Col>
                 <Col span={8} style={{ textAlign: 'right' }}>
-                  <PriceText>₹{item.price * item.quantity}</PriceText>
+                  <PriceText>PKR {item.price * item.quantity}</PriceText>
                 </Col>
               </Row>
             ))}
@@ -363,16 +512,16 @@ const CheckoutPage: React.FC = () => {
             
             <Row justify="space-between" style={{ marginBottom: '8px' }}>
               <Text>Subtotal:</Text>
-              <Text>₹{subtotal}</Text>
+              <Text>PKR {subtotal}</Text>
             </Row>
             <Row justify="space-between" style={{ marginBottom: '8px' }}>
               <Text>Shipping:</Text>
-              <Text>₹{shipping}</Text>
+              <Text>PKR {shipping}</Text>
             </Row>
             <Divider />
             <Row justify="space-between">
               <Text strong style={{ fontSize: '18px' }}>Total:</Text>
-              <PriceText>₹{total}</PriceText>
+              <PriceText>PKR {total}</PriceText>
             </Row>
           </OrderSummaryCard>
         </Col>

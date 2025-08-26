@@ -29,27 +29,56 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
+# Category schemas
+class CategoryBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    icon: Optional[str] = None
+
+class CategoryCreate(CategoryBase):
+    pass
+
+class Category(CategoryBase):
+    id: int
+    is_active: bool
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
 # Product schemas
 class ProductBase(BaseModel):
     name: str
-    description: str
-    price: float
-    original_price: float
-    category: str
-    subcategory: str
-    stock_quantity: int
+    full_name: Optional[str] = None
+    type: Optional[str] = None
+    retail_price: float
+    offer_price: Optional[float] = None
+    currency: str = "PKR"
+    description: Optional[str] = None
+    delivery_charges: float = 0.0
+    stock: int = 0
+    status: str = "available"
+    available: int = 0
+    sold: int = 0
+    category_id: int
 
 class ProductCreate(ProductBase):
     images: List[str] = []
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
+    full_name: Optional[str] = None
+    type: Optional[str] = None
+    retail_price: Optional[float] = None
+    offer_price: Optional[float] = None
+    currency: Optional[str] = None
     description: Optional[str] = None
-    price: Optional[float] = None
-    original_price: Optional[float] = None
-    category: Optional[str] = None
-    subcategory: Optional[str] = None
-    stock_quantity: Optional[int] = None
+    delivery_charges: Optional[float] = None
+    stock: Optional[int] = None
+    status: Optional[str] = None
+    available: Optional[int] = None
+    sold: Optional[int] = None
+    category_id: Optional[int] = None
     images: Optional[List[str]] = None
     is_active: Optional[bool] = None
 
@@ -59,6 +88,12 @@ class Product(ProductBase):
     is_active: bool
     created_at: datetime
     updated_at: Optional[datetime] = None
+    
+    # Legacy fields for backward compatibility
+    price: Optional[float] = None
+    original_price: Optional[float] = None
+    subcategory: Optional[str] = None
+    stock_quantity: Optional[int] = None
     
     class Config:
         from_attributes = True

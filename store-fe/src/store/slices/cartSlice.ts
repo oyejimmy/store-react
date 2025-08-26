@@ -38,11 +38,12 @@ const cartSlice = createSlice({
       if (existingItem) {
         existingItem.quantity += quantity;
       } else {
+        const price = product.offer_price || product.price || product.retail_price;
         state.items.push({
           id: Date.now(),
           product,
           quantity,
-          price: product.price,
+          price,
           name: product.name,
           image_url: product.images[0] || '',
         });
