@@ -244,8 +244,13 @@ const AdminLayout: React.FC = () => {
         </AppBar>
 
         {/* Content Area */}
-        <Box sx={{ flexGrow: 1, bgcolor: '#f8fafc', overflow: 'hidden' }}>
-          <Box sx={{ p: 3 }}>
+        <Box sx={{ 
+          flexGrow: 1, 
+          bgcolor: '#f8fafc', 
+          overflow: 'auto',
+          maxHeight: 'calc(100vh - 64px)' 
+        }}>
+          <Box sx={{ p: 3, minHeight: '100%' }}>
             <Breadcrumbs sx={{ mb: 2 }}>
               <MuiLink component="button" onClick={() => navigate('/admin')} underline="hover">
                 Admin
