@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.database import get_db
@@ -7,6 +8,29 @@ from app.schemas import UserCreate, UserLogin, UserUpdate, User as UserSchema, T
 from app.auth import get_password_hash, verify_password, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user
 
 router = APIRouter()
+
+# OPTIONS handlers for CORS preflight requests
+@router.options("/login")
+async def login_options():
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        }
+    )
+
+@router.options("/signup")
+async def signup_options():
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        }
+    )
 
 @router.post("/signup", response_model=UserSchema)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
