@@ -128,6 +128,8 @@ export const adminAPI = {
     api.get(`/admin/orders/${id}`).then((res) => res.data),
   updateOrderStatus: (id: number, statusData: any) =>
     api.put(`/admin/orders/${id}`, statusData).then((res) => res.data),
+  deleteOrder: (id: number) =>
+    api.delete(`/admin/orders/${id}`).then((res) => res.data),
 
   // Inventory
   getInventoryStatus: () => api.get("/admin/inventory").then((res) => res.data),
