@@ -191,6 +191,19 @@ export const adminAPI = {
       })
       .then((res) => res.data);
   },
+  
+  // Product Image Upload
+  uploadProductImage: (id: number, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api
+      .post(`/admin/products/${id}/upload-image`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
 };
 
 export default api;

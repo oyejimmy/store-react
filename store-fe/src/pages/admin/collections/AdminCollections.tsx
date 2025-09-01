@@ -59,6 +59,12 @@ interface Collection {
   updated_at?: string;
 }
 
+const tableHeadingColor = {
+  backgroundColor: "#2c6e49",
+  color: "#ffffff",
+  fontWeight: 600,
+};
+
 const AdminCollections: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -304,199 +310,209 @@ const AdminCollections: React.FC = () => {
     <Box
       sx={{
         p: { xs: 1, sm: 2, md: 3 },
-        backgroundColor: "#f5f5f5",
         minHeight: "100vh",
       }}
     >
-      <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
-        <CardContent>
-          <Box
+      {/* Header with Add Button */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 4,
+          p: 3,
+          background: "linear-gradient(135deg, #2c6e49 0%, #4a8b6a 100%)",
+          borderRadius: 3,
+          boxShadow: "0 8px 32px rgba(44, 110, 73, 0.2)",
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{
+            fontWeight: 700,
+            color: "white",
+            textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          }}
+        >
+          Collections Management
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+          <Button
+            variant="outlined"
+            startIcon={<Refresh />}
+            onClick={fetchCollections}
+            disabled={loading}
+            size={isMobile ? "small" : "medium"}
             sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              justifyContent: "space-between",
-              alignItems: { xs: "flex-start", sm: "center" },
-              mb: 3,
-              gap: 2,
+              borderColor: "#2c6e49",
+              color: "#2c6e49",
+              backgroundColor: "rgb(224, 220, 220)",
+              "&:hover": {
+                borderColor: "#2c6e49",
+                backgroundColor: "rgb(230, 232, 210)",
+              },
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Collections sx={{ color: theme.palette.primary.main }} />
-              <Typography
-                variant={isMobile ? "h6" : "h5"}
-                sx={{ color: theme.palette.primary.main, fontWeight: "bold" }}
-              >
-                Collections Management
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-              <Button
-                variant="outlined"
-                startIcon={<Refresh />}
-                onClick={fetchCollections}
-                disabled={loading}
-                size={isMobile ? "small" : "medium"}
-              >
-                Refresh
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                onClick={handleAdd}
-                size={isMobile ? "small" : "medium"}
-              >
-                Add Collection
-              </Button>
-            </Box>
-          </Box>
-
-          <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
-            <Table size={isMobile ? "small" : "medium"}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Image</TableCell>
-                  <TableCell>Name</TableCell>
-                  {!isMobile && <TableCell>Description</TableCell>}
-                  <TableCell>Products</TableCell>
-                  {!isTablet && <TableCell>Conditions</TableCell>}
-                  <TableCell>Status</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={isMobile ? 5 : isTablet ? 6 : 7}
-                      sx={{ textAlign: "center", py: 4 }}
-                    >
-                      <CircularProgress />
+            Refresh
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={handleAdd}
+            size={isMobile ? "small" : "medium"}
+          >
+            Add Collection
+          </Button>
+        </Box>
+      </Box>
+      <TableContainer
+        component={Paper}
+        sx={{ overflowX: "auto", borderRadius: 2, boxShadow: 3 }}
+      >
+        <Table size={isMobile ? "small" : "medium"}>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={tableHeadingColor}>Image</TableCell>
+              <TableCell sx={tableHeadingColor}>Name</TableCell>
+              {!isMobile && (
+                <TableCell sx={tableHeadingColor}>Description</TableCell>
+              )}
+              <TableCell sx={tableHeadingColor}>Products</TableCell>
+              {!isTablet && (
+                <TableCell sx={tableHeadingColor}>Conditions</TableCell>
+              )}
+              <TableCell sx={tableHeadingColor}>Status</TableCell>
+              <TableCell sx={tableHeadingColor}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={isMobile ? 5 : isTablet ? 6 : 7}
+                  sx={{ textAlign: "center", py: 4 }}
+                >
+                  <CircularProgress />
+                </TableCell>
+              </TableRow>
+            ) : (
+              collections
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((collection) => (
+                  <TableRow key={collection.id} hover>
+                    <TableCell>
+                      <Avatar
+                        src={getImageUrl(collection.image)}
+                        sx={{ width: 40, height: 40 }}
+                      >
+                        {!collection.image && <Category />}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="bold">
+                        {collection.name}
+                      </Typography>
+                      {collection.icon && (
+                        <Typography variant="caption" color="textSecondary">
+                          {collection.icon}
+                        </Typography>
+                      )}
+                    </TableCell>
+                    {!isMobile && (
+                      <TableCell>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            maxWidth: 200,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {collection.description || "No description"}
+                        </Typography>
+                      </TableCell>
+                    )}
+                    <TableCell>
+                      <Chip
+                        icon={<Inventory />}
+                        label={`${collection.total_products}`}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                      />
+                    </TableCell>
+                    {!isTablet && (
+                      <TableCell>
+                        {collection.conditions ? (
+                          <Chip
+                            label={collection.conditions}
+                            color={
+                              getConditionsColor(collection.conditions) as any
+                            }
+                            size="small"
+                          />
+                        ) : (
+                          <Typography variant="caption" color="textSecondary">
+                            Not specified
+                          </Typography>
+                        )}
+                      </TableCell>
+                    )}
+                    <TableCell>
+                      <Chip
+                        label={collection.is_active ? "ACTIVE" : "INACTIVE"}
+                        color={getStatusColor(collection.is_active)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={0.5}>
+                        <Tooltip title="View Details">
+                          <IconButton
+                            color="info"
+                            onClick={() => handleView(collection)}
+                            size="small"
+                          >
+                            <Visibility />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Edit Collection">
+                          <IconButton
+                            color="primary"
+                            onClick={() => handleEdit(collection)}
+                            size="small"
+                          >
+                            <Edit />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete Collection">
+                          <IconButton
+                            color="error"
+                            onClick={() => handleDelete(collection.id)}
+                            size="small"
+                          >
+                            <Delete />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
                     </TableCell>
                   </TableRow>
-                ) : (
-                  collections
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((collection) => (
-                      <TableRow key={collection.id} hover>
-                        <TableCell>
-                          <Avatar
-                            src={getImageUrl(collection.image)}
-                            sx={{ width: 40, height: 40 }}
-                          >
-                            {!collection.image && <Category />}
-                          </Avatar>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" fontWeight="bold">
-                            {collection.name}
-                          </Typography>
-                          {collection.icon && (
-                            <Typography variant="caption" color="textSecondary">
-                              {collection.icon}
-                            </Typography>
-                          )}
-                        </TableCell>
-                        {!isMobile && (
-                          <TableCell>
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                maxWidth: 200,
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {collection.description || "No description"}
-                            </Typography>
-                          </TableCell>
-                        )}
-                        <TableCell>
-                          <Chip
-                            icon={<Inventory />}
-                            label={`${collection.total_products}`}
-                            color="primary"
-                            variant="outlined"
-                            size="small"
-                          />
-                        </TableCell>
-                        {!isTablet && (
-                          <TableCell>
-                            {collection.conditions ? (
-                              <Chip
-                                label={collection.conditions}
-                                color={
-                                  getConditionsColor(
-                                    collection.conditions
-                                  ) as any
-                                }
-                                size="small"
-                              />
-                            ) : (
-                              <Typography
-                                variant="caption"
-                                color="textSecondary"
-                              >
-                                Not specified
-                              </Typography>
-                            )}
-                          </TableCell>
-                        )}
-                        <TableCell>
-                          <Chip
-                            label={collection.is_active ? "ACTIVE" : "INACTIVE"}
-                            color={getStatusColor(collection.is_active)}
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Stack direction="row" spacing={0.5}>
-                            <Tooltip title="View Details">
-                              <IconButton
-                                color="info"
-                                onClick={() => handleView(collection)}
-                                size="small"
-                              >
-                                <Visibility />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Edit Collection">
-                              <IconButton
-                                color="primary"
-                                onClick={() => handleEdit(collection)}
-                                size="small"
-                              >
-                                <Edit />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Delete Collection">
-                              <IconButton
-                                color="error"
-                                onClick={() => handleDelete(collection.id)}
-                                size="small"
-                              >
-                                <Delete />
-                              </IconButton>
-                            </Tooltip>
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                )}
-              </TableBody>
-            </Table>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={collections.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableContainer>
-        </CardContent>
-      </Card>
+                ))
+            )}
+          </TableBody>
+        </Table>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={collections.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </TableContainer>
 
       {/* Add/Edit Collection Dialog */}
       <Dialog
