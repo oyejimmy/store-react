@@ -3,59 +3,59 @@ import { grey } from "@mui/material/colors";
 export const getLightPalette = (primaryColor: string) => ({
   primary: {
     main: primaryColor,
-    light: '#a5b4fc',
-    dark: '#4338ca',
+    light: '#4a8b6a',
+    dark: '#1e4d33',
   },
   secondary: {
-    main: '#10b981',
-    light: '#34d399',
-    dark: '#059669',
+    main: '#6E2C51',
+    light: '#8b4a73',
+    dark: '#4d1e38',
   },
   background: {
-    default: "#f8fafc",
+    default: "#ffffff",
     paper: "#ffffff",
   },
   text: {
-    primary: '#1e293b',
-    secondary: '#64748b',
+    primary: '#000000',
+    secondary: '#333333',
   },
   error: {
-    main: '#ef4444',
+    main: '#6E2C51',
   },
   warning: {
-    main: '#f59e0b',
+    main: '#6E2C51',
   },
   success: {
-    main: '#10b981',
+    main: '#2c6e49',
   },
 });
 
 export const getDarkPalette = (primaryColor: string) => ({
   primary: {
     main: primaryColor,
-    light: '#c4b5fd',
-    dark: '#7c3aed',
+    light: '#4a8b6a',
+    dark: '#1e4d33',
   },
   secondary: {
-    main: '#06d6a0',
-    light: '#4ade80',
-    dark: '#047857',
+    main: '#6E2C51',
+    light: '#8b4a73',
+    dark: '#4d1e38',
   },
   background: {
-    default: "#0f172a",
-    paper: "#1e293b",
+    default: "#1a1a1a",
+    paper: "#2d2d2d",
   },
   text: {
-    primary: '#f1f5f9',
-    secondary: '#94a3b8',
+    primary: '#ffffff',
+    secondary: '#cccccc',
   },
   error: {
-    main: '#f87171',
+    main: '#6E2C51',
   },
   warning: {
-    main: '#fbbf24',
+    main: '#6E2C51',
   },
   success: {
-    main: '#34d399',
+    main: '#2c6e49',
   },
 });

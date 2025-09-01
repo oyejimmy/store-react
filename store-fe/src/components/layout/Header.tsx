@@ -42,12 +42,12 @@ import { logout } from "../../store/slices/authSlice";
 
 
 interface HeaderProps {
-  isDarkMode: boolean;
-  toggleTheme: () => void;
+  isDarkMode?: boolean;
+  toggleTheme?: () => void;
   showBanner?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleTheme, showBanner = true }) => {
+const Header: React.FC<HeaderProps> = ({ isDarkMode = false, toggleTheme, showBanner = true }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -204,8 +204,8 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleTheme, showBanner = t
             justifyContent: 'center',
             gap: 1,
             transition: 'top 0.3s ease',
-            background: 'linear-gradient(135deg, #d4af37, #b8860b)',
-            color: '#000',
+            background: '#000000',
+            color: '#ffffff',
           }}
         >
           <span style={{ fontSize: '16px' }}>🚚</span>
@@ -270,10 +270,9 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleTheme, showBanner = t
 
           {/* Right Section */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton onClick={toggleTheme} color="primary">
+            <IconButton onClick={toggleTheme} color="inherit">
               {isDarkMode ? <LightMode /> : <DarkMode />}
             </IconButton>
-
             <IconButton component={Link} to="/cart" color="inherit">
               <Badge badgeContent={itemCount} color="primary">
                 <ShoppingCart />

@@ -122,6 +122,10 @@ export const adminAPI = {
   deleteProduct: (id: number) =>
     api.delete(`/admin/products/${id}`).then((res) => res.data),
   getProductAnalytics: () => api.get("/admin/products/analytics").then((res) => res.data),
+  getProductsByCategory: (category: string, subcategory?: string) =>
+    api
+      .get(`/admin/products/category/${category}`, { params: { subcategory } })
+      .then((res) => res.data),
 
   // Categories
   getAllCategories: () => api.get("/admin/categories").then((res) => res.data),

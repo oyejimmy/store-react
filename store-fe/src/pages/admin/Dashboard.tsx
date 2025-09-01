@@ -465,7 +465,7 @@ const AdminDashboard: React.FC = () => {
         stops: [0, 90, 100]
       }
     },
-    colors: ['#3b82f6', '#059669'],
+    colors: ['#2c6e49', '#6E2C51'],
     legend: {
       show: false
     },
@@ -598,10 +598,10 @@ const AdminDashboard: React.FC = () => {
   return (
     <Box sx={{ p: 0, minHeight: '100vh' }}>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 1, color: '#1a202c' }}>
+        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 1, color: '#000000' }}>
           Admin Dashboard
         </Typography>
-        <Typography variant="h6" sx={{ opacity: 0.7, color: '#4a5568' }}>
+        <Typography variant="h6" sx={{ opacity: 0.7, color: '#000000' }}>
           Welcome back! Here's what's happening with your store today.
         </Typography>
       </Box>
@@ -609,12 +609,12 @@ const AdminDashboard: React.FC = () => {
       {/* Analytics Dashboard */}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <BarChart sx={{ mr: 2, color: '#4a5568', fontSize: 28 }} />
+          <BarChart sx={{ mr: 2, color: '#2c6e49', fontSize: 28 }} />
           <Box>
-            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a202c' }}>
+            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#000000' }}>
               Analytics Overview
             </Typography>
-            <Typography variant="body2" sx={{ color: '#6b7280' }}>
+            <Typography variant="body2" sx={{ color: '#000000' }}>
               Last 30 days performance metrics
             </Typography>
           </Box>
@@ -640,7 +640,7 @@ const AdminDashboard: React.FC = () => {
             value={analyticsStats.sessions.toLocaleString()}
             change={analyticsStats.sessionsChange}
             icon={<Visibility sx={{ fontSize: 24 }} />}
-            color="#3b82f6"
+            color="#2c6e49"
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
@@ -649,7 +649,7 @@ const AdminDashboard: React.FC = () => {
             value={`PKR ${analyticsStats.totalSales.toLocaleString()}`}
             change={analyticsStats.salesChange}
             icon={<MonetizationOn sx={{ fontSize: 24 }} />}
-            color="#059669"
+            color="#2c6e49"
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
@@ -658,7 +658,7 @@ const AdminDashboard: React.FC = () => {
             value={analyticsStats.orders.toString()}
             change={analyticsStats.ordersChange}
             icon={<ShoppingCart sx={{ fontSize: 24 }} />}
-            color="#7c3aed"
+            color="#6E2C51"
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
@@ -667,7 +667,7 @@ const AdminDashboard: React.FC = () => {
             value={`${analyticsStats.conversionRate.toFixed(1)}%`}
             change={analyticsStats.conversionChange}
             icon={<TrendingUp sx={{ fontSize: 24 }} />}
-            color="#d97706"
+            color="#6E2C51"
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
@@ -676,7 +676,7 @@ const AdminDashboard: React.FC = () => {
             value={stats.totalProducts.toString()}
             subtitle="Items in catalog"
             icon={<Inventory sx={{ fontSize: 24 }} />}
-            color="#8b5cf6"
+            color="#2c6e49"
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
@@ -685,7 +685,7 @@ const AdminDashboard: React.FC = () => {
             value={stats.totalCustomers.toString()}
             subtitle="Registered users"
             icon={<Groups sx={{ fontSize: 24 }} />}
-            color="#ec4899"
+            color="#6E2C51"
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
@@ -694,7 +694,7 @@ const AdminDashboard: React.FC = () => {
             value={stats.lowStockProducts.toString()}
             subtitle="Items need restocking"
             icon={<Warning sx={{ fontSize: 24 }} />}
-            color="#f59e0b"
+            color="#6E2C51"
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
@@ -703,7 +703,7 @@ const AdminDashboard: React.FC = () => {
             value={stats.pendingOrders.toString()}
             subtitle="Awaiting processing"
             icon={<PendingActions sx={{ fontSize: 24 }} />}
-            color="#10b981"
+            color="#2c6e49"
           />
         </Grid>
       </Grid>
@@ -727,11 +727,11 @@ const AdminDashboard: React.FC = () => {
             </Box>
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Box sx={{ width: 12, height: 12, backgroundColor: '#3b82f6', borderRadius: '50%', mr: 1 }} />
+                <Box sx={{ width: 12, height: 12, backgroundColor: '#2c6e49', borderRadius: '50%', mr: 1 }} />
                 <Typography variant="caption" sx={{ color: '#6b7280' }}>Revenue</Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Box sx={{ width: 12, height: 12, backgroundColor: '#059669', borderRadius: '50%', mr: 1 }} />
+                <Box sx={{ width: 12, height: 12, backgroundColor: '#6E2C51', borderRadius: '50%', mr: 1 }} />
                 <Typography variant="caption" sx={{ color: '#6b7280' }}>Orders</Typography>
               </Box>
             </Box>

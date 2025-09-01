@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ThemeProvider, CssBaseline, Box } from "@mui/material";
 import { AppDispatch, RootState } from "./store";
 import { getCurrentUser } from "./store/slices/authSlice";
-import { lightTheme, darkTheme } from "./theme";
+import { lightTheme, darkTheme } from "./theme/globalTheme";
 
 // Layout Components
 import Header from "./components/layout/Header";
@@ -108,21 +108,16 @@ function App() {
                 minHeight: "100vh",
                 display: "flex",
                 flexDirection: "column",
+                backgroundColor: "#ffffff",
               }}
             >
-              <Header
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                showBanner={false}
-              />
+              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
               <Box
                 component="main"
                 sx={{
                   flex: 1,
                   pt: "70px",
-                  background: isDarkMode
-                    ? "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)"
-                    : "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+                  backgroundColor: "#ffffff",
                 }}
               >
                 <LoginPage />
@@ -138,21 +133,16 @@ function App() {
                 minHeight: "100vh",
                 display: "flex",
                 flexDirection: "column",
+                backgroundColor: "#ffffff",
               }}
             >
-              <Header
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                showBanner={false}
-              />
+              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
               <Box
                 component="main"
                 sx={{
                   flex: 1,
                   pt: "70px",
-                  background: isDarkMode
-                    ? "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)"
-                    : "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+                  backgroundColor: "#ffffff",
                 }}
               >
                 <SignupPage />
@@ -169,13 +159,10 @@ function App() {
                 display: "flex",
                 flexDirection: "column",
                 overflow: "hidden",
+                backgroundColor: "#ffffff",
               }}
             >
-              <Header
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                showBanner={false}
-              />
+              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
               <Box
                 component="main"
                 sx={{
@@ -184,9 +171,7 @@ function App() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: isDarkMode
-                    ? "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)"
-                    : "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+                  backgroundColor: "#ffffff",
                 }}
               >
                 <ForgotPasswordPage />
@@ -203,14 +188,11 @@ function App() {
                 display: "flex",
                 flexDirection: "column",
                 overflow: "hidden",
+                backgroundColor: "#ffffff",
               }}
             >
-              <Header
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                showBanner={false}
-              />
-              <Box component="main" sx={{ flex: 1, pt: "70px" }}>
+              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
+              <Box component="main" sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}>
                 <TermsPage />
               </Box>
             </Box>
@@ -225,14 +207,11 @@ function App() {
                 display: "flex",
                 flexDirection: "column",
                 overflow: "hidden",
+                backgroundColor: "#ffffff",
               }}
             >
-              <Header
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                showBanner={false}
-              />
-              <Box component="main" sx={{ flex: 1, pt: "70px" }}>
+              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
+              <Box component="main" sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}>
                 <PrivacyPage />
               </Box>
             </Box>
@@ -248,10 +227,11 @@ function App() {
                 minHeight: "100vh",
                 display: "flex",
                 flexDirection: "column",
+                backgroundColor: "#ffffff",
               }}
             >
               <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
-              <Box component="main" sx={{ flex: 1, pt: "70px" }}>
+              <Box component="main" sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}>
                 <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<HomePage />} />

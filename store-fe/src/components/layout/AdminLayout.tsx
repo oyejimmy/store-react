@@ -115,8 +115,8 @@ const AdminLayout: React.FC = () => {
             "& .MuiDrawer-paper": {
               width: collapsed ? collapsedWidth : drawerWidth,
               boxSizing: "border-box",
-              background: "linear-gradient(180deg, #1e293b, #334155)",
-              borderRight: "2px solid #6366f1",
+              backgroundColor: "#2c6e49",
+              borderRight: "2px solid #6E2C51",
               transition: "width 0.3s ease",
             },
           }}
@@ -126,8 +126,8 @@ const AdminLayout: React.FC = () => {
             sx={{
               p: 2,
               textAlign: "center",
-              background: "linear-gradient(135deg, #6366f1, #4f46e5)",
-              borderBottom: "2px solid #4f46e5",
+              backgroundColor: "#6E2C51",
+              borderBottom: "2px solid #2c6e49",
             }}
           >
             <Typography
@@ -157,18 +157,18 @@ const AdminLayout: React.FC = () => {
                     borderRadius: 2,
                     mx: 1,
                     mb: 0.5,
-                    color: "rgba(255, 255, 255, 0.8)",
+                    color: "#ffffff",
                     "&:hover": {
-                      background: "linear-gradient(135deg, #6366f1, #4f46e5)",
-                      color: "#fff",
+                      backgroundColor: "#6E2C51",
+                      color: "#ffffff",
                       transform: "translateX(4px)",
                     },
                     "&.Mui-selected": {
-                      background: "linear-gradient(135deg, #6366f1, #4f46e5)",
-                      color: "#fff",
+                      backgroundColor: "#6E2C51",
+                      color: "#ffffff",
                       fontWeight: 600,
                       "&:hover": {
-                        background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+                        backgroundColor: "#6E2C51",
                       },
                     },
                   }}
@@ -191,9 +191,9 @@ const AdminLayout: React.FC = () => {
           <AppBar
             position="static"
             sx={{
-              background: "linear-gradient(135deg, #6366f1, #4f46e5)",
-              boxShadow: "0 4px 12px rgba(99, 102, 241, 0.3)",
-              borderBottom: "2px solid #4f46e5",
+              backgroundColor: "#2c6e49",
+              boxShadow: "0 4px 12px rgba(44, 110, 73, 0.3)",
+              borderBottom: "2px solid #6E2C51",
             }}
           >
             <Toolbar sx={{ justifyContent: "space-between" }}>
@@ -228,8 +228,8 @@ const AdminLayout: React.FC = () => {
               >
                 <Avatar
                   sx={{
-                    bgcolor: "#fff",
-                    color: "#6366f1",
+                    bgcolor: "#ffffff",
+                    color: "#2c6e49",
                     width: 32,
                     height: 32,
                   }}
@@ -283,7 +283,7 @@ const AdminLayout: React.FC = () => {
           <Box
             sx={{
               flexGrow: 1,
-              bgcolor: "#f8fafc",
+              bgcolor: "#ffffff",
               overflow: "auto",
               maxHeight: "calc(100vh - 64px)",
             }}
@@ -294,10 +294,11 @@ const AdminLayout: React.FC = () => {
                   component="button"
                   onClick={() => navigate("/admin")}
                   underline="hover"
+                  sx={{ color: "#000000" }}
                 >
                   Admin
                 </MuiLink>
-                <Typography color="text.primary">
+                <Typography sx={{ color: "#000000" }}>
                   {getBreadcrumbTitle()}
                 </Typography>
               </Breadcrumbs>
