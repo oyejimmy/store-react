@@ -106,112 +106,203 @@ const AdminDashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [products, orders] = await Promise.all([
-        adminAPI.getAllProducts(),
-        adminAPI.getAllOrders()
+      console.log('Fetching dashboard data...');
+      
+      const [products, orders, categories] = await Promise.all([
+        adminAPI.getAllProducts().catch(err => {
+          console.error('Products API error:', err);
+          return [];
+        }),
+        adminAPI.getAllOrders().catch(err => {
+          console.error('Orders API error:', err);
+          return [];
+        }),
+        adminAPI.getAllCategories().catch(err => {
+          console.error('Categories API error:', err);
+          return [];
+        })
       ]);
 
-      const lowStock = products.filter((product: any) =>
-        (product.stock_quantity || product.stock || 0) < 10
-      ).map((product: any) => ({
+      console.log('Products received:', products);
+      console.log('Orders received:', orders);
+
+      // Ensure products, orders, and categories are arrays
+      const safeProducts = Array.isArray(products) ? products : [];
+      const safeOrders = Array.isArray(orders) ? orders : [];
+      const safeCategories = Array.isArray(categories) ? categories : [];
+
+      console.log('Products received:', safeProducts.length);
+      console.log('Categories received:', safeCategories.length);
+      
+      const lowStock = safeProducts.filter((product: any) => {
+        // Use the primary stock field from the database model
+        const stockValue = Number(product.stock || product.stock_quantity || 0);
+        const isLowStock = stockValue < 10;
+        
+        // Debug: Log all stock values
+        console.log(`Product: ${product.name}, stock: ${product.stock}, stock_quantity: ${product.stock_quantity}, calculated: ${stockValue}, isLowStock: ${isLowStock}`);
+        
+        return isLowStock;
+      }).map((product: any) => ({
         id: product.id,
-        name: product.name,
-        type: product.jewelry_type || product.type || 'Jewelry',
+        name: product.name || 'Unknown Product',
+        type: product.type || 'Product',
         size: product.size || 'OS',
-        material: product.material || product.metal_type || 'Gold',
-        stock: product.stock_quantity || product.stock || 0,
-        threshold: product.reorder_level || 5
+        material: product.material || 'N/A',
+        stock: Number(product.stock || product.stock_quantity || 0),
+        threshold: 10
       }));
+      
+      console.log('Low stock products found:', lowStock.length);
+      console.log('Low stock products:', lowStock);
 
       setLowStockItems(lowStock);
-      const sortedOrders = orders.sort((a: any, b: any) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
+      
+      const sortedOrders = safeOrders
+        .filter((order: any) => order && order.created_at)
+        .sort((a: any, b: any) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
       setRecentOrders(sortedOrders.slice(0, 3));
 
-      const categories = ['Anklets', 'Bangles', 'Bracelets', 'Combos', 'Ear Studs', 'Earrings', 'Hoops', 'Pendants', 'Rings', 'Wall Frame Design', 'Hair Accessories'];
-      const categoryData = categories.map(category => {
-        const categoryProducts = products.filter((product: any) =>
-          product.subcategory?.toLowerCase().includes(category.toLowerCase()) ||
-          product.category?.toLowerCase().includes(category.toLowerCase())
+      // Define the specific categories to display
+      const targetCategories = [
+        'Rings', 'Earrings', 'Bangles', 'Anklets', 'Bracelets', 
+        'Pendants', 'Ear Studs', 'Hoops', 'Wall Frame Design', 
+        'Combos', 'Hair Accessories'
+      ];
+      
+      // Build category statistics - show only category-level data
+      const categoryStatsData = targetCategories.map(categoryName => {
+        // Find matching category from database
+        const dbCategory = safeCategories.find((cat: any) => 
+          cat.name.toLowerCase() === categoryName.toLowerCase()
         );
+        
+        // Get products for this category (by name matching if no category_id match)
+        const categoryProducts = safeProducts.filter((product: any) => {
+          if (dbCategory && product.category_id === dbCategory.id) {
+            return true;
+          }
+          // Fallback: match by product type or name
+          return product.type?.toLowerCase() === categoryName.toLowerCase() ||
+                 product.name?.toLowerCase().includes(categoryName.toLowerCase());
+        });
+        
+        // Calculate total products available (not sold)
+        const availableProducts = categoryProducts.filter((product: any) => 
+          product.status !== 'sold' && product.is_active !== false
+        );
+        
+        // Calculate total sold products
+        const soldProducts = categoryProducts.filter((product: any) => 
+          product.status === 'sold'
+        );
+        
         return {
-          category,
-          totalProducts: categoryProducts.length,
-          totalStock: categoryProducts.reduce((sum: number, product: any) => sum + (product.stock_quantity || product.stock || 0), 0),
-          totalSold: categoryProducts.reduce((sum: number, product: any) => sum + (product.sold || 0), 0)
+          category: categoryName,
+          totalProducts: categoryProducts.length, // Total products in category
+          totalStock: availableProducts.length,   // Available products (Stock Available)
+          totalSold: soldProducts.length          // Sold products (Total Sold)
         };
       });
-      setCategoryStats(categoryData);
+      
+      setCategoryStats(categoryStatsData);
 
       setStats({
-        totalProducts: products.length,
-        totalOrders: orders.length,
-        totalRevenue: orders.reduce((sum: number, order: any) => sum + (order.total_amount || 0), 0),
-        totalCustomers: new Set(orders.map((order: any) => order.customer_email)).size,
+        totalProducts: safeProducts.length,
+        totalOrders: safeOrders.length,
+        totalRevenue: safeOrders.reduce((sum: number, order: any) => sum + (order.total_amount || 0), 0),
+        totalCustomers: new Set(safeOrders.map((order: any) => order.customer_email).filter(Boolean)).size,
         lowStockProducts: lowStock.length,
-        pendingOrders: orders.filter((order: any) => order.status === 'pending').length,
+        pendingOrders: safeOrders.filter((order: any) => order.status === 'pending').length,
       });
 
       // Generate analytics data
-      generateAnalyticsData(orders);
+      generateAnalyticsData(safeOrders);
+      
     } catch (error) {
-      setSnackbar({ open: true, message: 'Failed to fetch dashboard data', severity: 'error' });
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      setSnackbar({ open: true, message: `Failed to fetch dashboard data: ${errorMessage}`, severity: 'error' });
     } finally {
       setLoading(false);
     }
   };
 
   const generateAnalyticsData = (orders: any[]) => {
-    // Generate last 30 days data
-    const today = new Date();
-    const chartData = [];
-    
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
+    try {
+      // Generate last 30 days data
+      const today = new Date();
+      const chartData = [];
       
-      const dayOrders = orders.filter(order => {
-        const orderDate = new Date(order.created_at);
-        return orderDate.toDateString() === date.toDateString();
-      });
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        
+        const dayOrders = orders.filter(order => {
+          if (!order || !order.created_at) return false;
+          try {
+            const orderDate = new Date(order.created_at);
+            return orderDate.toDateString() === date.toDateString();
+          } catch (e) {
+            return false;
+          }
+        });
+        
+        const dayRevenue = dayOrders.reduce((sum, order) => sum + (order.total_amount || 0), 0);
+        const sessions = Math.floor(Math.random() * 200) + 50; // Simulated sessions data
+        
+        chartData.push({
+          date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          fullDate: date.toISOString().split('T')[0],
+          orders: dayOrders.length,
+          revenue: dayRevenue,
+          sessions: sessions
+        });
+      }
       
-      const dayRevenue = dayOrders.reduce((sum, order) => sum + (order.total_amount || 0), 0);
-      const sessions = Math.floor(Math.random() * 200) + 50; // Simulated sessions data
+      setAnalyticsData(chartData);
       
-      chartData.push({
-        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        fullDate: date.toISOString().split('T')[0],
-        orders: dayOrders.length,
-        revenue: dayRevenue,
-        sessions: sessions
+      // Calculate analytics stats with percentage changes
+      const totalOrders = orders.length || 0;
+      const totalRevenue = orders.reduce((sum: number, order: any) => sum + (order.total_amount || 0), 0);
+      const totalSessions = chartData.reduce((sum, day) => sum + day.sessions, 0);
+      const conversionRate = totalSessions > 0 ? (totalOrders / totalSessions) * 100 : 0;
+      
+      // Simulate previous period data for percentage calculations
+      const prevOrders = Math.max(1, Math.floor(totalOrders * (0.8 + Math.random() * 0.4)));
+      const prevRevenue = Math.max(1, Math.floor(totalRevenue * (0.7 + Math.random() * 0.6)));
+      const prevSessions = Math.max(1, Math.floor(totalSessions * (0.6 + Math.random() * 0.8)));
+      const prevConversion = prevSessions > 0 ? (prevOrders / prevSessions) * 100 : 0;
+      
+      const analyticsStats = {
+        sessions: totalSessions,
+        sessionsChange: prevSessions > 0 ? ((totalSessions - prevSessions) / prevSessions) * 100 : 0,
+        totalSales: totalRevenue,
+        salesChange: prevRevenue > 0 ? ((totalRevenue - prevRevenue) / prevRevenue) * 100 : 0,
+        orders: totalOrders,
+        ordersChange: prevOrders > 0 ? ((totalOrders - prevOrders) / prevOrders) * 100 : 0,
+        conversionRate: conversionRate,
+        conversionChange: prevConversion > 0 ? ((conversionRate - prevConversion) / prevConversion) * 100 : 0
+      };
+      
+      setAnalyticsStats(analyticsStats);
+      console.log('Analytics stats updated:', analyticsStats);
+    } catch (error) {
+      console.error('Error generating analytics data:', error);
+      // Set default analytics data
+      setAnalyticsData([]);
+      setAnalyticsStats({
+        sessions: 0,
+        sessionsChange: 0,
+        totalSales: 0,
+        salesChange: 0,
+        orders: 0,
+        ordersChange: 0,
+        conversionRate: 0,
+        conversionChange: 0
       });
     }
-    
-    setAnalyticsData(chartData);
-    
-    // Calculate analytics stats with percentage changes
-    const totalOrders = orders.length;
-    const totalRevenue = orders.reduce((sum: number, order: any) => sum + (order.total_amount || 0), 0);
-    const totalSessions = chartData.reduce((sum, day) => sum + day.sessions, 0);
-    const conversionRate = totalSessions > 0 ? (totalOrders / totalSessions) * 100 : 0;
-    
-    // Simulate previous period data for percentage calculations
-    const prevOrders = Math.floor(totalOrders * (0.8 + Math.random() * 0.4));
-    const prevRevenue = Math.floor(totalRevenue * (0.7 + Math.random() * 0.6));
-    const prevSessions = Math.floor(totalSessions * (0.6 + Math.random() * 0.8));
-    const prevConversion = prevSessions > 0 ? (prevOrders / prevSessions) * 100 : 0;
-    
-    setAnalyticsStats({
-      sessions: totalSessions,
-      sessionsChange: prevSessions > 0 ? ((totalSessions - prevSessions) / prevSessions) * 100 : 0,
-      totalSales: totalRevenue,
-      salesChange: prevRevenue > 0 ? ((totalRevenue - prevRevenue) / prevRevenue) * 100 : 0,
-      orders: totalOrders,
-      ordersChange: prevOrders > 0 ? ((totalOrders - prevOrders) / prevOrders) * 100 : 0,
-      conversionRate: conversionRate,
-      conversionChange: prevConversion > 0 ? ((conversionRate - prevConversion) / prevConversion) * 100 : 0
-    });
   };
 
   const getStatusColor = (status: string) => {

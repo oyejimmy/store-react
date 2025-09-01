@@ -15,7 +15,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
   if (user && !user.is_admin) {

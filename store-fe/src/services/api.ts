@@ -113,14 +113,18 @@ export const adminAPI = {
   // Dashboard
   getDashboardStats: () => api.get("/admin/dashboard").then((res) => res.data),
 
-  // Products
-  getAllProducts: () => api.get("/admin/products").then((res) => res.data),
+  // Products - temporarily use debug endpoint
+  getAllProducts: (params?: any) => api.get("/admin/products/temp", { params }).then((res) => res.data),
   createProduct: (productData: any) =>
     api.post("/admin/products", productData).then((res) => res.data),
   updateProduct: (id: number, productData: any) =>
     api.put(`/admin/products/${id}`, productData).then((res) => res.data),
   deleteProduct: (id: number) =>
     api.delete(`/admin/products/${id}`).then((res) => res.data),
+  getProductAnalytics: () => api.get("/admin/products/analytics").then((res) => res.data),
+
+  // Categories
+  getAllCategories: () => api.get("/admin/categories").then((res) => res.data),
 
   // Orders
   getAllOrders: () => api.get("/admin/orders").then((res) => res.data),
@@ -160,6 +164,29 @@ export const adminAPI = {
     api
       .delete(`/offers/${offerId}/products/${productId}`)
       .then((res) => res.data),
+
+  // Collections
+  getAllCollections: () =>
+    api.get("/admin/collections").then((res) => res.data),
+  createCollection: (collectionData: any) =>
+    api.post("/admin/collections", collectionData).then((res) => res.data),
+  updateCollection: (id: number, collectionData: any) =>
+    api.put(`/admin/collections/${id}`, collectionData).then((res) => res.data),
+  deleteCollection: (id: number) =>
+    api.delete(`/admin/collections/${id}`).then((res) => res.data),
+  getCollection: (id: number) =>
+    api.get(`/admin/collections/${id}`).then((res) => res.data),
+  uploadCollectionImage: (id: number, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api
+      .post(`/admin/collections/${id}/upload-image`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
 };
 
 export default api;

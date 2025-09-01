@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import Response
 import os
 
-from app.routers import auth, products, orders, admin, offers, payments
+from app.routers import auth, products, orders, admin, offers, payments, collections
 from app.database import engine
 from app.models import Base
 
@@ -37,6 +37,7 @@ app.include_router(orders.router, prefix="/api/orders", tags=["Orders"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(offers.router, prefix="/api/offers", tags=["Offers"])
 app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
+app.include_router(collections.router, prefix="/api/collections", tags=["Collections"])
 
 @app.get("/")
 async def root():

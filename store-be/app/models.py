@@ -26,8 +26,12 @@ class Category(Base):
     name = Column(String, unique=True, index=True)
     description = Column(Text)
     icon = Column(String)
+    image = Column(String, nullable=True)  # New field for collection image
+    total_products = Column(Integer, default=0)  # New field for total products count
+    conditions = Column(String, nullable=True)  # New field for product conditions
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     products = relationship("Product", back_populates="category")
 

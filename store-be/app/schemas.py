@@ -41,14 +41,27 @@ class CategoryBase(BaseModel):
     name: str
     description: Optional[str] = None
     icon: Optional[str] = None
+    image: Optional[str] = None
+    total_products: Optional[int] = 0
+    conditions: Optional[str] = None
 
 class CategoryCreate(CategoryBase):
     pass
+
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    icon: Optional[str] = None
+    image: Optional[str] = None
+    total_products: Optional[int] = None
+    conditions: Optional[str] = None
+    is_active: Optional[bool] = None
 
 class Category(CategoryBase):
     id: int
     is_active: bool
     created_at: datetime
+    updated_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
@@ -60,17 +73,24 @@ class ProductBase(BaseModel):
     type: Optional[str] = None
     retail_price: float
     offer_price: Optional[float] = None
+    buy_price: Optional[float] = None
+    sell_price: Optional[float] = None
     currency: str = "PKR"
     description: Optional[str] = None
     delivery_charges: float = 0.0
     stock: int = 0
+    stock_quantity: int = 0
+    total_qty: int = 0
+    location: str = "Store"
     status: str = "available"
     available: int = 0
     sold: int = 0
-    category_id: int
+    category_id: Optional[int] = None
+    subcategory: Optional[str] = None
 
 class ProductCreate(ProductBase):
     images: List[str] = []
+    stock_quantity: int = 0
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
@@ -78,20 +98,26 @@ class ProductUpdate(BaseModel):
     type: Optional[str] = None
     retail_price: Optional[float] = None
     offer_price: Optional[float] = None
+    buy_price: Optional[float] = None
+    sell_price: Optional[float] = None
     currency: Optional[str] = None
     description: Optional[str] = None
     delivery_charges: Optional[float] = None
     stock: Optional[int] = None
+    stock_quantity: Optional[int] = None
+    total_qty: Optional[int] = None
+    location: Optional[str] = None
     status: Optional[str] = None
     available: Optional[int] = None
     sold: Optional[int] = None
     category_id: Optional[int] = None
+    subcategory: Optional[str] = None
     images: Optional[List[str]] = None
     is_active: Optional[bool] = None
 
 class Product(ProductBase):
     id: int
-    images: List[str]
+    images: Optional[List[str]] = []
     is_active: bool
     created_at: datetime
     updated_at: Optional[datetime] = None
@@ -99,8 +125,10 @@ class Product(ProductBase):
     # Legacy fields for backward compatibility
     price: Optional[float] = None
     original_price: Optional[float] = None
-    subcategory: Optional[str] = None
     stock_quantity: Optional[int] = None
+    
+    # Category relationship
+    category: Optional[Category] = None
     
     class Config:
         from_attributes = True
