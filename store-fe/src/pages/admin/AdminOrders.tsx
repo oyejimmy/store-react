@@ -1,38 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Table, Tag, Button, Space, Select, Modal, Descriptions, message, Spin, Image } from 'antd';
-import { EyeOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
-import { adminAPI } from '../../services/api';
-import styled from 'styled-components';
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+  Chip,
+  Avatar,
+  Snackbar,
+  Alert,
+  Card,
+  CardContent,
+  Grid,
+  IconButton,
+} from "@mui/material";
+import {
+  Visibility as VisibilityIcon,
+  Refresh as RefreshIcon,
+  Add as AddIcon,
+  ShoppingCart as ShoppingCartIcon,
+} from "@mui/icons-material";
+import { adminAPI } from "../../services/api";
 
-const { Option } = Select;
-
-const AdminContainer = styled.div`
-  padding: 24px;
-  background: #f5f5f5;
-  min-height: 100vh;
-`;
-
-const StyledCard = styled(Card)`
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: none;
-  
-  .ant-card-head {
-    background: linear-gradient(135deg, #d4af37, #b8860b);
-    border-radius: 12px 12px 0 0;
-    
-    .ant-card-head-title {
-      color: white;
-      font-weight: 600;
-    }
-  }
-`;
+const tableHeadingColor = {
+  backgroundColor: "#2c6e49",
+  color: "#ffffff",
+  fontWeight: 600,
+};
 
 const AdminOrders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error" | "info" | "warning",
+  });
 
   useEffect(() => {
     fetchOrders();
@@ -44,7 +61,11 @@ const AdminOrders: React.FC = () => {
       const data = await adminAPI.getAllOrders();
       setOrders(data);
     } catch (error) {
-      message.error('Failed to fetch orders');
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch orders",
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -52,292 +73,424 @@ const AdminOrders: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'orange';
-      case 'processing': return 'blue';
-      case 'shipped': return 'purple';
-      case 'delivered': return 'green';
-      case 'cancelled': return 'red';
-      default: return 'default';
+      case "pending":
+        return "warning";
+      case "processing":
+        return "info";
+      case "shipped":
+        return "primary";
+      case "delivered":
+        return "success";
+      case "cancelled":
+        return "error";
+      default:
+        return "default";
     }
   };
 
-  const columns = [
-    {
-      title: 'Order#',
-      dataIndex: 'order_number',
-      key: 'orderNumber',
-      width: 100,
-      render: (orderNumber: string) => (
-        <span style={{ fontWeight: 'bold', color: '#333' }}>{orderNumber}</span>
-      ),
-    },
-    {
-      title: 'Customer Name',
-      dataIndex: 'customer_name',
-      key: 'customer',
-      width: 150,
-    },
-    {
-      title: 'Total amount',
-      dataIndex: 'total_amount',
-      key: 'total',
-      width: 120,
-      render: (total: number) => (
-        <span style={{ fontWeight: 'bold' }}>PKR {total || 0}</span>
-      ),
-    },
-    {
-      title: 'Date',
-      dataIndex: 'created_at',
-      key: 'date',
-      width: 100,
-      render: (date: string) => new Date(date).toLocaleDateString('en-GB'),
-    },
-    {
-      title: 'Delivery Deadline',
-      key: 'deliveryDeadline',
-      width: 120,
-      render: (_: any, record: any) => {
-        const deliveryDate = new Date(record.created_at);
-        deliveryDate.setDate(deliveryDate.getDate() + 7);
-        return deliveryDate.toLocaleDateString('en-GB');
-      },
-    },
-    {
-      title: 'Status',
-      dataIndex: 'payment_status',
-      key: 'paymentStatus',
-      width: 80,
-      render: (paymentStatus: string) => (
-        <Tag color={paymentStatus === 'paid' ? 'green' : 'red'}>
-          {paymentStatus === 'paid' ? 'Paid' : 'Not Paid'}
-        </Tag>
-      ),
-    },
-    {
-      title: 'Product Availability',
-      dataIndex: 'status',
-      key: 'productStatus',
-      width: 120,
-      render: (status: string) => {
-        const statusMap = {
-          'pending': 'Expected',
-          'processing': 'Picked',
-          'shipped': 'Picked',
-          'delivered': 'Picked'
-        };
-        return statusMap[status as keyof typeof statusMap] || 'Expected';
-      },
-    },
-    {
-      title: 'Delivery',
-      dataIndex: 'status',
-      key: 'deliveryStatus',
-      width: 100,
-      render: (status: string) => {
-        const deliveryMap = {
-          'pending': <span style={{ color: '#ff4d4f' }}>Not Shipped</span>,
-          'processing': <span style={{ color: '#faad14' }}>Packed</span>,
-          'shipped': <span style={{ color: '#52c41a' }}>Packed</span>,
-          'delivered': <span style={{ color: '#52c41a' }}>Packed</span>
-        };
-        return deliveryMap[status as keyof typeof deliveryMap] || 'Packed';
-      },
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      width: 120,
-      render: (_: any, record: any) => (
-        <Space>
-          <Button 
-            type="primary" 
-            size="small" 
-            icon={<EyeOutlined />}
-            onClick={() => handleViewOrder(record)}
-            style={{ background: '#d4af37', borderColor: '#d4af37' }}
-          >
-            View
-          </Button>
-        </Space>
-      ),
-    },
-  ];
+  const getPaymentStatusColor = (status: string) => {
+    return status === "paid" ? "success" : "error";
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handleViewOrder = (order: any) => {
     setSelectedOrder(order);
     setIsModalVisible(true);
   };
 
-  const handleUpdateStatus = (order: any) => {
-    Modal.confirm({
-      title: 'Update Order Status',
-      content: (
-        <Select 
-          defaultValue={order.status} 
-          style={{ width: '100%', marginTop: '8px' }}
-          onChange={(value) => {
-            message.success(`Order status updated to ${value}`);
+  return (
+    <Box sx={{ p: 3, minHeight: "100vh" }}>
+      {/* Header with Add Button */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 4,
+          p: 3,
+          background: "linear-gradient(135deg, #2c6e49 0%, #4a8b6a 100%)",
+          borderRadius: 3,
+          boxShadow: "0 8px 32px rgba(44, 110, 73, 0.2)",
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{
+            fontWeight: 700,
+            color: "white",
+            textShadow: "0 2px 4px rgba(0,0,0,0.1)",
           }}
         >
-          <Option value="pending">Pending</Option>
-          <Option value="processing">Processing</Option>
-          <Option value="shipped">Shipped</Option>
-          <Option value="delivered">Delivered</Option>
-          <Option value="cancelled">Cancelled</Option>
-        </Select>
-      ),
-      onOk() {
-        // Handle status update
-      },
-    });
-  };
-
-  return (
-    <AdminContainer>
-      <StyledCard 
-        title="Orders" 
-        extra={
-          <Button 
-            type="primary" 
-            style={{ background: '#ff4d4f', borderColor: '#ff4d4f' }}
+          Orders Management
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={fetchOrders}
+            disabled={loading}
+            sx={{
+              borderColor: "#2c6e49",
+              color: "#2c6e49",
+              backgroundColor: "rgb(224, 220, 220)",
+              "&:hover": {
+                borderColor: "#2c6e49",
+                backgroundColor: "rgb(230, 232, 210)",
+              },
+            }}
+          >
+            Refresh
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            sx={{
+              backgroundColor: "#2c6e49",
+              "&:hover": {
+                backgroundColor: "#1e4a33",
+              },
+            }}
           >
             New Order
           </Button>
-        }
-      >
-        <Table
-          columns={columns}
-          dataSource={orders}
-          rowKey="id"
-          loading={loading}
-          size="small"
-          pagination={{
-            pageSize: 15,
-            showSizeChanger: false,
-            showQuickJumper: false,
-            simple: true,
-          }}
-          scroll={{ x: 1000 }}
-        />
-      </StyledCard>
+        </Box>
+      </Box>
 
-      <Modal
-        title="Order Details"
-        open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setIsModalVisible(false)}>
-            Close
-          </Button>
-        ]}
-        width={1000}
+      {/* Orders Table */}
+      <TableContainer
+        component={Paper}
+        sx={{ overflowX: "auto", borderRadius: 2, boxShadow: 3 }}
       >
-        {selectedOrder && (
-          <div>
-            <Descriptions bordered column={2} style={{ marginBottom: '24px' }}>
-              <Descriptions.Item label="Order Number" span={2}>
-                <strong>{selectedOrder.order_number}</strong>
-              </Descriptions.Item>
-              <Descriptions.Item label="Customer Name">
-                {selectedOrder.customer_name}
-              </Descriptions.Item>
-              <Descriptions.Item label="Customer Email">
-                {selectedOrder.customer_email}
-              </Descriptions.Item>
-              <Descriptions.Item label="Customer Phone">
-                {selectedOrder.customer_phone}
-              </Descriptions.Item>
-              <Descriptions.Item label="User ID">
-                {selectedOrder.user_id || 'Guest Order'}
-              </Descriptions.Item>
-              <Descriptions.Item label="Total Amount">
-                <strong>PKR {selectedOrder.total_amount}</strong>
-              </Descriptions.Item>
-              <Descriptions.Item label="Payment Method">
-                {selectedOrder.payment_method}
-              </Descriptions.Item>
-              <Descriptions.Item label="Order Status">
-                <Tag color={getStatusColor(selectedOrder.status)}>
-                  {selectedOrder.status.toUpperCase()}
-                </Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="Payment Status">
-                <Tag color={selectedOrder.payment_status === 'paid' ? 'green' : 'orange'}>
-                  {selectedOrder.payment_status.toUpperCase()}
-                </Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="Order Date">
-                {new Date(selectedOrder.created_at).toLocaleString()}
-              </Descriptions.Item>
-              <Descriptions.Item label="Last Updated">
-                {selectedOrder.updated_at ? new Date(selectedOrder.updated_at).toLocaleString() : 'N/A'}
-              </Descriptions.Item>
-              <Descriptions.Item label="Shipping Address" span={2}>
-                {selectedOrder.shipping_address}
-              </Descriptions.Item>
-            </Descriptions>
-            
-            <Card title="Order Items" style={{ marginTop: '16px' }}>
-              {selectedOrder.items && selectedOrder.items.length > 0 ? (
-                selectedOrder.items.map((item: any, index: number) => (
-                  <Card key={index} type="inner" style={{ marginBottom: '16px' }}>
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                      {item.product && item.product.images && item.product.images[0] && (
-                        <img 
-                          src={item.product.images[0]} 
-                          alt={item.product.name}
-                          style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }}
-                        />
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={tableHeadingColor}>Order#</TableCell>
+              <TableCell sx={tableHeadingColor}>Customer</TableCell>
+              <TableCell sx={tableHeadingColor}>Total Amount</TableCell>
+              <TableCell sx={tableHeadingColor}>Date</TableCell>
+              <TableCell sx={tableHeadingColor}>Delivery Deadline</TableCell>
+              <TableCell sx={tableHeadingColor}>Payment Status</TableCell>
+              <TableCell sx={tableHeadingColor}>Order Status</TableCell>
+              <TableCell sx={tableHeadingColor}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {orders
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((order) => {
+                const deliveryDate = new Date(order.created_at);
+                deliveryDate.setDate(deliveryDate.getDate() + 7);
+                
+                return (
+                  <TableRow key={order.id} hover>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        {order.order_number}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        {order.customer_name}
+                      </Typography>
+                      {order.customer_email && (
+                        <Typography variant="caption" color="text.secondary">
+                          {order.customer_email}
+                        </Typography>
                       )}
-                      <div style={{ flex: 1 }}>
-                        <Descriptions size="small" column={2}>
-                          <Descriptions.Item label="Product ID">
-                            {item.product_id}
-                          </Descriptions.Item>
-                          <Descriptions.Item label="Product Name">
-                            <strong>{item.product ? item.product.name : 'Product not found'}</strong>
-                          </Descriptions.Item>
-                          <Descriptions.Item label="Quantity">
-                            {item.quantity}
-                          </Descriptions.Item>
-                          <Descriptions.Item label="Unit Price">
-                            PKR {item.price}
-                          </Descriptions.Item>
-                          <Descriptions.Item label="Total Price">
-                            <strong>PKR {item.price * item.quantity}</strong>
-                          </Descriptions.Item>
-                          {item.product && (
-                            <>
-                              <Descriptions.Item label="Category">
-                                {item.product.category || item.product.subcategory || 'N/A'}
-                              </Descriptions.Item>
-                              <Descriptions.Item label="Stock Available">
-                                {item.product.stock_quantity || item.product.stock || 0}
-                              </Descriptions.Item>
-                              <Descriptions.Item label="Product Status">
-                                {item.product.status}
-                              </Descriptions.Item>
-                              {item.product.description && (
-                                <Descriptions.Item label="Description" span={2}>
-                                  {item.product.description}
-                                </Descriptions.Item>
-                              )}
-                            </>
-                          )}
-                        </Descriptions>
-                      </div>
-                    </div>
-                  </Card>
-                ))
-              ) : (
-                <p>No items found for this order</p>
-              )}
-            </Card>
-          </div>
-        )}
-      </Modal>
-    </AdminContainer>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        PKR {order.total_amount?.toLocaleString() || 0}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        {new Date(order.created_at).toLocaleDateString("en-GB")}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        {deliveryDate.toLocaleDateString("en-GB")}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={order.payment_status === "paid" ? "PAID" : "NOT PAID"}
+                        color={getPaymentStatusColor(order.payment_status)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={order.status?.toUpperCase() || "PENDING"}
+                        color={getStatusColor(order.status)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleViewOrder(order)}
+                        size="small"
+                        sx={{
+                          color: "#2c6e49",
+                          "&:hover": {
+                            backgroundColor: "rgba(44, 110, 73, 0.1)",
+                          },
+                        }}
+                      >
+                        <VisibilityIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={orders.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </TableContainer>
+
+      {/* Order Details Dialog */}
+      <Dialog
+        open={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>Order Details</DialogTitle>
+        <DialogContent>
+          {selectedOrder && (
+            <Box>
+              {/* Order Information */}
+              <Card sx={{ mb: 3 }}>
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 2, color: "#2c6e49" }}>
+                    Order Information
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Order Number
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                        {selectedOrder.order_number}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Total Amount
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                        PKR {selectedOrder.total_amount?.toLocaleString()}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Order Date
+                      </Typography>
+                      <Typography variant="body1">
+                        {new Date(selectedOrder.created_at).toLocaleString()}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Payment Method
+                      </Typography>
+                      <Typography variant="body1">
+                        {selectedOrder.payment_method || "N/A"}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Order Status
+                      </Typography>
+                      <Chip
+                        label={selectedOrder.status?.toUpperCase() || "PENDING"}
+                        color={getStatusColor(selectedOrder.status)}
+                        size="small"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Payment Status
+                      </Typography>
+                      <Chip
+                        label={selectedOrder.payment_status === "paid" ? "PAID" : "NOT PAID"}
+                        color={getPaymentStatusColor(selectedOrder.payment_status)}
+                        size="small"
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+
+              {/* Customer Information */}
+              <Card sx={{ mb: 3 }}>
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 2, color: "#2c6e49" }}>
+                    Customer Information
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Customer Name
+                      </Typography>
+                      <Typography variant="body1">
+                        {selectedOrder.customer_name}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Email
+                      </Typography>
+                      <Typography variant="body1">
+                        {selectedOrder.customer_email || "N/A"}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Phone
+                      </Typography>
+                      <Typography variant="body1">
+                        {selectedOrder.customer_phone || "N/A"}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        User ID
+                      </Typography>
+                      <Typography variant="body1">
+                        {selectedOrder.user_id || "Guest Order"}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" color="text.secondary">
+                        Shipping Address
+                      </Typography>
+                      <Typography variant="body1">
+                        {selectedOrder.shipping_address || "N/A"}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+
+              {/* Order Items */}
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 2, color: "#2c6e49" }}>
+                    Order Items
+                  </Typography>
+                  {selectedOrder.items && selectedOrder.items.length > 0 ? (
+                    selectedOrder.items.map((item: any, index: number) => (
+                      <Card key={index} variant="outlined" sx={{ mb: 2 }}>
+                        <CardContent>
+                          <Box sx={{ display: "flex", gap: 2 }}>
+                            {item.product?.images?.[0] && (
+                              <Avatar
+                                src={item.product.images[0]}
+                                alt={item.product.name}
+                                sx={{ width: 80, height: 80 }}
+                                variant="rounded"
+                              />
+                            )}
+                            <Box sx={{ flex: 1 }}>
+                              <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                  <Typography variant="body2" color="text.secondary">
+                                    Product Name
+                                  </Typography>
+                                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                                    {item.product?.name || "Product not found"}
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                  <Typography variant="body2" color="text.secondary">
+                                    Product ID
+                                  </Typography>
+                                  <Typography variant="body1">
+                                    {item.product_id}
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                  <Typography variant="body2" color="text.secondary">
+                                    Quantity
+                                  </Typography>
+                                  <Typography variant="body1">
+                                    {item.quantity}
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                  <Typography variant="body2" color="text.secondary">
+                                    Unit Price
+                                  </Typography>
+                                  <Typography variant="body1">
+                                    PKR {item.price}
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                  <Typography variant="body2" color="text.secondary">
+                                    Total Price
+                                  </Typography>
+                                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                                    PKR {(item.price * item.quantity).toLocaleString()}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <Typography variant="body1" color="text.secondary">
+                      No items found for this order
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsModalVisible(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };
 
