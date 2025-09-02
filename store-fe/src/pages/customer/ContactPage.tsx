@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -7,43 +7,54 @@ import {
   CardContent,
   TextField,
   Button,
-} from '@mui/material';
+  useTheme,
+  Chip,
+  Divider,
+  Alert,
+  InputAdornment,
+  Fade,
+  Slide,
+} from "@mui/material";
 import {
   Email,
   Phone,
   LocationOn,
-  Send
-} from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
+  Send,
+  AccessTime,
+  Person,
+  Subject as SubjectIcon,
+  Message,
+} from "@mui/icons-material";
+import { COLORS } from "../../utils/contstant";
 
 const ContactPage: React.FC = () => {
   const theme = useTheme();
 
-  
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
   });
   const [errors, setErrors] = useState<any>({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const validateForm = () => {
     const newErrors: any = {};
-    
-    if (!formData.firstName) newErrors.firstName = 'First name is required';
-    if (!formData.lastName) newErrors.lastName = 'Last name is required';
+
+    if (!formData.firstName) newErrors.firstName = "First name is required";
+    if (!formData.lastName) newErrors.lastName = "Last name is required";
     if (!formData.email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = "Please enter a valid email";
     }
-    if (!formData.phone) newErrors.phone = 'Phone number is required';
-    if (!formData.subject) newErrors.subject = 'Subject is required';
-    if (!formData.message) newErrors.message = 'Message is required';
-    
+    if (!formData.phone) newErrors.phone = "Phone number is required";
+    if (!formData.subject) newErrors.subject = "Subject is required";
+    if (!formData.message) newErrors.message = "Message is required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -51,197 +62,505 @@ const ContactPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    
+
     try {
-      // Here you would typically send the form data to your backend
-      alert("Thank you for your message! We'll get back to you soon.");
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
-      });
+      // Simulate form submission
+      setIsSubmitted(true);
+      setTimeout(() => {
+        alert("Thank you for your message! We'll get back to you soon.");
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+        setIsSubmitted(false);
+      }, 2000);
     } catch (error) {
-      alert('Failed to send message. Please try again.');
+      alert("Failed to send message. Please try again.");
     }
   };
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [field]: e.target.value });
-    if (errors[field]) {
-      setErrors({ ...errors, [field]: '' });
-    }
-  };
+  const handleChange =
+    (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData({ ...formData, [field]: e.target.value });
+      if (errors[field]) {
+        setErrors({ ...errors, [field]: "" });
+      }
+    };
+  const accentColor =
+    theme.palette.mode === "light" ? COLORS.deepNavy : COLORS.offWhite;
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
-      <Typography variant="h3" sx={{ textAlign: 'center', mb: 4, fontWeight: 'bold' }}>
-        Contact Us
-      </Typography>
-      
-      <Grid container spacing={4}>
-        <Grid item xs={12} lg={8}>
-          <Card>
-            <CardContent sx={{ p: 4 }}>
-              <Typography variant="h4" gutterBottom>
-                Send us a Message
-              </Typography>
-              <Box component="form" onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="First Name"
-                      value={formData.firstName}
-                      onChange={handleChange('firstName')}
-                      error={!!errors.firstName}
-                      helperText={errors.firstName}
-                      sx={{ mb: 2 }}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: theme.palette.background.default,
+        pt: 12,
+        pb: 8,
+        transition: "background-color 0.3s ease",
+      }}
+    >
+      <Box
+        sx={{
+          p: 3,
+          maxWidth: 1200,
+          mx: "auto",
+          minHeight: "100vh",
+          backgroundColor: theme.palette.background.default,
+          transition: "background-color 0.3s ease",
+        }}
+      >
+        <Fade in={true} timeout={800}>
+          <Box sx={{ textAlign: "center", mb: 6 }}>
+            <Typography
+              variant="h2"
+              sx={{
+                textAlign: "center",
+                color: theme.palette.text.primary,
+                mb: 5,
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                textShadow: `2px 2px 4px ${accentColor}40`,
+                fontSize: { xs: "2rem", md: "3rem" },
+                letterSpacing: "2px",
+                position: "relative",
+                "&::after": {
+                  content: '""',
+                  display: "block",
+                  width: "100px",
+                  height: "2px",
+                  background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+                  margin: "10px auto 0",
+                  boxShadow: `0 2px 10px ${accentColor}40`,
+                },
+              }}
+            >
+              Contact Us
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                color: theme.palette.text.secondary,
+                maxWidth: 600,
+                mx: "auto",
+              }}
+            >
+              Get in touch with us - we'd love to hear from you!
+            </Typography>
+          </Box>
+        </Fade>
+
+        <Grid container spacing={4}>
+          {/* Contact Form */}
+          <Grid item xs={12} lg={8}>
+            <Slide direction="right" in={true} timeout={800}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  backgroundColor: theme.palette.background.paper,
+                  border: `1px solid ${theme.palette.divider}`,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    boxShadow: theme.shadows[6],
+                  },
+                }}
+              >
+                <CardContent sx={{ p: 4 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                    <Send
+                      sx={{
+                        mr: 2,
+                        color: theme.palette.primary.main,
+                        fontSize: 32,
+                      }}
                     />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Last Name"
-                      value={formData.lastName}
-                      onChange={handleChange('lastName')}
-                      error={!!errors.lastName}
-                      helperText={errors.lastName}
-                      sx={{ mb: 2 }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange('email')}
-                      error={!!errors.email}
-                      helperText={errors.email}
-                      sx={{ mb: 2 }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Phone Number"
-                      value={formData.phone}
-                      onChange={handleChange('phone')}
-                      error={!!errors.phone}
-                      helperText={errors.phone}
-                      sx={{ mb: 2 }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Subject"
-                      value={formData.subject}
-                      onChange={handleChange('subject')}
-                      error={!!errors.subject}
-                      helperText={errors.subject}
-                      sx={{ mb: 2 }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Message"
-                      multiline
-                      rows={6}
-                      value={formData.message}
-                      onChange={handleChange('message')}
-                      error={!!errors.message}
-                      helperText={errors.message}
-                      sx={{ mb: 3 }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      size="large"
-                      startIcon={<Send />}
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: 600,
+                        color: theme.palette.text.primary,
+                      }}
                     >
-                      Send Message
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        
-        <Grid item xs={12} lg={4}>
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                Get in Touch
-              </Typography>
-              <Typography variant="body1" paragraph>
-                We&apos;d love to hear from you! Send us a message and we&apos;ll respond as soon as possible.
-              </Typography>
-              
-              <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Email sx={{ fontSize: 20, color: theme.palette.primary.main, mr: 1.5 }} />
-                  <Box>
-                    <Typography variant="subtitle1" fontWeight="bold">Email</Typography>
-                    <Typography variant="body2">support@saiyaara.com</Typography>
-                  </Box>
-                </Box>
-                
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Phone sx={{ fontSize: 20, color: theme.palette.primary.main, mr: 1.5 }} />
-                  <Box>
-                    <Typography variant="subtitle1" fontWeight="bold">Phone</Typography>
-                    <Typography variant="body2">+91-XXXXXXXXXX</Typography>
-                  </Box>
-                </Box>
-                
-                <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
-                  <LocationOn sx={{ fontSize: 20, color: theme.palette.primary.main, mr: 1.5, mt: 0.5 }} />
-                  <Box>
-                    <Typography variant="subtitle1" fontWeight="bold">Address</Typography>
-                    <Typography variant="body2">
-                      Saiyaara Jewelry Store<br />
-                      123 Jewelry Street<br />
-                      Mumbai, Maharashtra 400001<br />
-                      India
+                      Send us a Message
                     </Typography>
                   </Box>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Business Hours
-              </Typography>
-              <Box sx={{ mb: 1 }}>
-                <Typography variant="body2">
-                  <strong>Monday - Friday:</strong> 9:00 AM - 8:00 PM
-                </Typography>
-              </Box>
-              <Box sx={{ mb: 1 }}>
-                <Typography variant="body2">
-                  <strong>Saturday:</strong> 10:00 AM - 6:00 PM
-                </Typography>
-              </Box>
+
+                  {isSubmitted && (
+                    <Alert severity="success" sx={{ mb: 3 }}>
+                      Sending your message...
+                    </Alert>
+                  )}
+
+                  <Box component="form" onSubmit={handleSubmit}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="First Name"
+                          value={formData.firstName}
+                          onChange={handleChange("firstName")}
+                          error={!!errors.firstName}
+                          helperText={errors.firstName}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <Person
+                                  sx={{ color: theme.palette.text.secondary }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                          sx={{ mb: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Last Name"
+                          value={formData.lastName}
+                          onChange={handleChange("lastName")}
+                          error={!!errors.lastName}
+                          helperText={errors.lastName}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <Person
+                                  sx={{ color: theme.palette.text.secondary }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                          sx={{ mb: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleChange("email")}
+                          error={!!errors.email}
+                          helperText={errors.email}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <Email
+                                  sx={{ color: theme.palette.text.secondary }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                          sx={{ mb: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Phone Number"
+                          value={formData.phone}
+                          onChange={handleChange("phone")}
+                          error={!!errors.phone}
+                          helperText={errors.phone}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <Phone
+                                  sx={{ color: theme.palette.text.secondary }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                          sx={{ mb: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          label="Subject"
+                          value={formData.subject}
+                          onChange={handleChange("subject")}
+                          error={!!errors.subject}
+                          helperText={errors.subject}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SubjectIcon
+                                  sx={{ color: theme.palette.text.secondary }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                          sx={{ mb: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          label="Message"
+                          multiline
+                          rows={6}
+                          value={formData.message}
+                          onChange={handleChange("message")}
+                          error={!!errors.message}
+                          helperText={errors.message}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <Message
+                                  sx={{
+                                    color: theme.palette.text.secondary,
+                                    alignSelf: "flex-start",
+                                    mt: 1,
+                                  }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                          sx={{ mb: 3 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          size="large"
+                          startIcon={<Send />}
+                          sx={{
+                            backgroundColor: theme.palette.primary.main,
+                            color: theme.palette.primary.contrastText,
+                            "&:hover": {
+                              backgroundColor: theme.palette.primary.dark,
+                            },
+                            px: 4,
+                            py: 1.5,
+                            fontSize: "1.1rem",
+                          }}
+                        >
+                          Send Message
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Slide>
+          </Grid>
+
+          {/* Contact Information */}
+          <Grid item xs={12} lg={4}>
+            <Slide direction="left" in={true} timeout={800}>
               <Box>
-                <Typography variant="body2">
-                  <strong>Sunday:</strong> 11:00 AM - 5:00 PM
-                </Typography>
+                <Card
+                  sx={{
+                    mb: 3,
+                    borderRadius: 3,
+                    backgroundColor: theme.palette.background.paper,
+                    border: `1px solid ${theme.palette.divider}`,
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  <CardContent sx={{ p: 4 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontWeight: 600,
+                          color: theme.palette.text.primary,
+                        }}
+                      >
+                        Get in Touch
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ mb: 3 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 3 }}
+                      >
+                        <Box
+                          sx={{
+                            p: 1.5,
+                            borderRadius: "50%",
+                            backgroundColor: theme.palette.primary.main,
+                            color: theme.palette.primary.contrastText,
+                            mr: 2,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Email sx={{ fontSize: 20 }} />
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight="bold"
+                            sx={{ color: theme.palette.text.primary }}
+                          >
+                            Email
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: theme.palette.text.secondary }}
+                          >
+                            support@saiyaara.com
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 3 }}
+                      >
+                        <Box
+                          sx={{
+                            p: 1.5,
+                            borderRadius: "50%",
+                            backgroundColor: theme.palette.primary.main,
+                            color: theme.palette.primary.contrastText,
+                            mr: 2,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Phone sx={{ fontSize: 20 }} />
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight="bold"
+                            sx={{ color: theme.palette.text.primary }}
+                          >
+                            Phone
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: theme.palette.text.secondary }}
+                          >
+                            +91-XXXXXXXXXX
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box sx={{ display: "flex", alignItems: "flex-start" }}>
+                        <Box
+                          sx={{
+                            p: 1.5,
+                            borderRadius: "50%",
+                            backgroundColor: theme.palette.primary.main,
+                            color: theme.palette.primary.contrastText,
+                            mr: 2,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mt: 0.5,
+                          }}
+                        >
+                          <LocationOn sx={{ fontSize: 20 }} />
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight="bold"
+                            sx={{ color: theme.palette.text.primary }}
+                          >
+                            Address
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: theme.palette.text.secondary }}
+                          >
+                            Saiyaara Jewelry Store
+                            <br />
+                            123 Jewelry Street
+                            <br />
+                            Mumbai, Maharashtra 400001
+                            <br />
+                            India
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+
+                    <Divider sx={{ my: 3 }} />
+
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                      <AccessTime
+                        sx={{ mr: 2, color: theme.palette.primary.main }}
+                      />
+                      <Typography
+                        variant="h6"
+                        sx={{ color: theme.palette.text.primary }}
+                      >
+                        Business Hours
+                      </Typography>
+                    </Box>
+                    <Box sx={{ mb: 1 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.text.secondary }}
+                      >
+                        <strong>Monday - Friday:</strong> 9:00 AM - 8:00 PM
+                      </Typography>
+                    </Box>
+                    <Box sx={{ mb: 1 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.text.secondary }}
+                      >
+                        <strong>Saturday:</strong> 10:00 AM - 6:00 PM
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.text.secondary }}
+                      >
+                        <strong>Sunday:</strong> 11:00 AM - 5:00 PM
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+
+                <Card
+                  sx={{
+                    borderRadius: 3,
+                    backgroundColor: theme.palette.background.paper,
+                    border: `1px solid ${theme.palette.divider}`,
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  <CardContent sx={{ p: 4 }}>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ color: theme.palette.text.primary }}
+                    >
+                      Response Time
+                    </Typography>
+                    <Chip
+                      label="Typically within 24 hours"
+                      color="primary"
+                      variant="filled"
+                      sx={{ mb: 2 }}
+                    />
+                    <Typography
+                      variant="body2"
+                      sx={{ color: theme.palette.text.secondary }}
+                    >
+                      We strive to respond to all inquiries within one business
+                      day. For urgent matters, please call us directly.
+                    </Typography>
+                  </CardContent>
+                </Card>
               </Box>
-            </CardContent>
-          </Card>
+            </Slide>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
     </Box>
   );
 };

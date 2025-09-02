@@ -291,6 +291,7 @@ const Header: React.FC<HeaderProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            padding: "3.8px",
             gap: 1,
             transition: "top 0.3s ease",
             background: colors.bannerBg, // Black background for banner

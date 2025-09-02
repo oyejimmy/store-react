@@ -40,6 +40,7 @@ import {
   Close as CloseIcon,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
+import { COLORS } from "../../utils/contstant";
 
 type AvailabilityFilter = "in_stock" | "out_of_stock";
 
@@ -166,7 +167,7 @@ const ShopPage = () => {
 
   const snackbarStyle = {
     backgroundColor: theme.palette.mode === "dark" ? "#1E1B4B" : "#F8FAFC",
-    color: theme.palette.mode === "dark" ? "#F8FAFC" : "#1E1B4B",
+    color: theme.palette.mode === "dark" ? "#94A3B8" : "#1E1B4B",
   };
 
   const cardButtonStyle = {
@@ -175,6 +176,8 @@ const ShopPage = () => {
     fontWeight: "bold",
     borderRadius: "8px",
   };
+  const accentColor =
+    theme.palette.mode === "light" ? COLORS.deepNavy : COLORS.offWhite;
 
   return (
     // Main container with dynamic background color
@@ -185,7 +188,7 @@ const ShopPage = () => {
         pb: 10,
       }}
     >
-      <Box sx={{ margin: 5, p: 3, maxWidth: 1600, mx: "auto", mb: 10 }}>
+      <Box sx={{ margin: 4, p: 3, maxWidth: 1600, mx: "auto", mb: 10 }}>
         <Typography
           variant="h3"
           sx={{
@@ -193,6 +196,20 @@ const ShopPage = () => {
             color: theme.palette.text.primary,
             mb: 5,
             fontWeight: "bold",
+            textTransform: "uppercase",
+            textShadow: `2px 2px 4px ${accentColor}40`,
+            fontSize: { xs: "2rem", md: "3rem" },
+            letterSpacing: "2px",
+            position: "relative",
+            "&::after": {
+              content: '""',
+              display: "block",
+              width: "100px",
+              height: "2px",
+              background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+              margin: "10px auto 0",
+              boxShadow: `0 2px 10px ${accentColor}40`,
+            },
           }}
         >
           {pageTitle}
@@ -220,6 +237,15 @@ const ShopPage = () => {
                   onClick={resetFilters}
                   variant="text"
                   color="secondary"
+                  sx={{
+                    borderRadius: "50px",
+                    backgroundColor: COLORS.silver,
+                    color: COLORS.deepNavy,
+                    "&:hover": {
+                      backgroundColor: COLORS.accent,
+                      color: COLORS.offWhite,
+                    },
+                  }}
                 >
                   Reset
                 </Button>

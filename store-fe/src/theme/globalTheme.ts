@@ -5,7 +5,7 @@ export const brandColors = {
   primary: '#1E1B4B',        // Deep navy blue
   secondary: '#94A3B8',      // Silver
   background: '#F8FAFC',     // Off-white
-  backgroundDark: '#0F172A', // Dark background for the dark theme
+  backgroundDark: '#1E1B4B', // Deep navy blue background for the dark theme
   text: '#1E1B4B',           // Default text color, deep navy
   textLight: '#FFFFFF',      // White text for dark backgrounds or primary buttons
 };
