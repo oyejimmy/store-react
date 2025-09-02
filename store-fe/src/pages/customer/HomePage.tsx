@@ -750,49 +750,62 @@ const HomePage = () => {
           sx={{
             textAlign: "center",
             mb: 8,
-            fontWeight: 300,
-            fontSize: { xs: "2rem", md: "3rem" },
-            letterSpacing: "2px",
+            fontWeight: 700,
+            fontSize: { xs: "2.5rem", md: "3.5rem" },
+            letterSpacing: "1px",
             color: primaryColor,
             position: "relative",
-            "&::after": {
+            "&::before, &::after": {
               content: '""',
-              display: "block",
-              width: "100px",
+              position: "absolute",
+              top: "50%",
+              width: { xs: "30px", md: "60px" },
               height: "2px",
-              background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
-              margin: "20px auto 0",
-              boxShadow: `0 2px 10px ${accentColor}40`,
+              background: `linear-gradient(90deg, transparent, ${accentColor})`,
+            },
+            "&::before": {
+              left: { xs: "10%", md: "20%" },
+            },
+            "&::after": {
+              right: { xs: "10%", md: "20%" },
+              background: `linear-gradient(90deg, ${accentColor}, transparent)`,
             },
           }}
         >
           Special Offers
         </Typography>
-        <Grid container spacing={2}>
+
+        <Grid container spacing={4}>
           {[
             {
               title: "Under PKR 299",
               description: "Beautiful jewelry pieces at unbeatable prices",
-              cta: "SHOP NOW ✨",
+              cta: "SHOP NOW",
               link: "/offers/under-299",
               image:
-                "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=400&h=200&fit=crop",
+                "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=400&h=300&fit=crop",
+              icon: "✨",
+              gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             },
             {
               title: "Special Deals",
               description: "Limited time offers on premium collections",
-              cta: "GRAB DEALS 🔥",
+              cta: "GRAB DEALS",
               link: "/offers/special-deals",
               image:
-                "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop",
+                "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
+              icon: "🔥",
+              gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
             },
             {
               title: "Deal of the Month",
               description: "Exclusive monthly offers on trending pieces",
-              cta: "EXPLORE NOW 💎",
+              cta: "EXPLORE NOW",
               link: "/offers/deal-of-month",
               image:
-                "https://images.unsplash.com/photo-1549062572-544a64fb0c56?w=400&h=200&fit=crop",
+                "https://images.unsplash.com/photo-1549062572-544a64fb0c56?w=400&h=300&fit=crop",
+              icon: "💎",
+              gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
             },
           ].map((offer, index) => (
             <Grid item xs={12} md={4} key={index}>
@@ -802,65 +815,146 @@ const HomePage = () => {
                 sx={{
                   textAlign: "center",
                   borderRadius: "25px",
-                  transition: "all 0.5s ease",
+                  transition:
+                    "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                   overflow: "hidden",
                   textDecoration: "none",
                   background:
                     theme.palette.mode === "light"
-                      ? `linear-gradient(145deg, ${secondaryColor}, #F3F6F9)`
-                      : `linear-gradient(145deg, ${secondaryColor}, #2A2A57)`,
-                  border: `2px solid ${primaryColor}`,
+                      ? "#fff"
+                      : `linear-gradient(145deg, ${COLORS.deepNavy}20, ${COLORS.deepNavy}40)`,
+                  border: "none",
                   boxShadow:
                     theme.palette.mode === "light"
-                      ? "0 10px 30px rgba(0, 0, 0, 0.1)"
-                      : "0 10px 30px rgba(0, 0, 0, 0.3)",
+                      ? "0 15px 35px rgba(0, 0, 0, 0.1)"
+                      : "0 15px 35px rgba(0, 0, 0, 0.25)",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  position: "relative",
                   "&:hover": {
-                    transform: "translateY(-10px) scale(1.03)",
-                    boxShadow: `0 20px 40px ${accentColor}40`,
+                    transform: "translateY(-15px)",
+                    boxShadow: `0 25px 50px ${accentColor}30`,
+                    "& .offer-image": {
+                      transform: "scale(1.1)",
+                    },
+                    "& .offer-button": {
+                      background: primaryColor,
+                      color: secondaryColor,
+                      boxShadow: `0 10px 20px ${primaryColor}40`,
+                    },
                   },
                 }}
               >
+                {/* Ribbon for special badge */}
                 <Box
                   sx={{
-                    height: "200px",
-                    backgroundImage: `url(${offer.image})`,
+                    position: "absolute",
+                    top: 20,
+                    right: -30,
+                    background: accentColor,
+                    color: "white",
+                    padding: "5px 40px",
+                    transform: "rotate(45deg)",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    zIndex: 1,
+                    boxShadow: `0 2px 10px ${accentColor}80`,
+                  }}
+                >
+                  SALE
+                </Box>
+
+                <Box
+                  className="offer-image"
+                  sx={{
+                    height: "220px",
+                    background: `url(${offer.image})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     position: "relative",
-                    "&::after": {
+                    transition: "transform 0.5s ease",
+                    "&::before": {
                       content: '""',
                       position: "absolute",
                       top: 0,
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      background:
-                        "linear-gradient(45deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6))",
+                      background: offer.gradient,
+                      opacity: 0.7,
+                      mixBlendMode: "multiply",
                     },
                   }}
                 />
-                <CardContent sx={{ p: 5 }}>
-                  <Typography variant="h4" sx={{ mb: 2, color: primaryColor }}>
+
+                <CardContent
+                  sx={{
+                    p: 4,
+                    flexGrow: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "60px",
+                      height: "60px",
+                      borderRadius: "50%",
+                      background: offer.gradient,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0 auto 20px",
+                      fontSize: "24px",
+                      boxShadow: `0 5px 15px ${accentColor}40`,
+                    }}
+                  >
+                    {offer.icon}
+                  </Box>
+
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      mb: 2,
+                      color: primaryColor,
+                      fontWeight: 700,
+                      fontSize: "1.75rem",
+                    }}
+                  >
                     {offer.title}
                   </Typography>
+
                   <Typography
                     variant="body1"
-                    sx={{ mb: 3, color: primaryColor }}
+                    sx={{
+                      mb: 3,
+                      color:
+                        theme.palette.mode === "light"
+                          ? COLORS.silver
+                          : COLORS.offWhite,
+                      flexGrow: 1,
+                    }}
                   >
                     {offer.description}
                   </Typography>
+
                   <Button
-                    variant="contained"
+                    className="offer-button"
+                    variant="outlined"
                     size="large"
                     sx={{
-                      borderRadius: "25px",
+                      borderRadius: "50px",
                       fontWeight: "bold",
                       px: 4,
                       py: 1.5,
-                      backgroundColor: primaryColor,
-                      color: secondaryColor,
+                      borderWidth: "2px",
+                      borderColor: primaryColor,
+                      color: primaryColor,
+                      background: "transparent",
+                      transition: "all 0.3s ease",
                       "&:hover": {
-                        transform: "translateY(-3px)",
+                        borderColor: primaryColor,
                       },
                     }}
                   >
