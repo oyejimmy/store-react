@@ -15,43 +15,63 @@ import {
   Stack,
   Divider,
 } from "@mui/material";
-import { Phone, LocationOn, Info } from "@mui/icons-material";
-import {
-  FaTruck,
-  FaMapMarkedAlt,
-  FaDollarSign,
-  FaEnvelopeOpenText,
-  FaStore,
-  FaWarehouse,
-  FaBuilding,
-  FaCubes,
-  FaShippingFast,
-  FaMailBulk,
-  FaBoxOpen,
-} from "react-icons/fa";
+import { 
+  Phone, 
+  LocationOn, 
+  Info,
+  LocalShipping as TruckIcon,
+  Map as MapIcon,
+  AttachMoney as DollarIcon,
+  Email as EmailIcon,
+  Store as StoreIcon,
+  Warehouse as WarehouseIcon,
+  Business as BuildingIcon,
+  ViewInAr as CubesIcon,
+  DeliveryDining as ShippingFastIcon,
+  Mail as MailIcon,
+  Inventory as BoxIcon
+} from "@mui/icons-material";
 
-// Explicitly define the type for the icons object to resolve the TypeScript error
-const courierIcons: { [key: string]: React.ReactNode } = {
-  TCS: <FaTruck size={32} color="#E53935" />,
-  "Leopard Courier": <FaMapMarkedAlt size={32} color="#0064d2" />,
-  BlueEx: <FaDollarSign size={32} color="#0096C7" />,
-  CallCourier: <FaEnvelopeOpenText size={32} color="#5D4037" />,
-  "M&P (Muller & Phipps)": <FaWarehouse size={32} color="#5C6BC0" />,
-  Rider: <FaShippingFast size={32} color="#FFD100" />,
-  Trax: <FaBoxOpen size={32} color="#2ECC71" />,
-  Cheetay: <FaStore size={32} color="#FF5722" />,
-  "Pakistan Post": <FaMailBulk size={32} color="#2196F3" />,
+// Create a type-safe icon component
+const IconWrapper = ({
+  icon: Icon,
+  ...props
+}: { 
+  icon: React.ElementType,
+  color?: string,
+  key?: string 
+} & React.HTMLAttributes<SVGElement>) => (
+  <Icon {...props} style={{ color: props.color }} />
+);
+
+// Define the courier icons with type safety
+const courierIcons: Record<string, React.ReactElement> = {
+  TCS: <IconWrapper icon={TruckIcon} key="tcs" color="#E53935" />,
+  "Leopard Courier": (
+    <IconWrapper icon={MapIcon} key="leopard-courier" color="#0064d2" />
+  ),
+  BlueEx: <IconWrapper icon={DollarIcon} key="blue-ex" color="#0096C7" />,
+  CallCourier: (
+    <IconWrapper icon={EmailIcon} key="call-courier" color="#5D4037" />
+  ),
+  "M&P (Muller & Phipps)": (
+    <IconWrapper icon={WarehouseIcon} key="m-p" color="#5C6BC0" />
+  ),
+  Rider: <IconWrapper icon={ShippingFastIcon} key="rider" color="#FFD100" />,
+  Trax: <IconWrapper icon={BoxIcon} color="#2ECC71" />,
+  Cheetay: <IconWrapper icon={StoreIcon} color="#FF5722" />,
+  "Pakistan Post": <IconWrapper icon={MailIcon} color="#2196F3" />,
 };
 
 // Helper function to get a unique icon for each location
-const getLocationIcon = (index: number) => {
+const getLocationIcon = (index: number): React.ReactElement => {
   const icons = [
-    <FaBuilding key={index} size={32} color="#E53935" />,
-    <FaStore key={index} size={32} color="#0064d2" />,
-    <FaCubes key={index} size={32} color="#0096C7" />,
-    <FaMapMarkedAlt key={index} size={32} color="#5D4037" />,
-  ];
-  return icons[index % icons.length];
+    <IconWrapper key={`building-${index}`} icon={BuildingIcon} color="#E53935" />,
+    <IconWrapper key={`store-${index}`} icon={StoreIcon} color="#0064d2" />,
+    <IconWrapper key={`cubes-${index}`} icon={CubesIcon} color="#0096C7" />,
+    <IconWrapper key={`map-${index}`} icon={MapIcon} color="#5D4037" />,
+  ] as const;
+  return icons[Math.abs(index) % icons.length];
 };
 
 interface Location {

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-// import { AppDispatch, RootState } from "../../store";
+import type { RootState, AppDispatch } from "../../store";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
 import {
   fetchProducts,
   fetchProductsByCategory,
@@ -40,20 +41,26 @@ import {
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 
+type AvailabilityFilter = "in_stock" | "out_of_stock";
+
 const ShopPage = () => {
-  const { category } = useParams();
+  const { category } = useParams<{ category?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const theme = useTheme();
 
-  const { products, loading, filters } = useSelector((state) => state.products);
+  const { products, loading, filters } = useSelector(
+    (state: RootState) => state.products
+  );
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("featured");
   const [currentPage, setCurrentPage] = useState(1);
-  const [availabilityFilter, setAvailabilityFilter] = useState([]);
-  const [priceRange, setPriceRange] = useState([0, 799]);
+  const [availabilityFilter, setAvailabilityFilter] = useState<
+    AvailabilityFilter[]
+  >([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 799]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -66,20 +73,20 @@ const ShopPage = () => {
     }
   }, [dispatch, category, searchParams]);
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = (product: any) => {
     dispatch(addToCart({ product, quantity: 1 }));
     setSnackbarMessage(`${product.name} added to cart!`);
     setOpenSnackbar(true);
   };
 
-  const handleCloseSnackbar = (event, reason) => {
+  const handleCloseSnackbar = (_: any, reason: any) => {
     if (reason === "clickaway") {
       return;
     }
     setOpenSnackbar(false);
   };
 
-  const handleViewDetails = (productId) => {
+  const handleViewDetails = (productId: any) => {
     navigate(`/product/${productId}`);
   };
 
@@ -88,7 +95,7 @@ const ShopPage = () => {
     setPriceRange([0, 799]);
   };
 
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = products.filter((product: any) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -107,7 +114,7 @@ const ShopPage = () => {
     return matchesSearch && matchesPrice && matchesAvailability;
   });
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
+  const sortedProducts = [...filteredProducts].sort((a: any, b: any) => {
     switch (sortBy) {
       case "price_low":
         const priceA = a.offer_price || a.price || a.retail_price || 0;
@@ -291,7 +298,9 @@ const ShopPage = () => {
                 </Typography>
                 <Slider
                   value={priceRange}
-                  onChange={(_, value) => setPriceRange(value)}
+                  onChange={(_, value) =>
+                    setPriceRange(value as [number, number])
+                  }
                   valueLabelDisplay="auto"
                   min={0}
                   max={799}
@@ -382,7 +391,7 @@ const ShopPage = () => {
             ) : (
               <>
                 <Grid container spacing={4}>
-                  {paginatedProducts.map((product) => {
+                  {paginatedProducts.map((product: any) => {
                     const isOutOfStock =
                       (product.stock_quantity || product.stock || 0) === 0;
 
@@ -589,10 +598,11 @@ const ShopPage = () => {
           >
             <Typography>{snackbarMessage}</Typography>
             <IconButton
+              key="close"
               size="small"
               aria-label="close"
               color="inherit"
-              onClick={handleCloseSnackbar}
+              onClick={(event) => handleCloseSnackbar(event, "clickaway")}
               sx={{ ml: 2 }}
             >
               <CloseIcon fontSize="small" />

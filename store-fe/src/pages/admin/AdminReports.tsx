@@ -24,6 +24,10 @@ import {
   ContentCopy,
   Delete,
 } from "@mui/icons-material";
+import { saveAs } from "file-saver";
+import Papa from "papaparse";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 // Define the types for your data to resolve TypeScript errors.
 interface Product {
@@ -281,14 +285,14 @@ const AdminReports = () => {
 
   const handleExportCSV = () => {
     const { headers, data } = formatTableDataForExport();
-    const csv = Papa.unparse({ fields: headers, data });
+    const csv: any = Papa.unparse({ fields: headers, data });
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     saveAs(blob, "reports.csv");
   };
 
   const handleExportExcel = () => {
     const { headers, data } = formatTableDataForExport();
-    const csv = Papa.unparse({ fields: headers, data });
+    const csv: any = Papa.unparse({ fields: headers, data });
     const blob = new Blob([csv], { type: "application/vnd.ms-excel" });
     saveAs(blob, "reports.xls");
   };

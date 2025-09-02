@@ -1,4 +1,4 @@
-import { createTheme, responsiveFontSizes, PaletteOptions, Components, Shadows } from "@mui/material";
+import { createTheme, responsiveFontSizes, PaletteOptions, Components, Shadows, alpha } from "@mui/material";
 
 // --- Placeholder Palettes ---
 // You will need to replace these with your actual palette logic.
@@ -14,6 +14,7 @@ const getLightPalette = (primaryColor: string): PaletteOptions => ({
     default: '#F8FAFC',
     paper: '#FFFFFF',
   },
+  divider: 'rgba(0, 0, 0, 0.12)',
 });
 
 const getDarkPalette = (primaryColor: string): PaletteOptions => ({
@@ -28,6 +29,7 @@ const getDarkPalette = (primaryColor: string): PaletteOptions => ({
     default: '#0F172A',
     paper: '#1e293b',
   },
+  divider: 'rgba(255, 255, 255, 0.12)',
 });
 
 // --- Placeholder Shadows ---

@@ -368,7 +368,9 @@ const AdminLayout: React.FC = () => {
           sx={{
             backgroundColor: theme.palette.background.paper,
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-            borderBottom: `1px solid ${theme?.palette?.divider}`,
+            // borderBottom: `1px solid ${
+            //   theme.palette.divider || "rgba(0, 0, 0, 0.12)"
+            // }`,
           }}
         >
           <Toolbar sx={{ justifyContent: "space-between", gap: 2 }}>

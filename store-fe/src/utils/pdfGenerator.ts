@@ -5,7 +5,7 @@
 // Import types
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-import html2canvas, { Options as Html2CanvasOptions } from 'html2canvas';
+import html2canvas from 'html2canvas';
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -38,7 +38,6 @@ export const generateSimplePdf = async (
     doc.text(content, 10, 10);
     doc.save(filename);
   } catch (error) {
-    console.error('Error generating PDF:', error);
     throw error;
   }
 };
@@ -119,7 +118,6 @@ export const htmlToPdf = async (
       document.body.removeChild(tempElement);
     }
   } catch (error) {
-    console.error('Error generating PDF from HTML:', error);
     throw error;
   }
 };

@@ -17,7 +17,7 @@ import {
   Fade,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 // import { AppDispatch, RootState } from "../../store";
 import { fetchProducts } from "../../store/slices/productSlice";
 import { fetchOffersByType } from "../../store/slices/offerSlice";
@@ -26,8 +26,8 @@ import { COLORS } from "../../utils/contstant";
 
 const HomePage = () => {
   const theme = useTheme();
-  const dispatch = useDispatch();
-  const { products, loading } = useSelector((state: any) => state.products);
+  const dispatch = useAppDispatch();
+  const { products, loading } = useAppSelector((state) => state.products);
 
   // Define color variables based on the current theme mode
   const primaryColor =
@@ -407,10 +407,12 @@ const HomePage = () => {
                       sx={{
                         borderRadius: "25px",
                         px: 3,
+                        borderColor: COLORS.offWhite,
                         backgroundColor: COLORS.deepNavy,
                         color: COLORS.offWhite,
                         "&:hover": {
-                          backgroundColor: COLORS.deepNavy,
+                          backgroundColor: COLORS.offWhite,
+                          color: COLORS.deepNavy,
                           opacity: 0.9,
                         },
                         "&:disabled": {
@@ -426,11 +428,11 @@ const HomePage = () => {
                       sx={{
                         borderRadius: "25px",
                         px: 3,
-                        borderColor: COLORS.deepNavy,
-                        color: COLORS.deepNavy,
+                        borderColor: COLORS.offWhite,
+                        color: COLORS.offWhite,
                         "&:hover": {
-                          backgroundColor: COLORS.deepNavy,
-                          color: COLORS.offWhite,
+                          backgroundColor: COLORS.offWhite,
+                          color: COLORS.deepNavy,
                         },
                       }}
                     >

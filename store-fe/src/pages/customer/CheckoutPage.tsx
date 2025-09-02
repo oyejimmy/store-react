@@ -133,7 +133,7 @@ const CheckoutPage: React.FC = () => {
       }
     };
 
-  const processPayment = async () => {
+  const processPayment = async (orderData: any, formData: any) => {
     if (paymentMethod === "easypaisa" || paymentMethod === "jazzcash") {
       const txnId = `TXN${Date.now()}`;
       setSnackbar({
@@ -153,6 +153,7 @@ const CheckoutPage: React.FC = () => {
       const customer_name = `${formData.firstName} ${formData.lastName}`.trim();
       const addressParts = [
         formData.addressLine1,
+
         formData.addressLine2,
         formData.city,
         formData.state,

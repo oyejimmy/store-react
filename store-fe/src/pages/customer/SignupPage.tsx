@@ -355,10 +355,9 @@ const SignupPage: React.FC = () => {
                     style={{
                       color: theme.palette.primary.main,
                       textDecoration: "none",
-                      "&:hover": {
-                        textDecoration: "underline",
-                      },
                     }}
+                    onMouseOver={(e) => (e.currentTarget.style.textDecoration = "underline")}
+                    onMouseOut={(e) => (e.currentTarget.style.textDecoration = "none")}
                   >
                     Terms and Conditions
                   </Link>{" "}
@@ -368,10 +367,9 @@ const SignupPage: React.FC = () => {
                     style={{
                       color: theme.palette.primary.main,
                       textDecoration: "none",
-                      "&:hover": {
-                        textDecoration: "underline",
-                      },
                     }}
+                    onMouseOver={(e) => (e.currentTarget.style.textDecoration = "underline")}
+                    onMouseOut={(e) => (e.currentTarget.style.textDecoration = "none")}
                   >
                     Privacy Policy
                   </Link>
@@ -442,10 +440,9 @@ const SignupPage: React.FC = () => {
                   color: theme.palette.primary.main,
                   fontWeight: "bold",
                   textDecoration: "none",
-                  "&:hover": {
-                    textDecoration: "underline",
-                  },
                 }}
+                onMouseOver={(e) => (e.currentTarget.style.textDecoration = "underline")}
+                onMouseOut={(e) => (e.currentTarget.style.textDecoration = "none")}
               >
                 Sign In
               </Link>
