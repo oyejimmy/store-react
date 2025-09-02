@@ -11,22 +11,52 @@ import {
   Chip,
   Container,
   useTheme,
+  CircularProgress,
+  Alert,
+  IconButton,
+  Rating,
+  Skeleton,
+  Fade,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { fetchProducts } from "../../store/slices/productSlice";
 import { fetchOffersByType } from "../../store/slices/offerSlice";
+import {
+  ShoppingCart,
+  Favorite,
+  FavoriteBorder,
+  Visibility,
+  Refresh,
+} from "@mui/icons-material";
+
+// Color constants
+const COLORS = {
+  offWhite: "#F8FAFC",
+  deepNavy: "#1E1B4B",
+  silver: "#94A3B8",
+  accent: "#FF6B6B",
+  success: "#4CAF50",
+  warning: "#FF9800",
+};
 
 const HomePage = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { products } = useSelector((state) => state.products);
+  const { products, loading } = useSelector((state: any) => state.products);
+
+  console.log(products, loading);
 
   // Define color variables based on the current theme mode
-  const primaryColor = theme.palette.mode === "light" ? "#1E1B4B" : "#F8FAFC";
-  const secondaryColor = theme.palette.mode === "light" ? "#F8FAFC" : "#1E1B4B";
-  const accentColor = theme.palette.mode === "light" ? "#1E1B4B" : "#F8FAFC";
+  const primaryColor =
+    theme.palette.mode === "light" ? COLORS.deepNavy : COLORS.offWhite;
+  const secondaryColor =
+    theme.palette.mode === "light" ? COLORS.offWhite : COLORS.deepNavy;
+  const accentColor =
+    theme.palette.mode === "light" ? COLORS.deepNavy : COLORS.offWhite;
+  const textColor =
+    theme.palette.mode === "light" ? COLORS.deepNavy : COLORS.offWhite;
 
   useEffect(() => {
     // Fetch featured products
@@ -37,6 +67,10 @@ const HomePage = () => {
     dispatch(fetchOffersByType("special_deals"));
     dispatch(fetchOffersByType("deal_of_month"));
   }, [dispatch]);
+
+  const retryFetch = () => {
+    dispatch(fetchProducts({ limit: 8 }));
+  };
 
   const bannerSlides = [
     {
@@ -116,14 +150,329 @@ const HomePage = () => {
     },
   ];
 
+  // Calculate discount percentage
+  const calculateDiscount = (product: any) => {
+    const originalPrice = product.original_price || product.retail_price;
+    const currentPrice =
+      product.offer_price || product.price || product.retail_price;
+    if (originalPrice > currentPrice) {
+      return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    }
+    return 0;
+  };
+
+  // Render featured products section with loading states
+  const renderFeaturedProducts = () => {
+    if (loading) {
+      return (
+        <Grid container spacing={4}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card
+                sx={{
+                  height: "100%",
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                }}
+              >
+                <Skeleton variant="rectangular" height={280} />
+                <CardContent>
+                  <Skeleton variant="text" height={32} />
+                  <Skeleton variant="text" height={24} width="60%" />
+                  <Skeleton variant="text" height={20} width="40%" />
+                </CardContent>
+                <CardActions>
+                  <Skeleton variant="rectangular" width={120} height={36} />
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      );
+    }
+
+    if (products.length === 0) {
+      return (
+        <Box sx={{ textAlign: "center", py: 8 }}>
+          <Typography variant="h6" color="textSecondary" gutterBottom>
+            No featured products available
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            Check back later for new arrivals
+          </Typography>
+        </Box>
+      );
+    }
+
+    return (
+      <Grid container spacing={4}>
+        {products.slice(0, 6).map((product: any) => {
+          const discount = calculateDiscount(product);
+          const isOutOfStock =
+            (product.stock_quantity || product.stock || 0) === 0;
+
+          return (
+            <Grid item xs={12} sm={6} md={4} key={product.id}>
+              <Fade in={true} timeout={800}>
+                <Card
+                  component={Link}
+                  to={`/product/${product.id}`}
+                  sx={{
+                    height: "100%",
+                    borderRadius: "20px",
+                    transition: "all 0.4s ease",
+                    overflow: "hidden",
+                    textDecoration: "none",
+                    display: "flex",
+                    flexDirection: "column",
+                    background:
+                      theme.palette.mode === "light"
+                        ? COLORS.offWhite
+                        : `linear-gradient(145deg, ${COLORS.deepNavy}20, ${COLORS.deepNavy}40)`,
+                    border: `1px solid ${COLORS.silver}30`,
+                    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.08)",
+                    position: "relative",
+                    "&:hover": {
+                      transform: "translateY(-12px) scale(1.02)",
+                      boxShadow: `0 20px 40px ${COLORS.deepNavy}20`,
+                      borderColor: COLORS.deepNavy,
+                      "& .product-image": {
+                        transform: "scale(1.05)",
+                      },
+                    },
+                  }}
+                >
+                  {/* Discount Badge */}
+                  {discount > 0 && (
+                    <Chip
+                      label={`${discount}% OFF`}
+                      sx={{
+                        position: "absolute",
+                        top: 12,
+                        left: 12,
+                        backgroundColor: COLORS.accent,
+                        color: "white",
+                        fontWeight: "bold",
+                        zIndex: 2,
+                      }}
+                    />
+                  )}
+
+                  {/* Out of Stock Overlay */}
+                  {isOutOfStock && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: "rgba(0, 0, 0, 0.7)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 3,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          backgroundColor: COLORS.accent,
+                          padding: "16px",
+                          borderRadius: "50px",
+                          border: `2px solid ${COLORS.deepNavy}`,
+                          transform: "rotate(-5deg)",
+                        }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            color: "white",
+                            fontWeight: "bold",
+                            textTransform: "uppercase",
+                            letterSpacing: "1px",
+                          }}
+                        >
+                          Out of Stock
+                        </Typography>
+                      </Box>
+                    </Box>
+                  )}
+
+                  <CardMedia
+                    component="img"
+                    className="product-image"
+                    height="280"
+                    image={
+                      product.images?.[0] ||
+                      "https://via.placeholder.com/300x200?text=Product+Image"
+                    }
+                    alt={product.name}
+                    sx={{
+                      objectFit: "cover",
+                      transition: "transform 0.4s ease",
+                      filter: isOutOfStock ? "blur(2px)" : "none",
+                    }}
+                  />
+
+                  <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        mb: 2,
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: textColor,
+                          fontWeight: 600,
+                          mb: 1.5,
+                          flex: 1,
+                        }}
+                      >
+                        {product.name}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        sx={{ color: COLORS.accent }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          // Add to wishlist functionality
+                        }}
+                      >
+                        <FavoriteBorder />
+                      </IconButton>
+                    </Box>
+
+                    <Box sx={{ mb: 2 }}>
+                      <Rating
+                        value={4.5}
+                        precision={0.5}
+                        readOnly
+                        size="small"
+                        sx={{ color: COLORS.warning, mb: 1 }}
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{ color: COLORS.silver, mb: 2 }}
+                      >
+                        {product.sold || 0} sold •{" "}
+                        {product.stock_quantity || product.stock || 0} in stock
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ mb: 1.5 }}>
+                      <Typography
+                        variant="h6"
+                        component="span"
+                        sx={{
+                          fontSize: "1.25rem",
+                          fontWeight: 600,
+                          color: textColor,
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        PKR{" "}
+                        {product.offer_price ||
+                          product.price ||
+                          product.retail_price}
+                      </Typography>
+                      {discount > 0 && (
+                        <Typography
+                          component="span"
+                          sx={{
+                            textDecoration: "line-through",
+                            ml: 1.5,
+                            color: COLORS.silver,
+                            fontSize: "1rem",
+                          }}
+                        >
+                          PKR {product.original_price || product.retail_price}
+                        </Typography>
+                      )}
+                    </Box>
+
+                    <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                      <Chip
+                        label={product.category || product.type || "Jewelry"}
+                        size="small"
+                        sx={{
+                          backgroundColor: COLORS.deepNavy,
+                          color: COLORS.offWhite,
+                          fontWeight: 500,
+                        }}
+                      />
+                      {product.delivery_charges === 0 && (
+                        <Chip
+                          label="Free Delivery"
+                          size="small"
+                          sx={{
+                            backgroundColor: COLORS.success,
+                            color: "white",
+                          }}
+                        />
+                      )}
+                    </Box>
+                  </CardContent>
+
+                  <CardActions sx={{ p: 3, pt: 0 }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<ShoppingCart />}
+                      disabled={isOutOfStock}
+                      sx={{
+                        borderRadius: "25px",
+                        px: 3,
+                        backgroundColor: COLORS.deepNavy,
+                        color: COLORS.offWhite,
+                        "&:hover": {
+                          backgroundColor: COLORS.deepNavy,
+                          opacity: 0.9,
+                        },
+                        "&:disabled": {
+                          backgroundColor: COLORS.silver,
+                        },
+                      }}
+                    >
+                      Add to Cart
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Visibility />}
+                      sx={{
+                        borderRadius: "25px",
+                        px: 3,
+                        borderColor: COLORS.deepNavy,
+                        color: COLORS.deepNavy,
+                        "&:hover": {
+                          backgroundColor: COLORS.deepNavy,
+                          color: COLORS.offWhite,
+                        },
+                      }}
+                    >
+                      View
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Fade>
+            </Grid>
+          );
+        })}
+      </Grid>
+    );
+  };
+
   return (
     <Box
       sx={{
         minHeight: "100vh",
         background:
           theme.palette.mode === "light"
-            ? secondaryColor
-            : "linear-gradient(135deg, #1E1B4B 0%, #2A2A57 50%, #1E1B4B 100%)",
+            ? COLORS.offWhite
+            : `linear-gradient(135deg, ${COLORS.deepNavy} 0%, #2A2A57 50%, ${COLORS.deepNavy} 100%)`,
       }}
     >
       {/* Banner Section */}
@@ -193,7 +542,7 @@ const HomePage = () => {
         </Box>
       </Box>
 
-      {/* Categories */}
+      {/* Categories Section */}
       <Container maxWidth="lg" sx={{ mb: 12, py: 10 }}>
         <Typography
           variant="h2"
@@ -235,24 +584,15 @@ const HomePage = () => {
                   transition: "all 0.5s ease",
                   display: "block",
                   textDecoration: "none",
-                  boxShadow:
-                    theme.palette.mode === "light"
-                      ? "0 10px 30px rgba(0, 0, 0, 0.1)"
-                      : "0 10px 30px rgba(0, 0, 0, 0.4)",
-                  border:
-                    theme.palette.mode === "light"
-                      ? "2px solid #e8e8e8"
-                      : `2px solid ${primaryColor}`,
+                  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+                  border: `2px solid ${COLORS.silver}30`,
                   "&:hover": {
                     transform: "translateY(-15px) scale(1.03)",
-                    boxShadow: `0 25px 50px ${accentColor}40`,
-                    borderColor: accentColor,
-                    "& .category-overlay": {
-                      background: `linear-gradient(45deg, ${accentColor}d9, ${accentColor}d9)`,
-                    },
+                    boxShadow: `0 25px 50px ${COLORS.deepNavy}20`,
+                    borderColor: COLORS.deepNavy,
                     "& .category-title": {
                       transform: "translateY(-15px) scale(1.1)",
-                      color: secondaryColor,
+                      color: "white",
                     },
                   },
                 }}
@@ -280,7 +620,12 @@ const HomePage = () => {
                     left: 0,
                     right: 0,
                     bottom: 0,
+                    background: `linear-gradient(45deg, ${COLORS.deepNavy}80, ${COLORS.deepNavy}80)`,
                     transition: "all 0.4s ease",
+                    opacity: 0,
+                    "&:hover": {
+                      opacity: 1,
+                    },
                   }}
                 />
                 <Box
@@ -298,7 +643,7 @@ const HomePage = () => {
                     variant="h5"
                     sx={{
                       margin: 0,
-                      color: primaryColor,
+                      color: COLORS.offWhite,
                       fontWeight: 400,
                       letterSpacing: "1px",
                       transition: "all 0.4s ease",
@@ -339,14 +684,15 @@ const HomePage = () => {
         </Box>
       </Container>
 
-      {/* Featured Products */}
+      {/* Featured Products Section */}
       <Container maxWidth="lg" sx={{ mb: 12, py: 10 }}>
         <Typography
           variant="h2"
           sx={{
             textAlign: "center",
             mb: 8,
-            fontWeight: 300,
+            fontWeight: "bold",
+            textTransform: "uppercase",
             fontSize: { xs: "2rem", md: "3rem" },
             letterSpacing: "2px",
             color: primaryColor,
@@ -364,124 +710,37 @@ const HomePage = () => {
         >
           Featured Products →
         </Typography>
-        <Grid container spacing={4}>
-          {products.slice(0, 6).map((product) => (
-            <Grid item xs={12} sm={6} md={4} key={product.id}>
-              <Card
-                component={Link}
-                to={`/product/${product.id}`}
-                sx={{
-                  height: "100%",
-                  borderRadius: "20px",
-                  transition: "all 0.4s ease",
-                  overflow: "hidden",
-                  textDecoration: "none",
-                  display: "flex",
-                  flexDirection: "column",
-                  background:
-                    theme.palette.mode === "light"
-                      ? `linear-gradient(145deg, ${secondaryColor}, #F3F6F9)`
-                      : `linear-gradient(145deg, ${secondaryColor}, #2A2A57)`,
-                  border: `1px solid ${primaryColor}`,
-                  boxShadow:
-                    theme.palette.mode === "light"
-                      ? "0 8px 25px rgba(0, 0, 0, 0.08)"
-                      : "0 8px 25px rgba(0, 0, 0, 0.3)",
-                  "&:hover": {
-                    transform: "translateY(-12px) scale(1.02)",
-                    boxShadow: `0 20px 40px ${accentColor}30`,
-                    borderColor: accentColor,
-                    "& .product-image": {
-                      transform: "scale(1.05)",
-                    },
-                  },
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  className="product-image"
-                  height="280"
-                  image={
-                    product.images[0] ||
-                    "https://via.placeholder.com/300x200?text=Product+Image"
-                  }
-                  alt={product.name}
-                  sx={{
-                    objectFit: "cover",
-                    transition: "transform 0.4s ease",
-                  }}
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: primaryColor,
-                      fontWeight: 600,
-                      mb: 1.5,
-                    }}
-                  >
-                    {product.name}
-                  </Typography>
-                  <Box sx={{ mb: 1.5 }}>
-                    <Typography
-                      variant="h6"
-                      component="span"
-                      sx={{
-                        fontSize: "1.25rem",
-                        fontWeight: 600,
-                        color: primaryColor,
-                        letterSpacing: "0.5px",
-                      }}
-                    >
-                      PKR{" "}
-                      {product.offer_price ||
-                        product.price ||
-                        product.retail_price}
-                    </Typography>
-                    {(product.original_price || product.retail_price) >
-                      (product.offer_price ||
-                        product.price ||
-                        product.retail_price) && (
-                      <Typography
-                        component="span"
-                        sx={{
-                          textDecoration: "line-through",
-                          ml: 1.5,
-                          color: "text.secondary",
-                          fontSize: "1rem",
-                        }}
-                      >
-                        PKR {product.original_price || product.retail_price}
-                      </Typography>
-                    )}
-                  </Box>
-                  <Chip
-                    label={product.category}
-                    sx={{
-                      backgroundColor: primaryColor,
-                      color: secondaryColor,
-                      fontWeight: 500,
-                    }}
-                  />
-                </CardContent>
-                <CardActions>
-                  <Button
-                    variant="outlined"
-                    sx={{
-                      borderRadius: "25px",
-                      mx: "auto",
-                      px: 3,
-                      color: primaryColor,
-                      borderColor: primaryColor,
-                    }}
-                  >
-                    View Details
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+
+        {renderFeaturedProducts()}
+
+        {!loading && products.length > 0 && (
+          <Box sx={{ textAlign: "center", mt: 8 }}>
+            <Button
+              component={Link}
+              to="/shop"
+              variant="outlined"
+              size="large"
+              sx={{
+                borderRadius: "50px",
+                px: 8,
+                py: 2,
+                fontSize: "16px",
+                fontWeight: 400,
+                letterSpacing: "1px",
+                borderWidth: "2px",
+                color: primaryColor,
+                borderColor: primaryColor,
+                "&:hover": {
+                  borderWidth: "2px",
+                  background: primaryColor,
+                  color: secondaryColor,
+                },
+              }}
+            >
+              VIEW ALL PRODUCTS
+            </Button>
+          </Box>
+        )}
       </Container>
 
       {/* Special Offers */}
