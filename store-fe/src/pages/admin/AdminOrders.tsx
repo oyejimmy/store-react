@@ -23,14 +23,24 @@ import {
   CardContent,
   Grid,
   IconButton,
+  CircularProgress,
+  Tooltip,
 } from "@mui/material";
+import { PDFViewer } from "@react-pdf/renderer";
 import {
   Visibility as VisibilityIcon,
   Refresh as RefreshIcon,
+  Download as DownloadIcon,
+  PictureAsPdf as PictureAsPdfIcon,
   Add as AddIcon,
   ShoppingCart as ShoppingCartIcon,
 } from "@mui/icons-material";
 import { adminAPI } from "../../services/api";
+import OrderReceipt from "../../components/admin/OrderReceipt";
+import {
+  PdfDownloadButton,
+  generateOrderFileName,
+} from "../../components/PdfDownloadButton";
 
 const tableHeadingColor = {
   backgroundColor: "#2c6e49",
@@ -41,6 +51,7 @@ const tableHeadingColor = {
 const AdminOrders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isPdfPreviewVisible, setIsPdfPreviewVisible] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
@@ -107,6 +118,56 @@ const AdminOrders: React.FC = () => {
     setSelectedOrder(order);
     setIsModalVisible(true);
   };
+
+  const handlePreviewPdf = (order: any) => {
+    setSelectedOrder(order);
+    setIsPdfPreviewVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+    setSelectedOrder(null);
+  };
+
+  const handleClosePdfPreview = () => {
+    setIsPdfPreviewVisible(false);
+    setSelectedOrder(null);
+  };
+
+  const renderActions = (order: any) => (
+    <Box sx={{ display: "flex", gap: 1 }}>
+      <Tooltip title="View Order">
+        <IconButton
+          size="small"
+          onClick={() => handleViewOrder(order)}
+          color="primary"
+        >
+          <VisibilityIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Preview Invoice">
+        <IconButton
+          size="small"
+          onClick={() => handlePreviewPdf(order)}
+          color="info"
+        >
+          <PictureAsPdfIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    </Box>
+  );
+
+  const renderPdfDownloadButton = (order: any) => (
+    <PdfDownloadButton
+      document={<OrderReceipt order={order} />}
+      fileName={generateOrderFileName(
+        order.order_number || `order-${order.id}`
+      )}
+      buttonText=""
+      size="small"
+      startIcon={<DownloadIcon fontSize="small" />}
+    />
+  );
 
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
@@ -191,7 +252,7 @@ const AdminOrders: React.FC = () => {
               .map((order) => {
                 const deliveryDate = new Date(order.created_at);
                 deliveryDate.setDate(deliveryDate.getDate() + 7);
-                
+
                 return (
                   <TableRow key={order.id} hover>
                     <TableCell>
@@ -226,7 +287,9 @@ const AdminOrders: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={order.payment_status === "paid" ? "PAID" : "NOT PAID"}
+                        label={
+                          order.payment_status === "paid" ? "PAID" : "NOT PAID"
+                        }
                         color={getPaymentStatusColor(order.payment_status)}
                         size="small"
                       />
@@ -238,21 +301,7 @@ const AdminOrders: React.FC = () => {
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>
-                      <IconButton
-                        color="primary"
-                        onClick={() => handleViewOrder(order)}
-                        size="small"
-                        sx={{
-                          color: "#2c6e49",
-                          "&:hover": {
-                            backgroundColor: "rgba(44, 110, 73, 0.1)",
-                          },
-                        }}
-                      >
-                        <VisibilityIcon />
-                      </IconButton>
-                    </TableCell>
+                    <TableCell>{renderActions(order)}</TableCell>
                   </TableRow>
                 );
               })}
@@ -272,8 +321,8 @@ const AdminOrders: React.FC = () => {
       {/* Order Details Dialog */}
       <Dialog
         open={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-        maxWidth="lg"
+        onClose={handleCloseModal}
+        maxWidth="md"
         fullWidth
       >
         <DialogTitle>Order Details</DialogTitle>
@@ -334,8 +383,14 @@ const AdminOrders: React.FC = () => {
                         Payment Status
                       </Typography>
                       <Chip
-                        label={selectedOrder.payment_status === "paid" ? "PAID" : "NOT PAID"}
-                        color={getPaymentStatusColor(selectedOrder.payment_status)}
+                        label={
+                          selectedOrder.payment_status === "paid"
+                            ? "PAID"
+                            : "NOT PAID"
+                        }
+                        color={getPaymentStatusColor(
+                          selectedOrder.payment_status
+                        )}
                         size="small"
                       />
                     </Grid>
@@ -416,15 +471,24 @@ const AdminOrders: React.FC = () => {
                             <Box sx={{ flex: 1 }}>
                               <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6}>
-                                  <Typography variant="body2" color="text.secondary">
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
                                     Product Name
                                   </Typography>
-                                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                                  <Typography
+                                    variant="body1"
+                                    sx={{ fontWeight: "bold" }}
+                                  >
                                     {item.product?.name || "Product not found"}
                                   </Typography>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                  <Typography variant="body2" color="text.secondary">
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
                                     Product ID
                                   </Typography>
                                   <Typography variant="body1">
@@ -432,7 +496,10 @@ const AdminOrders: React.FC = () => {
                                   </Typography>
                                 </Grid>
                                 <Grid item xs={12} sm={4}>
-                                  <Typography variant="body2" color="text.secondary">
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
                                     Quantity
                                   </Typography>
                                   <Typography variant="body1">
@@ -440,7 +507,10 @@ const AdminOrders: React.FC = () => {
                                   </Typography>
                                 </Grid>
                                 <Grid item xs={12} sm={4}>
-                                  <Typography variant="body2" color="text.secondary">
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
                                     Unit Price
                                   </Typography>
                                   <Typography variant="body1">
@@ -448,11 +518,20 @@ const AdminOrders: React.FC = () => {
                                   </Typography>
                                 </Grid>
                                 <Grid item xs={12} sm={4}>
-                                  <Typography variant="body2" color="text.secondary">
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
                                     Total Price
                                   </Typography>
-                                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                                    PKR {(item.price * item.quantity).toLocaleString()}
+                                  <Typography
+                                    variant="body1"
+                                    sx={{ fontWeight: "bold" }}
+                                  >
+                                    PKR{" "}
+                                    {(
+                                      item.price * item.quantity
+                                    ).toLocaleString()}
                                   </Typography>
                                 </Grid>
                               </Grid>
@@ -472,8 +551,53 @@ const AdminOrders: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsModalVisible(false)}>Close</Button>
+          <Button onClick={handleCloseModal}>Close</Button>
+          <PdfDownloadButton
+            document={<OrderReceipt order={selectedOrder} />}
+            fileName={generateOrderFileName(
+              selectedOrder?.order_number || `order-${selectedOrder?.id}`
+            )}
+            buttonText="Download Invoice"
+            variant="contained"
+            color="primary"
+            startIcon={<DownloadIcon />}
+          />
         </DialogActions>
+      </Dialog>
+
+      {/* PDF Preview Modal */}
+      <Dialog
+        open={isPdfPreviewVisible}
+        onClose={handleClosePdfPreview}
+        maxWidth="lg"
+        fullWidth
+        sx={{ "& .MuiDialog-paper": { height: "90vh" } }}
+      >
+        <DialogTitle>Invoice Preview</DialogTitle>
+        <DialogContent sx={{ p: 0, height: "100%", overflow: "hidden" }}>
+          {selectedOrder && (
+            <Box
+              sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+            >
+              <PDFViewer width="100%" height="100%" style={{ border: "none" }}>
+                <OrderReceipt order={selectedOrder} />
+              </PDFViewer>
+              <DialogActions
+                sx={{ p: 2, borderTop: 1, borderColor: "divider" }}
+              >
+                <Button onClick={handleClosePdfPreview}>Close</Button>
+                <PdfDownloadButton
+                  document={<OrderReceipt order={selectedOrder} />}
+                  fileName={generateOrderFileName(
+                    selectedOrder.order_number || `order-${selectedOrder.id}`
+                  )}
+                  buttonText="Download PDF"
+                  startIcon={<DownloadIcon />}
+                />
+              </DialogActions>
+            </Box>
+          )}
+        </DialogContent>
       </Dialog>
 
       {/* Snackbar for notifications */}

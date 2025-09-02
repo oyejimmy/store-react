@@ -1,148 +1,447 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, Button, Switch, Typography, Dropdown } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
+import {
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  List,
+  ListItem,
+  Chip,
+  Stack,
+  Divider,
+} from '@mui/material';
+import { Phone, LocationOn, Info } from '@mui/icons-material';
+import {
+  FaTruck,
+  FaMapMarkedAlt,
+  FaDollarSign,
+  FaEnvelopeOpenText,
+  FaStore,
+  FaWarehouse,
+  FaBuilding,
+  FaCubes,
+  FaShippingFast,
+  FaMailBulk,
+  FaBoxOpen,
+} from 'react-icons/fa';
 
-const { Title, Text } = Typography;
+// Explicitly define the type for the icons object to resolve the TypeScript error
+const courierIcons: { [key: string]: React.ReactNode } = {
+  'TCS': <FaTruck size={32} color="#E53935" />,
+  'Leopard Courier': <FaMapMarkedAlt size={32} color="#0064d2" />,
+  'BlueEx': <FaDollarSign size={32} color="#0096C7" />,
+  'CallCourier': <FaEnvelopeOpenText size={32} color="#5D4037" />,
+  'M&P (Muller & Phipps)': <FaWarehouse size={32} color="#5C6BC0" />,
+  'Rider': <FaShippingFast size={32} color="#FFD100" />,
+  'Trax': <FaBoxOpen size={32} color="#2ECC71" />,
+  'Cheetay': <FaStore size={32} color="#FF5722" />,
+  'Pakistan Post': <FaMailBulk size={32} color="#2196F3" />,
+};
 
-const AdminContainer = styled.div`
-  padding: 24px;
-  background: #f5f5f5;
-  min-height: 100vh;
-`;
+// Helper function to get a unique icon for each location
+const getLocationIcon = (index: number) => {
+  const icons = [<FaBuilding />, <FaStore />, <FaCubes />, <FaMapMarkedAlt />];
+  return icons[index % icons.length];
+};
 
-const ChannelCard = styled(Card)`
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e8e8e8;
-  margin-bottom: 24px;
-  
-  .ant-card-body {
-    padding: 24px;
-  }
-`;
+interface Location {
+  name: string;
+  address: string;
+  phone: string[];
+}
 
-const ChannelLogo = styled.div`
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 16px;
-  text-align: center;
-`;
+interface Courier {
+  name: string;
+  services: string;
+  notes: string;
+  locations: Location[];
+}
 
-const SyncItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 8px 0;
-`;
+const courierData: Courier[] = [
+  {
+    name: 'TCS',
+    services: 'Nationwide courier, international shipping, COD, warehousing',
+    notes: 'One of Pakistan’s most reliable couriers',
+    locations: [
+      {
+        name: 'Head Office',
+        address: 'I‑9/3 Markaz, Near Model Police Station',
+        phone: ['051‑111123456', '051‑4440487'],
+      },
+      {
+        name: 'F‑8 Markaz Express Center',
+        address: 'Kohistan Rd',
+        phone: ['0332‑5361098'],
+      },
+      {
+        name: 'Blue Area',
+        address: 'G‑7/3',
+        phone: ['0333‑5112180'],
+      },
+      {
+        name: 'G‑11 Markaz',
+        address: 'Islamabad Arcade',
+        phone: ['0300‑8542250'],
+      },
+      {
+        name: 'F‑6/1',
+        address: 'Khayaban‑e‑Suharwardy Rd',
+        phone: ['051‑2274201'],
+      },
+      {
+        name: 'F‑11 Markaz',
+        address: 'Lords Trade Centre, Ground',
+        phone: ['051‑2114100'],
+      },
+      {
+        name: 'F‑7 Markaz',
+        address: 'Javaid Pharmacy',
+        phone: ['0316‑9992772'],
+      },
+      {
+        name: 'F‑11',
+        address: 'Sharjah Plaza',
+        phone: ['0316‑9992779'],
+      },
+      {
+        name: 'Barakahu',
+        address: 'Barakahu',
+        phone: ['051‑2321930'],
+      },
+    ],
+  },
+  {
+    name: 'Leopard Courier',
+    services: 'Domestic & international shipping, COD, fulfillment services',
+    notes: 'Popular among e‑commerce sellers',
+    locations: [
+      {
+        name: 'Head Office',
+        address: 'I‑9 Markaz, near Metro',
+        phone: ['051‑111‑300‑786'],
+      },
+      {
+        name: 'Leopards House',
+        address: 'Raja Nizam‑ud‑Din Rd, Iqbal Town',
+        phone: ['051‑111‑300‑786'],
+      },
+      {
+        name: 'Helplines',
+        address: 'Islamabad',
+        phone: ['+92‑51‑2824743', '+92‑51‑2801267', '+92‑57‑2801268'],
+      },
+      {
+        name: 'Blue Area',
+        address: 'G‑6/2, Ghausia Plaza',
+        phone: ['051‑2612321'],
+      },
+      {
+        name: 'DHA Phase II',
+        address: 'near Legnum Tower',
+        phone: ['051‑4918068'],
+      },
+      {
+        name: 'Aabpara',
+        address: 'Shahbaz Plaza, G‑6/1',
+        phone: ['0300‑9542629'],
+      },
+      {
+        name: 'F‑8 Markaz',
+        address: 'Shop #13, Pacific Center',
+        phone: ['0305‑5519123'],
+      },
+    ],
+  },
+  {
+    name: 'BlueEx',
+    services: 'E‑commerce logistics, COD, fulfillment, platform integrations',
+    notes: 'Strong ecommerce focus',
+    locations: [
+      {
+        name: 'Zamaan Plaza',
+        address: 'Airport Service Road, Fazal Town',
+        phone: ['021‑111‑258‑339'],
+      },
+      {
+        name: 'Islamabad Airport Office',
+        address: 'Islamabad Airport Office',
+        phone: ['021‑111‑258‑339'],
+      },
+    ],
+  },
+  {
+    name: 'CallCourier',
+    services: 'COD, fulfillment, reverse logistics',
+    notes: 'Excellent for ecommerce merchants',
+    locations: [
+      {
+        name: 'Aabpara Booking Centre',
+        address: 'Shop #57-A, KK Bldg, Khayaban‑e‑Suharwardy Rd',
+        phone: ['051‑2624738', '0304‑5130646'],
+      },
+    ],
+  },
+  {
+    name: 'M&P (Muller & Phipps)',
+    services: 'Courier, COD, warehousing',
+    notes: 'Widely trusted network',
+    locations: [
+      {
+        name: 'Main Office',
+        address: 'I‑9/2, near Jawa Chowk',
+        phone: ['0316‑0020423'],
+      },
+      {
+        name: 'Blue Area Express Center',
+        address: 'Block E, G‑6/2',
+        phone: ['0316‑0020336'],
+      },
+      {
+        name: 'Jalal Arcade',
+        address: 'Pakistan Town Phase 2, Block A, Police Foundation',
+        phone: ['0331‑5168662'],
+      },
+    ],
+  },
+  {
+    name: 'Rider',
+    services: 'Last‑mile delivery, COD, real‑time tracking',
+    notes: 'Tech‑focused delivery',
+    locations: [],
+  },
+  {
+    name: 'Trax',
+    services: 'E‑commerce logistics, same‑day fulfillment, Q‑commerce',
+    notes: 'Rapid, modern logistics',
+    locations: [
+      {
+        name: 'Main Office',
+        address: 'I‑10/3, 91 Street 7',
+        phone: ['021‑111118729', '0324‑8090945'],
+      },
+      {
+        name: 'Bani Gala',
+        address: 'Khattak Plaza',
+        phone: ['051‑6128844'],
+      },
+      {
+        name: 'G‑10 Markaz',
+        address: 'G‑10 Markaz',
+        phone: ['0349‑5636446'],
+      },
+      {
+        name: 'Industrial Area',
+        address: 'Kahuta Rd',
+        phone: ['051‑8733711'],
+      },
+    ],
+  },
+  {
+    name: 'Cheetay',
+    services: 'Urban delivery (food, parcels)',
+    notes: 'On‑demand, local deliveries',
+    locations: [
+      {
+        name: 'Rider hub',
+        address: 'Main IJP Road, Chungi (Islamabad/RWP)',
+        phone: ['+92‑340‑333‑2970'],
+      },
+    ],
+  },
+  {
+    name: 'Pakistan Post',
+    services: 'National postal & COD services',
+    notes: 'Nationwide coverage, slower but affordable',
+    locations: [
+      {
+        name: 'Directorate General',
+        address: 'G‑8/4',
+        phone: ['051‑111‑111‑117', '051‑8487080'],
+      },
+      {
+        name: 'PMG Islamabad',
+        address: '',
+        phone: ['051‑9261908', '051‑9260389'],
+      },
+      {
+        name: 'Controller IMO',
+        address: '',
+        phone: ['051‑9281273'],
+      },
+    ],
+  },
+];
 
-const AdminSalesChannels: React.FC = () => {
-  const channels = [
-    {
-      name: 'AliExpress',
-      logo: 'AliExpress',
-      color: '#ff6a00',
-      priceSync: true,
-      inventorySync: true
-    },
-    {
-      name: 'eBay',
-      logo: 'eBay',
-      color: '#0064d2',
-      priceSync: true,
-      inventorySync: true
-    },
-    {
-      name: 'Walmart',
-      logo: 'Walmart',
-      color: '#004c91',
-      priceSync: false,
-      inventorySync: true
-    },
-    {
-      name: 'Wayfair',
-      logo: 'wayfair',
-      color: '#7b2cbf',
-      priceSync: true,
-      inventorySync: true
-    },
-    {
-      name: 'Rakuten',
-      logo: 'Rakuten',
-      color: '#bf0000',
-      priceSync: true,
-      inventorySync: true
-    },
-    {
-      name: 'Etsy',
-      logo: 'Etsy',
-      color: '#f56500',
-      priceSync: false,
-      inventorySync: true
-    }
-  ];
+const CourierServices: React.FC = () => {
+  const [open, setOpen] = useState(false);
+  const [selectedCourier, setSelectedCourier] = useState<Courier | null>(null);
+
+  const handleClickOpen = (courier: Courier) => {
+    setSelectedCourier(courier);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedCourier(null);
+  };
 
   return (
-    <AdminContainer>
-      <div style={{ marginBottom: '24px' }}>
-        <Title level={2} style={{ margin: 0 }}>Sales Channels</Title>
-      </div>
+    <Box
+      sx={{
+        p: { xs: 2, sm: 3, md: 4 },
+        backgroundColor: '#f5f5f5',
+        minHeight: '100vh',
+        fontFamily: 'Poppins, sans-serif'
+      }}
+    >
+      {/* Header with Title */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 4,
+          p: 3,
+          background: 'linear-gradient(135deg, #4CAF50 0%, #81C784 100%)',
+          borderRadius: 3,
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{
+            fontWeight: 700,
+            color: 'white',
+            textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          }}
+        >
+          Islamabad Couriers
+        </Typography>
+      </Box>
 
-      <Row gutter={[24, 24]}>
-        {channels.map((channel, index) => (
-          <Col xs={24} md={8} key={index}>
-            <ChannelCard>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                <Text strong>{channel.name}</Text>
-                <Dropdown
-                  menu={{
-                    items: [
-                      { key: 'settings', label: 'Settings' },
-                      { key: 'disconnect', label: 'Disconnect' }
-                    ]
-                  }}
-                  trigger={['click']}
-                >
-                  <Button type="text" icon={<MoreOutlined />} />
-                </Dropdown>
-              </div>
-
-              <ChannelLogo style={{ color: channel.color }}>
-                {channel.logo}
-              </ChannelLogo>
-
-              <div style={{ marginBottom: '16px' }}>
-                <Button type="link" style={{ padding: 0, marginRight: '16px' }}>
-                  Import Product
-                </Button>
-                <Button type="link" style={{ padding: 0 }}>
-                  Sync Category
-                </Button>
-              </div>
-
-              <SyncItem>
-                <Text>Price</Text>
-                <Switch 
-                  checked={channel.priceSync} 
-                  size="small"
-                  style={{ backgroundColor: channel.priceSync ? '#52c41a' : '#d9d9d9' }}
-                />
-              </SyncItem>
-
-              <SyncItem>
-                <Text>Inventory</Text>
-                <Switch 
-                  checked={channel.inventorySync} 
-                  size="small"
-                  style={{ backgroundColor: channel.inventorySync ? '#52c41a' : '#d9d9d9' }}
-                />
-              </SyncItem>
-            </ChannelCard>
-          </Col>
+      {/* Courier Cards Grid */}
+      <Grid container spacing={3}>
+        {courierData.map((courier, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <Card
+              sx={{
+                borderRadius: 2,
+                boxShadow: 2,
+                p: 2,
+                cursor: 'pointer',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': { transform: 'translateY(-5px)', boxShadow: 6 },
+              }}
+              onClick={() => handleClickOpen(courier)}
+            >
+              <CardHeader
+                title={<Typography variant="h6" fontWeight="bold">{courier.name}</Typography>}
+                avatar={courierIcons[courier.name]}
+                sx={{ pb: 1 }}
+              />
+              <CardContent sx={{ pt: 0 }}>
+                <Typography variant="body2" color="text.secondary">
+                  <span style={{ fontWeight: 'bold' }}>Services:</span> {courier.services}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  <span style={{ fontWeight: 'bold' }}>Notes:</span> {courier.notes}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </Row>
-    </AdminContainer>
+      </Grid>
+
+      {/* Detailed Courier Dialog */}
+      <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
+        <DialogTitle>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            {selectedCourier && courierIcons[selectedCourier.name]}
+            <Typography variant="h5" fontWeight="bold">
+              {selectedCourier?.name}
+            </Typography>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          {selectedCourier && (
+            <Box>
+              <Typography variant="body1" fontWeight="bold" sx={{ mt: 2, mb: 1 }}>
+                <Info color="primary" sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Services & Notes
+              </Typography>
+              <Divider />
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                <span style={{ fontWeight: 'bold' }}>Services:</span> {selectedCourier.services}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                <span style={{ fontWeight: 'bold' }}>Notes:</span> {selectedCourier.notes}
+              </Typography>
+
+              <Typography variant="body1" fontWeight="bold" sx={{ mt: 4, mb: 1 }}>
+                <LocationOn color="primary" sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Islamabad Office Locations & Contact Details
+              </Typography>
+              <Divider />
+              <Grid container spacing={3} sx={{ mt: 2 }}>
+                {selectedCourier.locations.length > 0 ? (
+                  selectedCourier.locations.map((loc, locIndex) => (
+                    <Grid item xs={12} sm={6} md={4} key={locIndex}>
+                      <Card variant="outlined" sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                        <CardHeader
+                          avatar={getLocationIcon(locIndex)}
+                          title={<Typography variant="body1" fontWeight="bold">{loc.name}</Typography>}
+                          sx={{ p: 0, pb: 1 }}
+                        />
+                        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+                          {loc.address && (
+                            <Typography variant="body2" color="text.secondary">
+                              {loc.address}
+                            </Typography>
+                          )}
+                          <Stack direction="row" flexWrap="wrap" spacing={1} sx={{ mt: 1 }}>
+                            {loc.phone.map((number, numIndex) => (
+                              <Chip
+                                key={numIndex}
+                                icon={<Phone sx={{ fontSize: 16 }} />}
+                                label={number}
+                                size="small"
+                                color="primary"
+                                variant="outlined"
+                              />
+                            ))}
+                          </Stack>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))
+                ) : (
+                  <Grid item xs={12}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                      Contact details are not available in publicly accessible sources.
+                    </Typography>
+                  </Grid>
+                )}
+              </Grid>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} variant="contained" color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
-export default AdminSalesChannels;
+export default CourierServices;

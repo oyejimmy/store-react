@@ -43,6 +43,7 @@ import AdminPayments from "./pages/admin/AdminPayments";
 import AdminSalesChannels from "./pages/admin/AdminSalesChannels";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminLogin from "./pages/admin/AdminLogin";
+import TestPdf from "./pages/admin/TestPdf";
 import NotFound from "./pages/NotFound";
 
 // Protected Route Component
@@ -96,6 +97,7 @@ function App() {
           <Route path="payments" element={<AdminPayments />} />
           <Route path="sales-channels" element={<AdminSalesChannels />} />
           <Route path="reports" element={<AdminReports />} />
+          <Route path="test-pdf" element={<TestPdf />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 

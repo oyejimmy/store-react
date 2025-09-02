@@ -11,24 +11,22 @@ import {
   Chip,
   Container,
   useTheme,
-} from '@mui/material';
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import {
-  fetchProducts,
-} from "../../store/slices/productSlice";
+import { fetchProducts } from "../../store/slices/productSlice";
 import { fetchOffersByType } from "../../store/slices/offerSlice";
 
-
-
-
-const HomePage: React.FC = () => {
+const HomePage = () => {
   const theme = useTheme();
-  const dispatch = useDispatch<AppDispatch>();
-  const { products, loading } = useSelector(
-    (state: RootState) => state.products
-  );
+  const dispatch = useDispatch();
+  const { products } = useSelector((state) => state.products);
+
+  // Define color variables based on the current theme mode
+  const primaryColor = theme.palette.mode === "light" ? "#1E1B4B" : "#F8FAFC";
+  const secondaryColor = theme.palette.mode === "light" ? "#F8FAFC" : "#1E1B4B";
+  const accentColor = theme.palette.mode === "light" ? "#1E1B4B" : "#F8FAFC";
 
   useEffect(() => {
     // Fetch featured products
@@ -68,83 +66,89 @@ const HomePage: React.FC = () => {
   ];
 
   const categories = [
-    { 
-      name: "Rings", 
-      icon: "💍", 
+    {
+      name: "Rings",
+      icon: "💍",
       link: "/shop?category=rings",
       gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=200&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=200&fit=crop",
     },
-    { 
-      name: "Earrings", 
-      icon: "👂", 
+    {
+      name: "Earrings",
+      icon: "👂",
       link: "/shop?category=earrings",
       gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-      image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop",
     },
-    { 
-      name: "Bangles", 
-      icon: "💫", 
+    {
+      name: "Bangles",
+      icon: "💫",
       link: "/shop?category=bangles",
       gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-      image: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=300&h=200&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=300&h=200&fit=crop",
     },
-    { 
-      name: "Anklets", 
-      icon: "🦶", 
+    {
+      name: "Anklets",
+      icon: "🦶",
       link: "/shop?category=anklets",
       gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
-      image: "https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?w=300&h=200&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?w=300&h=200&fit=crop",
     },
-    { 
-      name: "Bracelets", 
-      icon: "💎", 
+    {
+      name: "Bracelets",
+      icon: "💎",
       link: "/shop?category=bracelets",
       gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-      image: "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=300&h=200&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=300&h=200&fit=crop",
     },
-    { 
-      name: "Pendants", 
-      icon: "✨", 
+    {
+      name: "Pendants",
+      icon: "✨",
       link: "/shop?category=pendants",
       gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
-      image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=300&h=200&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=300&h=200&fit=crop",
     },
   ];
-
-
 
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        background: theme.palette.mode === 'light'
-          ? 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #f1f3f4 100%)'
-          : 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%)',
+        minHeight: "100vh",
+        background:
+          theme.palette.mode === "light"
+            ? secondaryColor
+            : "linear-gradient(135deg, #1E1B4B 0%, #2A2A57 50%, #1E1B4B 100%)",
       }}
     >
       {/* Banner Section */}
       <Box sx={{ mb: 10 }}>
         <Box
           sx={{
-            height: '80vh',
+            height: "80vh",
             background: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url(${bannerSlides[0].image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            textAlign: 'center',
-            position: 'relative',
-            '&::after': {
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            textAlign: "center",
+            position: "relative",
+            "&::after": {
               content: '""',
-              position: 'absolute',
+              position: "absolute",
               bottom: 0,
               left: 0,
               right: 0,
-              height: '2px',
-              background: 'linear-gradient(90deg, transparent, #d4af37, transparent)',
+              height: "2px",
+              background:
+                "linear-gradient(90deg, transparent, #d4af37, transparent)",
             },
           }}
         >
@@ -152,9 +156,9 @@ const HomePage: React.FC = () => {
             <Typography
               variant="h1"
               sx={{
-                color: '#ffffff',
+                color: "#ffffff",
                 mb: 2,
-                fontSize: { xs: '2rem', md: '3.5rem' },
+                fontSize: { xs: "2rem", md: "3.5rem" },
                 fontWeight: 300,
               }}
             >
@@ -163,9 +167,9 @@ const HomePage: React.FC = () => {
             <Typography
               variant="h6"
               sx={{
-                color: '#ffffff',
+                color: "#ffffff",
                 mb: 3,
-                fontSize: { xs: '1rem', md: '1.25rem' },
+                fontSize: { xs: "1rem", md: "1.25rem" },
               }}
             >
               {bannerSlides[0].subtitle}
@@ -178,7 +182,9 @@ const HomePage: React.FC = () => {
               sx={{
                 px: 4,
                 py: 1.5,
-                fontSize: '1.1rem',
+                fontSize: "1.1rem",
+                backgroundColor: primaryColor,
+                color: secondaryColor,
               }}
             >
               {bannerSlides[0].cta}
@@ -192,21 +198,23 @@ const HomePage: React.FC = () => {
         <Typography
           variant="h2"
           sx={{
-            textAlign: 'center',
+            textAlign: "center",
             mb: 8,
-            fontWeight: 300,
-            fontSize: { xs: '2rem', md: '3rem' },
-            letterSpacing: '2px',
-            color: theme.palette.primary.main,
-            position: 'relative',
-            '&::after': {
+            fontWeight: "bold",
+            textTransform: "uppercase",
+            textShadow: `2px 2px 4px ${accentColor}40`,
+            fontSize: { xs: "2rem", md: "3rem" },
+            letterSpacing: "2px",
+            color: primaryColor,
+            position: "relative",
+            "&::after": {
               content: '""',
-              display: 'block',
-              width: '100px',
-              height: '2px',
-              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
-              margin: '20px auto 0',
-              boxShadow: `0 2px 10px ${theme.palette.primary.main}40`,
+              display: "block",
+              width: "100px",
+              height: "2px",
+              background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+              margin: "20px auto 0",
+              boxShadow: `0 2px 10px ${accentColor}40`,
             },
           }}
         >
@@ -219,30 +227,32 @@ const HomePage: React.FC = () => {
                 component={Link}
                 to={category.link}
                 sx={{
-                  position: 'relative',
-                  height: '320px',
-                  borderRadius: '25px',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  transition: 'all 0.5s ease',
-                  display: 'block',
-                  textDecoration: 'none',
-                  boxShadow: theme.palette.mode === 'light'
-                    ? '0 10px 30px rgba(0, 0, 0, 0.1)'
-                    : '0 10px 30px rgba(0, 0, 0, 0.4)',
-                  border: theme.palette.mode === 'light'
-                    ? '2px solid #e8e8e8'
-                    : '2px solid #333',
-                  '&:hover': {
-                    transform: 'translateY(-15px) scale(1.03)',
-                    boxShadow: `0 25px 50px ${theme.palette.primary.main}40`,
-                    borderColor: theme.palette.primary.main,
-                    '& .category-overlay': {
-                      background: `linear-gradient(45deg, ${theme.palette.primary.main}d9, ${theme.palette.primary.dark}d9)`,
+                  position: "relative",
+                  height: "320px",
+                  borderRadius: "25px",
+                  overflow: "hidden",
+                  cursor: "pointer",
+                  transition: "all 0.5s ease",
+                  display: "block",
+                  textDecoration: "none",
+                  boxShadow:
+                    theme.palette.mode === "light"
+                      ? "0 10px 30px rgba(0, 0, 0, 0.1)"
+                      : "0 10px 30px rgba(0, 0, 0, 0.4)",
+                  border:
+                    theme.palette.mode === "light"
+                      ? "2px solid #e8e8e8"
+                      : `2px solid ${primaryColor}`,
+                  "&:hover": {
+                    transform: "translateY(-15px) scale(1.03)",
+                    boxShadow: `0 25px 50px ${accentColor}40`,
+                    borderColor: accentColor,
+                    "& .category-overlay": {
+                      background: `linear-gradient(45deg, ${accentColor}d9, ${accentColor}d9)`,
                     },
-                    '& .category-title': {
-                      transform: 'translateY(-15px) scale(1.1)',
-                      color: '#ffffff !important',
+                    "& .category-title": {
+                      transform: "translateY(-15px) scale(1.1)",
+                      color: secondaryColor,
                     },
                   },
                 }}
@@ -252,29 +262,30 @@ const HomePage: React.FC = () => {
                   src={category.image}
                   alt={category.name}
                   sx={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    position: 'absolute',
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    position: "absolute",
                     top: 0,
                     left: 0,
+                    right: 0,
+                    bottom: 0,
                   }}
                 />
                 <Box
                   className="category-overlay"
                   sx={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: 0,
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: 'linear-gradient(45deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4))',
-                    transition: 'all 0.4s ease',
+                    transition: "all 0.4s ease",
                   }}
                 />
                 <Box
                   sx={{
-                    position: 'absolute',
+                    position: "absolute",
                     bottom: 0,
                     left: 0,
                     right: 0,
@@ -287,10 +298,10 @@ const HomePage: React.FC = () => {
                     variant="h5"
                     sx={{
                       margin: 0,
-                      color: theme.palette.primary.main,
+                      color: primaryColor,
                       fontWeight: 400,
-                      letterSpacing: '1px',
-                      transition: 'all 0.4s ease',
+                      letterSpacing: "1px",
+                      transition: "all 0.4s ease",
                     }}
                   >
                     {category.name} →
@@ -300,24 +311,26 @@ const HomePage: React.FC = () => {
             </Grid>
           ))}
         </Grid>
-        <Box sx={{ textAlign: 'center', mt: 8 }}>
+        <Box sx={{ textAlign: "center", mt: 8 }}>
           <Button
             component={Link}
             to="/categories"
             variant="outlined"
             size="large"
             sx={{
-              borderRadius: '50px',
+              borderRadius: "50px",
               px: 8,
               py: 2,
-              fontSize: '16px',
+              fontSize: "16px",
               fontWeight: 400,
-              letterSpacing: '1px',
-              borderWidth: '2px',
-              '&:hover': {
-                borderWidth: '2px',
-                background: theme.palette.primary.main,
-                color: '#000',
+              letterSpacing: "1px",
+              borderWidth: "2px",
+              color: primaryColor,
+              borderColor: primaryColor,
+              "&:hover": {
+                borderWidth: "2px",
+                background: primaryColor,
+                color: secondaryColor,
               },
             }}
           >
@@ -331,21 +344,21 @@ const HomePage: React.FC = () => {
         <Typography
           variant="h2"
           sx={{
-            textAlign: 'center',
+            textAlign: "center",
             mb: 8,
             fontWeight: 300,
-            fontSize: { xs: '2rem', md: '3rem' },
-            letterSpacing: '2px',
-            color: theme.palette.primary.main,
-            position: 'relative',
-            '&::after': {
+            fontSize: { xs: "2rem", md: "3rem" },
+            letterSpacing: "2px",
+            color: primaryColor,
+            position: "relative",
+            "&::after": {
               content: '""',
-              display: 'block',
-              width: '100px',
-              height: '2px',
-              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
-              margin: '20px auto 0',
-              boxShadow: `0 2px 10px ${theme.palette.primary.main}40`,
+              display: "block",
+              width: "100px",
+              height: "2px",
+              background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+              margin: "20px auto 0",
+              boxShadow: `0 2px 10px ${accentColor}40`,
             },
           }}
         >
@@ -358,28 +371,28 @@ const HomePage: React.FC = () => {
                 component={Link}
                 to={`/product/${product.id}`}
                 sx={{
-                  height: '100%',
-                  borderRadius: '20px',
-                  transition: 'all 0.4s ease',
-                  overflow: 'hidden',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  background: theme.palette.mode === 'light'
-                    ? 'linear-gradient(145deg, #ffffff, #f8f9fa)'
-                    : 'linear-gradient(145deg, #1e1e1e, #2a2a2a)',
-                  border: theme.palette.mode === 'light'
-                    ? '1px solid #e8e8e8'
-                    : '1px solid #333',
-                  boxShadow: theme.palette.mode === 'light'
-                    ? '0 8px 25px rgba(0, 0, 0, 0.08)'
-                    : '0 8px 25px rgba(0, 0, 0, 0.3)',
-                  '&:hover': {
-                    transform: 'translateY(-12px) scale(1.02)',
-                    boxShadow: `0 20px 40px ${theme.palette.primary.main}30`,
-                    borderColor: theme.palette.primary.main,
-                    '& .product-image': {
-                      transform: 'scale(1.05)',
+                  height: "100%",
+                  borderRadius: "20px",
+                  transition: "all 0.4s ease",
+                  overflow: "hidden",
+                  textDecoration: "none",
+                  display: "flex",
+                  flexDirection: "column",
+                  background:
+                    theme.palette.mode === "light"
+                      ? `linear-gradient(145deg, ${secondaryColor}, #F3F6F9)`
+                      : `linear-gradient(145deg, ${secondaryColor}, #2A2A57)`,
+                  border: `1px solid ${primaryColor}`,
+                  boxShadow:
+                    theme.palette.mode === "light"
+                      ? "0 8px 25px rgba(0, 0, 0, 0.08)"
+                      : "0 8px 25px rgba(0, 0, 0, 0.3)",
+                  "&:hover": {
+                    transform: "translateY(-12px) scale(1.02)",
+                    boxShadow: `0 20px 40px ${accentColor}30`,
+                    borderColor: accentColor,
+                    "& .product-image": {
+                      transform: "scale(1.05)",
                     },
                   },
                 }}
@@ -394,15 +407,15 @@ const HomePage: React.FC = () => {
                   }
                   alt={product.name}
                   sx={{
-                    objectFit: 'cover',
-                    transition: 'transform 0.4s ease',
+                    objectFit: "cover",
+                    transition: "transform 0.4s ease",
                   }}
                 />
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography
                     variant="h6"
                     sx={{
-                      color: theme.palette.primary.main,
+                      color: primaryColor,
                       fontWeight: 600,
                       mb: 1.5,
                     }}
@@ -414,22 +427,28 @@ const HomePage: React.FC = () => {
                       variant="h6"
                       component="span"
                       sx={{
-                        fontSize: '1.25rem',
+                        fontSize: "1.25rem",
                         fontWeight: 600,
-                        color: theme.palette.primary.main,
-                        letterSpacing: '0.5px',
+                        color: primaryColor,
+                        letterSpacing: "0.5px",
                       }}
                     >
-                      PKR {product.offer_price || product.price || product.retail_price}
+                      PKR{" "}
+                      {product.offer_price ||
+                        product.price ||
+                        product.retail_price}
                     </Typography>
-                    {(product.original_price || product.retail_price) > (product.offer_price || product.price || product.retail_price) && (
+                    {(product.original_price || product.retail_price) >
+                      (product.offer_price ||
+                        product.price ||
+                        product.retail_price) && (
                       <Typography
                         component="span"
                         sx={{
-                          textDecoration: 'line-through',
+                          textDecoration: "line-through",
                           ml: 1.5,
-                          color: 'text.secondary',
-                          fontSize: '1rem',
+                          color: "text.secondary",
+                          fontSize: "1rem",
                         }}
                       >
                         PKR {product.original_price || product.retail_price}
@@ -439,8 +458,8 @@ const HomePage: React.FC = () => {
                   <Chip
                     label={product.category}
                     sx={{
-                      backgroundColor: theme.palette.primary.main,
-                      color: '#000',
+                      backgroundColor: primaryColor,
+                      color: secondaryColor,
                       fontWeight: 500,
                     }}
                   />
@@ -449,9 +468,11 @@ const HomePage: React.FC = () => {
                   <Button
                     variant="outlined"
                     sx={{
-                      borderRadius: '25px',
-                      mx: 'auto',
+                      borderRadius: "25px",
+                      mx: "auto",
                       px: 3,
+                      color: primaryColor,
+                      borderColor: primaryColor,
                     }}
                   >
                     View Details
@@ -468,21 +489,21 @@ const HomePage: React.FC = () => {
         <Typography
           variant="h2"
           sx={{
-            textAlign: 'center',
+            textAlign: "center",
             mb: 8,
             fontWeight: 300,
-            fontSize: { xs: '2rem', md: '3rem' },
-            letterSpacing: '2px',
-            color: theme.palette.primary.main,
-            position: 'relative',
-            '&::after': {
+            fontSize: { xs: "2rem", md: "3rem" },
+            letterSpacing: "2px",
+            color: primaryColor,
+            position: "relative",
+            "&::after": {
               content: '""',
-              display: 'block',
-              width: '100px',
-              height: '2px',
-              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
-              margin: '20px auto 0',
-              boxShadow: `0 2px 10px ${theme.palette.primary.main}40`,
+              display: "block",
+              width: "100px",
+              height: "2px",
+              background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+              margin: "20px auto 0",
+              boxShadow: `0 2px 10px ${accentColor}40`,
             },
           }}
         >
@@ -491,25 +512,28 @@ const HomePage: React.FC = () => {
         <Grid container spacing={2}>
           {[
             {
-              title: 'Under PKR 299',
-              description: 'Beautiful jewelry pieces at unbeatable prices',
-              cta: 'SHOP NOW ✨',
-              link: '/offers/under-299',
-              image: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=400&h=200&fit=crop',
+              title: "Under PKR 299",
+              description: "Beautiful jewelry pieces at unbeatable prices",
+              cta: "SHOP NOW ✨",
+              link: "/offers/under-299",
+              image:
+                "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=400&h=200&fit=crop",
             },
             {
-              title: 'Special Deals',
-              description: 'Limited time offers on premium collections',
-              cta: 'GRAB DEALS 🔥',
-              link: '/offers/special-deals',
-              image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop',
+              title: "Special Deals",
+              description: "Limited time offers on premium collections",
+              cta: "GRAB DEALS 🔥",
+              link: "/offers/special-deals",
+              image:
+                "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop",
             },
             {
-              title: 'Deal of the Month',
-              description: 'Exclusive monthly offers on trending pieces',
-              cta: 'EXPLORE NOW 💎',
-              link: '/offers/deal-of-month',
-              image: 'https://images.unsplash.com/photo-1549062572-544a64fb0c56?w=400&h=200&fit=crop',
+              title: "Deal of the Month",
+              description: "Exclusive monthly offers on trending pieces",
+              cta: "EXPLORE NOW 💎",
+              link: "/offers/deal-of-month",
+              image:
+                "https://images.unsplash.com/photo-1549062572-544a64fb0c56?w=400&h=200&fit=crop",
             },
           ].map((offer, index) => (
             <Grid item xs={12} md={4} key={index}>
@@ -517,59 +541,67 @@ const HomePage: React.FC = () => {
                 component={Link}
                 to={offer.link}
                 sx={{
-                  textAlign: 'center',
-                  borderRadius: '25px',
-                  transition: 'all 0.5s ease',
-                  overflow: 'hidden',
-                  textDecoration: 'none',
-                  background: theme.palette.mode === 'light'
-                    ? 'linear-gradient(145deg, #ffffff, #f8f9fa)'
-                    : 'linear-gradient(145deg, #1e1e1e, #2a2a2a)',
-                  border: `2px solid ${theme.palette.primary.main}`,
-                  boxShadow: theme.palette.mode === 'light'
-                    ? '0 10px 30px rgba(0, 0, 0, 0.1)'
-                    : '0 10px 30px rgba(0, 0, 0, 0.3)',
-                  '&:hover': {
-                    transform: 'translateY(-10px) scale(1.03)',
-                    boxShadow: `0 20px 40px ${theme.palette.primary.main}40`,
+                  textAlign: "center",
+                  borderRadius: "25px",
+                  transition: "all 0.5s ease",
+                  overflow: "hidden",
+                  textDecoration: "none",
+                  background:
+                    theme.palette.mode === "light"
+                      ? `linear-gradient(145deg, ${secondaryColor}, #F3F6F9)`
+                      : `linear-gradient(145deg, ${secondaryColor}, #2A2A57)`,
+                  border: `2px solid ${primaryColor}`,
+                  boxShadow:
+                    theme.palette.mode === "light"
+                      ? "0 10px 30px rgba(0, 0, 0, 0.1)"
+                      : "0 10px 30px rgba(0, 0, 0, 0.3)",
+                  "&:hover": {
+                    transform: "translateY(-10px) scale(1.03)",
+                    boxShadow: `0 20px 40px ${accentColor}40`,
                   },
                 }}
               >
                 <Box
                   sx={{
-                    height: '200px',
+                    height: "200px",
                     backgroundImage: `url(${offer.image})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    position: 'relative',
-                    '&::after': {
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    position: "relative",
+                    "&::after": {
                       content: '""',
-                      position: 'absolute',
+                      position: "absolute",
                       top: 0,
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      background: 'linear-gradient(45deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6))',
+                      background:
+                        "linear-gradient(45deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6))",
                     },
                   }}
                 />
                 <CardContent sx={{ p: 5 }}>
-                  <Typography variant="h4" sx={{ mb: 2 }}>
+                  <Typography variant="h4" sx={{ mb: 2, color: primaryColor }}>
                     {offer.title}
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 3 }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ mb: 3, color: primaryColor }}
+                  >
                     {offer.description}
                   </Typography>
                   <Button
                     variant="contained"
                     size="large"
                     sx={{
-                      borderRadius: '25px',
-                      fontWeight: 'bold',
+                      borderRadius: "25px",
+                      fontWeight: "bold",
                       px: 4,
                       py: 1.5,
-                      '&:hover': {
-                        transform: 'translateY(-3px)',
+                      backgroundColor: primaryColor,
+                      color: secondaryColor,
+                      "&:hover": {
+                        transform: "translateY(-3px)",
                       },
                     }}
                   >
@@ -587,21 +619,21 @@ const HomePage: React.FC = () => {
         <Typography
           variant="h2"
           sx={{
-            textAlign: 'center',
+            textAlign: "center",
             mb: 8,
             fontWeight: 300,
-            fontSize: { xs: '2rem', md: '3rem' },
-            letterSpacing: '2px',
-            color: theme.palette.primary.main,
-            position: 'relative',
-            '&::after': {
+            fontSize: { xs: "2rem", md: "3rem" },
+            letterSpacing: "2px",
+            color: primaryColor,
+            position: "relative",
+            "&::after": {
               content: '""',
-              display: 'block',
-              width: '100px',
-              height: '2px',
-              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
-              margin: '20px auto 0',
-              boxShadow: `0 2px 10px ${theme.palette.primary.main}40`,
+              display: "block",
+              width: "100px",
+              height: "2px",
+              background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+              margin: "20px auto 0",
+              boxShadow: `0 2px 10px ${accentColor}40`,
             },
           }}
         >
@@ -614,40 +646,40 @@ const HomePage: React.FC = () => {
                 sx={{
                   height: 400,
                   width: 180,
-                  borderRadius: '20px',
-                  overflow: 'hidden',
-                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.15)',
-                  background: '#000',
-                  position: 'relative',
-                  cursor: 'pointer',
-                  transition: 'transform 0.3s ease',
-                  '&:hover': {
-                    transform: 'scale(1.05)',
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                  boxShadow: "0 12px 30px rgba(0, 0, 0, 0.15)",
+                  background: "#000",
+                  position: "relative",
+                  cursor: "pointer",
+                  transition: "transform 0.3s ease",
+                  "&:hover": {
+                    transform: "scale(1.05)",
                   },
                 }}
               >
                 <Box
                   sx={{
-                    width: '100%',
-                    height: '100%',
+                    width: "100%",
+                    height: "100%",
                     background: `url(https://picsum.photos/180/400?random=${index}) center/cover`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
                   <Box
                     sx={{
                       width: 60,
                       height: 60,
-                      borderRadius: '50%',
-                      background: 'rgba(255, 255, 255, 0.9)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      borderRadius: "50%",
+                      background: "rgba(255, 255, 255, 0.9)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       fontSize: 24,
-                      color: '#ff0050',
-                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
+                      color: primaryColor,
+                      boxShadow: "0 4px 15px rgba(0, 0, 0, 0.3)",
                     }}
                   >
                     ▶
@@ -655,12 +687,12 @@ const HomePage: React.FC = () => {
                 </Box>
                 <Box
                   sx={{
-                    position: 'absolute',
+                    position: "absolute",
                     bottom: 10,
                     left: 10,
-                    color: 'white',
+                    color: secondaryColor,
                     fontSize: 12,
-                    background: 'rgba(0, 0, 0, 0.5)',
+                    background: "rgba(0, 0, 0, 0.5)",
                     p: 0.5,
                     borderRadius: 1,
                   }}

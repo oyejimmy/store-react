@@ -1,29 +1,37 @@
 import { createTheme } from '@mui/material/styles';
 
+// Define the core color variables for clarity
+const palette = {
+  offWhite: '#F8FAFC',
+  deepNavy: '#1E1B4B',
+  silver: '#94A3B8',
+};
+
+// Create the Light Theme with the specified palette
 export const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#d4af37',
-      dark: '#b8860b',
-      light: '#ffd700',
+      main: palette.deepNavy,
+      dark: '#141238', // A slightly darker navy
+      light: '#4C4A73', // A slightly lighter navy
     },
     secondary: {
-      main: '#333333',
-      light: '#666666',
-      dark: '#000000',
+      main: palette.silver,
+      light: '#CBD5E1', // Lighter silver
+      dark: '#64748B',  // Darker silver
     },
     background: {
-      default: '#ffffff',
-      paper: '#fafafa',
+      default: palette.offWhite,
+      paper: '#FFFFFF', // Pure white for paper elements to make the navy stand out
     },
     text: {
-      primary: '#333333',
-      secondary: '#666666',
+      primary: palette.deepNavy,
+      secondary: palette.silver,
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
     h1: {
       fontWeight: 800,
       letterSpacing: '-0.5px',
@@ -44,11 +52,12 @@ export const lightTheme = createTheme({
           fontWeight: 500,
         },
         contained: {
-          background: 'linear-gradient(135deg, #d4af37, #b8860b)',
-          boxShadow: '0 4px 12px rgba(212, 175, 55, 0.3)',
+          backgroundColor: palette.deepNavy,
+          color: '#FFFFFF',
+          boxShadow: '0 4px 12px rgba(30, 27, 75, 0.3)',
           '&:hover': {
-            background: 'linear-gradient(135deg, #b8860b, #996f0a)',
-            boxShadow: '0 6px 16px rgba(212, 175, 55, 0.4)',
+            backgroundColor: '#141238',
+            boxShadow: '0 6px 16px rgba(30, 27, 75, 0.4)',
           },
         },
       },
@@ -59,37 +68,38 @@ export const lightTheme = createTheme({
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(10px)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+          borderBottom: `1px solid ${palette.silver}`,
         },
       },
     },
   },
 });
 
+// Create the Dark Theme as an inverse of the light theme
 export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#d4af37',
-      dark: '#b8860b',
-      light: '#ffd700',
+      main: palette.silver,
+      dark: '#64748B',
+      light: '#CBD5E1',
     },
     secondary: {
-      main: '#e0e0e0',
-      light: '#ffffff',
-      dark: '#bdbdbd',
+      main: palette.deepNavy,
+      light: '#4C4A73',
+      dark: '#141238',
     },
     background: {
-      default: '#121212',
-      paper: '#1e1e1e',
+      default: '#0F172A', // Using a dark gray for the background
+      paper: '#1E293B',   // Using a slightly lighter dark gray for contrast
     },
     text: {
-      primary: '#e0e0e0',
-      secondary: '#bdbdbd',
+      primary: '#E2E8F0',
+      secondary: palette.silver,
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
     h1: {
       fontWeight: 800,
       letterSpacing: '-0.5px',
@@ -110,12 +120,12 @@ export const darkTheme = createTheme({
           fontWeight: 500,
         },
         contained: {
-          background: 'linear-gradient(135deg, #d4af37, #ffd700)',
-          color: '#000',
-          boxShadow: '0 4px 12px rgba(212, 175, 55, 0.4)',
+          backgroundColor: palette.silver,
+          color: palette.deepNavy,
+          boxShadow: '0 4px 12px rgba(148, 163, 184, 0.3)',
           '&:hover': {
-            background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
-            boxShadow: '0 6px 16px rgba(212, 175, 55, 0.5)',
+            backgroundColor: '#CBD5E1',
+            boxShadow: '0 6px 16px rgba(148, 163, 184, 0.4)',
           },
         },
       },
@@ -123,10 +133,10 @@ export const darkTheme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: 'rgba(26, 26, 26, 0.95)',
+          backgroundColor: 'rgba(15, 23, 42, 0.95)',
           backdropFilter: 'blur(10px)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.3)',
+          borderBottom: `1px solid ${palette.silver}`,
         },
       },
     },

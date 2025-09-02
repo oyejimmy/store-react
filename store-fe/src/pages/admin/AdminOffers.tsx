@@ -1,273 +1,508 @@
-import React, { useState } from 'react';
-import { Card, Table, Tag, Button, Space, Modal, Form, Input, Select, InputNumber, DatePicker, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
+import React, { useState } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid,
+  Typography,
+  CircularProgress,
+  Paper,
+  TablePagination,
+  Tooltip,
+  useMediaQuery,
+  useTheme,
+  Stack,
+  InputAdornment,
+} from "@mui/material";
+import {
+  Add,
+  Edit,
+  Delete,
+  Refresh,
+  Image as ImageIcon,
+} from "@mui/icons-material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
-const { Option } = Select;
-const { TextArea } = Input;
+interface Offer {
+  id: number;
+  title: string;
+  type: string;
+  discount: number;
+  validFrom: string;
+  validUntil: string;
+  status: string;
+  description?: string;
+}
 
-const AdminContainer = styled.div`
-  padding: 24px;
-  background: #f5f5f5;
-  min-height: 100vh;
-`;
-
-const StyledCard = styled(Card)`
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: none;
-  
-  .ant-card-head {
-    background: linear-gradient(135deg, #d4af37, #b8860b);
-    border-radius: 12px 12px 0 0;
-    
-    .ant-card-head-title {
-      color: white;
-      font-weight: 600;
-    }
-  }
-`;
+const tableHeadingColor = {
+  backgroundColor: "#2c6e49",
+  color: "#ffffff",
+  fontWeight: 600,
+};
 
 const AdminOffers: React.FC = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingOffer, setEditingOffer] = useState<any>(null);
-  const [form] = Form.useForm();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editingOffer, setEditingOffer] = useState<Offer | null>(null);
+  const [offerToDelete, setOfferToDelete] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const [formData, setFormData] = useState({
+    title: "",
+    type: "",
+    discount: 0,
+    validFrom: null as Date | null,
+    validUntil: null as Date | null,
+    description: "",
+  });
+
+  const [errors, setErrors] = useState<any>({});
 
   // Mock data
-  const offers = [
+  const offers: Offer[] = [
     {
       id: 1,
-      title: 'Under 299 Sale',
-      type: 'under-299',
+      title: "Under 299 Sale",
+      type: "under-299",
       discount: 20,
-      validFrom: '2024-01-01',
-      validUntil: '2024-01-31',
-      status: 'active'
+      validFrom: "2024-01-01",
+      validUntil: "2024-01-31",
+      status: "active",
     },
     {
       id: 2,
-      title: 'Special Deals',
-      type: 'special-deals',
+      title: "Special Deals",
+      type: "special-deals",
       discount: 15,
-      validFrom: '2024-01-15',
-      validUntil: '2024-02-15',
-      status: 'active'
-    }
+      validFrom: "2024-01-15",
+      validUntil: "2024-02-15",
+      status: "active",
+    },
   ];
 
-  const columns = [
-    {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-    },
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-      render: (type: string) => (
-        <Tag color="blue">{type.replace('-', ' ').toUpperCase()}</Tag>
-      ),
-    },
-    {
-      title: 'Discount',
-      dataIndex: 'discount',
-      key: 'discount',
-      render: (discount: number) => `${discount}%`,
-    },
-    {
-      title: 'Valid From',
-      dataIndex: 'validFrom',
-      key: 'validFrom',
-      render: (date: string) => new Date(date).toLocaleDateString(),
-    },
-    {
-      title: 'Valid Until',
-      dataIndex: 'validUntil',
-      key: 'validUntil',
-      render: (date: string) => new Date(date).toLocaleDateString(),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => (
-        <Tag color={status === 'active' ? 'green' : 'red'}>
-          {status.toUpperCase()}
-        </Tag>
-      ),
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_: any, record: any) => (
-        <Space>
-          <Button 
-            type="primary" 
-            size="small" 
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            Edit
-          </Button>
-          <Button 
-            danger 
-            size="small" 
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
-          >
-            Delete
-          </Button>
-        </Space>
-      ),
-    },
-  ];
+  const validateForm = () => {
+    const newErrors: any = {};
+    if (!formData.title.trim()) newErrors.title = "Offer title is required";
+    if (!formData.type) newErrors.type = "Offer type is required";
+    if (formData.discount <= 0 || formData.discount > 100)
+      newErrors.discount = "Discount must be between 1 and 100";
+    if (!formData.validFrom) newErrors.validFrom = "Start date is required";
+    if (!formData.validUntil) newErrors.validUntil = "End date is required";
+    if (
+      formData.validFrom &&
+      formData.validUntil &&
+      formData.validFrom > formData.validUntil
+    )
+      newErrors.validUntil = "End date must be after start date";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleAdd = () => {
     setEditingOffer(null);
-    form.resetFields();
-    setIsModalVisible(true);
+    setFormData({
+      title: "",
+      type: "",
+      discount: 0,
+      validFrom: null,
+      validUntil: null,
+      description: "",
+    });
+    setErrors({});
+    setIsModalOpen(true);
   };
 
-  const handleEdit = (offer: any) => {
+  const handleEdit = (offer: Offer) => {
     setEditingOffer(offer);
-    form.setFieldsValue(offer);
-    setIsModalVisible(true);
+    setFormData({
+      title: offer.title,
+      type: offer.type,
+      discount: offer.discount,
+      validFrom: new Date(offer.validFrom),
+      validUntil: new Date(offer.validUntil),
+      description: offer.description || "",
+    });
+    setErrors({});
+    setIsModalOpen(true);
   };
 
   const handleDelete = (id: number) => {
-    Modal.confirm({
-      title: 'Are you sure you want to delete this offer?',
-      content: 'This action cannot be undone.',
-      onOk() {
-        message.success('Offer deleted successfully');
-      },
-    });
+    setOfferToDelete(id);
+    setDeleteDialogOpen(true);
   };
 
-  const handleSubmit = async (values: any) => {
+  const confirmDelete = () => {
+    if (!offerToDelete) return;
+
+    // Here you would call your API to delete the offer
+    console.log("Deleting offer:", offerToDelete);
+    setDeleteDialogOpen(false);
+    setOfferToDelete(null);
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
     try {
-      if (editingOffer) {
-        message.success('Offer updated successfully');
-      } else {
-        message.success('Offer created successfully');
-      }
-      setIsModalVisible(false);
-      form.resetFields();
-    } catch (error) {
-      message.error('Failed to save offer');
+      setLoading(true);
+      // Here you would call your API to save the offer
+      console.log("Saving offer:", formData);
+
+      setIsModalOpen(false);
+    } catch (error: any) {
+      console.error("Failed to save offer:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleChange = (field: string) => (e: any) => {
+    const value = e.target.value;
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: "" });
+    }
+  };
+
+  const handleDateChange = (field: string) => (date: Date | null) => {
+    setFormData({ ...formData, [field]: date });
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: "" });
+    }
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const getStatusColor = (status: string) => {
+    return status === "active" ? "success" : "error";
+  };
+
+  const getTypeLabel = (type: string) => {
+    return type.replace(/-/g, " ").toUpperCase();
+  };
+
   return (
-    <AdminContainer>
-      <StyledCard
-        title="🎁 Offer Management"
-        extra={
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />} 
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Box
+        sx={{
+          p: { xs: 1, sm: 2, md: 3 },
+          minHeight: "100vh",
+        }}
+      >
+        {/* Header with Add Button */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 4,
+            p: 3,
+            background: "linear-gradient(135deg, #2c6e49 0%, #4a8b6a 100%)",
+            borderRadius: 3,
+            boxShadow: "0 8px 32px rgba(44, 110, 73, 0.2)",
+          }}
+        >
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              fontWeight: 700,
+              color: "white",
+              textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            }}
+          >
+            Offer Management
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
             onClick={handleAdd}
-            style={{ background: 'white', color: '#d4af37', borderColor: 'white' }}
+            size={isMobile ? "small" : "medium"}
+            sx={{
+             borderColor: "#2c6e49",
+              color: "#2c6e49",
+              backgroundColor: "rgb(224, 220, 220)",
+              "&:hover": {
+                borderColor: "#2c6e49",
+                backgroundColor: "rgb(230, 232, 210)",
+              },
+            }}
           >
             Add Offer
           </Button>
-        }
-      >
-        <Table
-          columns={columns}
-          dataSource={offers}
-          rowKey="id"
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
-          }}
-        />
-      </StyledCard>
+        </Box>
 
-      <Modal
-        title={editingOffer ? 'Edit Offer' : 'Add Offer'}
-        open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={null}
-        width={600}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
+        <TableContainer
+          component={Paper}
+          sx={{ overflowX: "auto", borderRadius: 2, boxShadow: 3 }}
         >
-          <Form.Item
-            name="title"
-            label="Offer Title"
-            rules={[{ required: true, message: 'Please enter offer title' }]}
-          >
-            <Input />
-          </Form.Item>
+          <Table size={isMobile ? "small" : "medium"}>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={tableHeadingColor}>Product Title</TableCell>
+                <TableCell sx={tableHeadingColor}>Type</TableCell>
+                <TableCell sx={tableHeadingColor}>Discount</TableCell>
+                {!isMobile && (
+                  <TableCell sx={tableHeadingColor}>Valid From</TableCell>
+                )}
+                {!isTablet && (
+                  <TableCell sx={tableHeadingColor}>Valid Until</TableCell>
+                )}
+                <TableCell sx={tableHeadingColor}>Status</TableCell>
+                <TableCell sx={tableHeadingColor}>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {offers
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((offer) => (
+                  <TableRow key={offer.id} hover>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="bold">
+                        {offer.title}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={getTypeLabel(offer.type)}
+                        color="primary"
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">{offer.discount}%</Typography>
+                    </TableCell>
+                    {!isMobile && (
+                      <TableCell>
+                        <Typography variant="body2">
+                          {new Date(offer.validFrom).toLocaleDateString()}
+                        </Typography>
+                      </TableCell>
+                    )}
+                    {!isTablet && (
+                      <TableCell>
+                        <Typography variant="body2">
+                          {new Date(offer.validUntil).toLocaleDateString()}
+                        </Typography>
+                      </TableCell>
+                    )}
+                    <TableCell>
+                      <Chip
+                        label={offer.status.toUpperCase()}
+                        color={getStatusColor(offer.status)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={0.5}>
+                        <Tooltip title="Edit Offer">
+                          <IconButton
+                            color="primary"
+                            onClick={() => handleEdit(offer)}
+                            size="small"
+                          >
+                            <Edit />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete Offer">
+                          <IconButton
+                            color="error"
+                            onClick={() => handleDelete(offer.id)}
+                            size="small"
+                          >
+                            <Delete />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={offers.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
 
-          <Form.Item
-            name="type"
-            label="Offer Type"
-            rules={[{ required: true, message: 'Please select offer type' }]}
-          >
-            <Select>
-              <Option value="under-299">Under 299</Option>
-              <Option value="special-deals">Special Deals</Option>
-              <Option value="deal-of-month">Deal of the Month</Option>
-            </Select>
-          </Form.Item>
+        {/* Add/Edit Offer Dialog */}
+        <Dialog
+          open={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>{editingOffer ? "Edit Offer" : "Add Offer"}</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Offer Title"
+                  value={formData.title}
+                  onChange={handleChange("title")}
+                  error={!!errors.title}
+                  helperText={errors.title}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth error={!!errors.type} required>
+                  <InputLabel>Offer Type</InputLabel>
+                  <Select
+                    value={formData.type}
+                    onChange={handleChange("type")}
+                    label="Offer Type"
+                  >
+                    <MenuItem value="under-299">Under 299</MenuItem>
+                    <MenuItem value="special-deals">Special Deals</MenuItem>
+                    <MenuItem value="deal-of-month">Deal of the Month</MenuItem>
+                  </Select>
+                  {errors.type && (
+                    <Typography variant="caption" color="error">
+                      {errors.type}
+                    </Typography>
+                  )}
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Discount Percentage"
+                  type="number"
+                  value={formData.discount}
+                  onChange={handleChange("discount")}
+                  error={!!errors.discount}
+                  helperText={errors.discount}
+                  required
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                    inputProps: { min: 0, max: 100 },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <DatePicker
+                  label="Valid From"
+                  value={formData.validFrom}
+                  onChange={handleDateChange("validFrom")}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: !!errors.validFrom,
+                      helperText: errors.validFrom,
+                      required: true,
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <DatePicker
+                  label="Valid Until"
+                  value={formData.validUntil}
+                  onChange={handleDateChange("validUntil")}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: !!errors.validUntil,
+                      helperText: errors.validUntil,
+                      required: true,
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Description"
+                  multiline
+                  rows={4}
+                  value={formData.description}
+                  onChange={handleChange("description")}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsModalOpen(false)} disabled={loading}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={loading}
+              startIcon={loading ? <CircularProgress size={20} /> : null}
+            >
+              {loading ? "Saving..." : editingOffer ? "Update" : "Add"} Offer
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-          <Form.Item
-            name="discount"
-            label="Discount Percentage"
-            rules={[{ required: true, message: 'Please enter discount percentage' }]}
-          >
-            <InputNumber min={0} max={100} style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item
-            name="validFrom"
-            label="Valid From"
-            rules={[{ required: true, message: 'Please select start date' }]}
-          >
-            <DatePicker 
-              style={{ width: '100%' }} 
-              format="YYYY-MM-DD"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="validUntil"
-            label="Valid Until"
-            rules={[{ required: true, message: 'Please select end date' }]}
-          >
-            <DatePicker 
-              style={{ width: '100%' }} 
-              format="YYYY-MM-DD"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="description"
-            label="Description"
-          >
-            <TextArea rows={4} />
-          </Form.Item>
-
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit">
-                {editingOffer ? 'Update' : 'Add'} Offer
-              </Button>
-              <Button onClick={() => setIsModalVisible(false)}>
-                Cancel
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </AdminContainer>
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+        >
+          <DialogTitle>Delete Offer</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete this offer? This action cannot be
+              undone.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+            <Button color="error" variant="contained" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </LocalizationProvider>
   );
 };
 

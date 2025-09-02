@@ -1,14 +1,21 @@
+/*
+  Global styles updated for the 'Modern & Minimalist' theme.
+  Colors are based on the light theme palette from your theme.js.
+*/
+
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  /* Updated font to match the theme.js file */
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Set the background color and text color from the light theme palette */
+  background-color: #F8FAFC;
+  color: #1E1B4B;
 }
 
 #root {
@@ -27,21 +34,24 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  /* Light gray background from the palette */
+  background: #E2E8F0;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  /* Silver accent color from the palette */
+  background: #94A3B8;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  /* Darker silver on hover */
+  background: #64748B;
 }
 
 /* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #c1c1c1 #f1f1f1;
+  scrollbar-color: #94A3B8 #E2E8F0;
 }

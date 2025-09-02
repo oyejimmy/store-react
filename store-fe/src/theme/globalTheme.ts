@@ -1,13 +1,13 @@
 import { createTheme } from '@mui/material/styles';
 
-// Global brand colors
+// Define the core color variables for the brand
 export const brandColors = {
-  primary: '#2c6e49',      // Green
-  secondary: '#6E2C51',    // Purple/Burgundy
-  background: '#ffffff',   // White background
-  backgroundDark: '#1a1a1a', // Dark background
-  text: '#000000',         // Black text
-  textLight: '#ffffff',    // White text for dark backgrounds
+  primary: '#1E1B4B',        // Deep navy blue
+  secondary: '#94A3B8',      // Silver
+  background: '#F8FAFC',     // Off-white
+  backgroundDark: '#0F172A', // Dark background for the dark theme
+  text: '#1E1B4B',           // Default text color, deep navy
+  textLight: '#FFFFFF',      // White text for dark backgrounds or primary buttons
 };
 
 // Light theme
@@ -16,40 +16,77 @@ export const lightTheme = createTheme({
     mode: 'light',
     primary: {
       main: brandColors.primary,
-      light: '#4a8b6a',
-      dark: '#1e4d33',
+      light: '#4C4A73',
+      dark: '#141238',
       contrastText: brandColors.textLight,
     },
     secondary: {
       main: brandColors.secondary,
-      light: '#8b4a73',
-      dark: '#4d1e38',
-      contrastText: brandColors.textLight,
+      light: '#CBD5E1',
+      dark: '#64748B',
+      contrastText: brandColors.text,
     },
     background: {
       default: brandColors.background,
-      paper: brandColors.background,
+      paper: '#FFFFFF',
     },
     text: {
       primary: brandColors.text,
-      secondary: '#333333',
+      secondary: '#64748B',
+    },
+  },
+  typography: {
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    h1: {
+      fontWeight: 800,
+      letterSpacing: '-0.5px',
+    },
+    h2: {
+      fontWeight: 700,
+    },
+    h3: {
+      fontWeight: 600,
     },
   },
   components: {
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: brandColors.primary,
-          color: brandColors.textLight,
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+          borderBottom: `1px solid ${brandColors.secondary}`,
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
+          borderRadius: 8,
+          textTransform: 'none',
+          fontWeight: 500,
+          transition: 'all 0.3s ease',
+        },
+        contained: {
+          backgroundColor: brandColors.primary,
           color: brandColors.textLight,
+          boxShadow: '0 4px 12px rgba(30, 27, 75, 0.3)',
           '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            backgroundColor: '#141238',
+            boxShadow: '0 6px 16px rgba(30, 27, 75, 0.4)',
+          },
+        },
+        outlined: {
+          borderColor: brandColors.primary,
+          color: brandColors.primary,
+          '&:hover': {
+            backgroundColor: 'rgba(30, 27, 75, 0.04)',
+          },
+        },
+        text: {
+          color: brandColors.primary,
+          '&:hover': {
+            backgroundColor: 'rgba(30, 27, 75, 0.04)',
           },
         },
       },
@@ -62,41 +99,78 @@ export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: brandColors.primary,
-      light: '#4a8b6a',
-      dark: '#1e4d33',
-      contrastText: brandColors.textLight,
+      main: brandColors.secondary,
+      light: '#CBD5E1',
+      dark: '#64748B',
+      contrastText: brandColors.primary,
     },
     secondary: {
-      main: brandColors.secondary,
-      light: '#8b4a73',
-      dark: '#4d1e38',
+      main: brandColors.primary,
+      light: '#4C4A73',
+      dark: '#141238',
       contrastText: brandColors.textLight,
     },
     background: {
       default: brandColors.backgroundDark,
-      paper: '#2d2d2d',
+      paper: '#1E293B',
     },
     text: {
-      primary: brandColors.textLight,
-      secondary: '#cccccc',
+      primary: '#E2E8F0',
+      secondary: brandColors.secondary,
+    },
+  },
+  typography: {
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    h1: {
+      fontWeight: 800,
+      letterSpacing: '-0.5px',
+    },
+    h2: {
+      fontWeight: 700,
+    },
+    h3: {
+      fontWeight: 600,
     },
   },
   components: {
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: brandColors.primary,
-          color: brandColors.textLight,
+          backgroundColor: 'rgba(15, 23, 42, 0.95)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+          borderBottom: `1px solid ${brandColors.secondary}`,
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          color: brandColors.textLight,
+          borderRadius: 8,
+          textTransform: 'none',
+          fontWeight: 500,
+          transition: 'all 0.3s ease',
+        },
+        contained: {
+          backgroundColor: brandColors.secondary,
+          color: brandColors.primary,
+          boxShadow: '0 4px 12px rgba(148, 163, 184, 0.3)',
           '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            backgroundColor: '#CBD5E1',
+            boxShadow: '0 6px 16px rgba(148, 163, 184, 0.4)',
+          },
+        },
+        outlined: {
+          borderColor: brandColors.secondary,
+          color: brandColors.secondary,
+          '&:hover': {
+            backgroundColor: 'rgba(148, 163, 184, 0.04)',
+          },
+        },
+        text: {
+          color: brandColors.secondary,
+          '&:hover': {
+            backgroundColor: 'rgba(148, 163, 184, 0.04)',
           },
         },
       },
@@ -110,15 +184,15 @@ export const globalTheme = createTheme({
     mode: 'light',
     primary: {
       main: brandColors.primary,
-      light: '#4a8b6a',
-      dark: '#1e4d33',
+      light: '#4C4A73',
+      dark: '#141238',
       contrastText: brandColors.textLight,
     },
     secondary: {
       main: brandColors.secondary,
-      light: '#8b4a73',
-      dark: '#4d1e38',
-      contrastText: brandColors.textLight,
+      light: '#CBD5E1',
+      dark: '#64748B',
+      contrastText: brandColors.text,
     },
     background: {
       default: brandColors.background,
@@ -146,14 +220,15 @@ export const globalTheme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
     h1: {
       color: brandColors.text,
-      fontWeight: 700,
+      fontWeight: 800,
+      letterSpacing: '-0.5px',
     },
     h2: {
       color: brandColors.text,
-      fontWeight: 600,
+      fontWeight: 700,
     },
     h3: {
       color: brandColors.text,
@@ -191,23 +266,23 @@ export const globalTheme = createTheme({
           backgroundColor: brandColors.primary,
           color: brandColors.textLight,
           '&:hover': {
-            backgroundColor: '#1e4d33',
+            backgroundColor: '#1e4d33', // Adjusted to a darker navy
             transform: 'translateY(-2px)',
-            boxShadow: '0 6px 20px rgba(44, 110, 73, 0.3)',
+            boxShadow: '0 6px 20px rgba(30, 27, 75, 0.3)',
           },
         },
         outlined: {
           borderColor: brandColors.primary,
           color: brandColors.primary,
           '&:hover': {
-            borderColor: '#1e4d33',
-            backgroundColor: 'rgba(44, 110, 73, 0.04)',
+            borderColor: '#1e4d33', // Adjusted to a darker navy
+            backgroundColor: 'rgba(30, 27, 75, 0.04)',
           },
         },
         text: {
           color: brandColors.primary,
           '&:hover': {
-            backgroundColor: 'rgba(44, 110, 73, 0.04)',
+            backgroundColor: 'rgba(30, 27, 75, 0.04)',
           },
         },
       },
@@ -217,16 +292,17 @@ export const globalTheme = createTheme({
         root: {
           backgroundColor: brandColors.background,
           borderRadius: 12,
-          boxShadow: '0 4px 20px rgba(44, 110, 73, 0.1)',
-          border: '1px solid rgba(44, 110, 73, 0.1)',
+          boxShadow: '0 4px 20px rgba(30, 27, 75, 0.1)',
+          border: `1px solid rgba(30, 27, 75, 0.1)`,
         },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: brandColors.primary,
-          color: brandColors.textLight,
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          color: brandColors.text,
+          borderBottom: `1px solid ${brandColors.secondary}`,
         },
       },
     },
@@ -246,7 +322,7 @@ export const globalTheme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: 'rgba(44, 110, 73, 0.04)',
+            backgroundColor: 'rgba(30, 27, 75, 0.04)',
           },
         },
       },
@@ -269,7 +345,7 @@ export const globalTheme = createTheme({
         },
         colorSecondary: {
           backgroundColor: brandColors.secondary,
-          color: brandColors.textLight,
+          color: brandColors.text,
         },
       },
     },
