@@ -1,4 +1,4 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, PaletteColor, PaletteColorOptions } from "@mui/material/styles";
 
 // Define the core color variables for clarity
 const palette = {
@@ -6,6 +6,24 @@ const palette = {
   deepNavy: "#1E1B4B",
   silver: "#94A3B8",
 };
+
+// Extend the palette to include other standard colors for better type safety
+declare module '@mui/material/styles' {
+  interface Palette {
+    info: PaletteColor;
+    success: PaletteColor;
+    warning: PaletteColor;
+    error: PaletteColor;
+    divider: string;
+  }
+  interface PaletteOptions {
+    info?: PaletteColorOptions;
+    success?: PaletteColorOptions;
+    warning?: PaletteColorOptions;
+    error?: PaletteColorOptions;
+    divider?: string;
+  }
+}
 
 // Create the Light Theme with the specified palette
 export const lightTheme = createTheme({
@@ -29,6 +47,29 @@ export const lightTheme = createTheme({
       primary: palette.deepNavy,
       secondary: palette.silver,
     },
+    // --- Added standard palette colors to resolve the error ---
+    info: {
+      main: '#2196F3',
+      light: '#64B5F6',
+      dark: '#1565C0',
+    },
+    success: {
+      main: '#4CAF50',
+      light: '#81C784',
+      dark: '#2E7D32',
+    },
+    warning: {
+      main: '#FF9800',
+      light: '#FFB74D',
+      dark: '#EF6C00',
+    },
+    error: {
+      main: '#F44336',
+      light: '#E57373',
+      dark: '#D32F2F',
+    },
+    divider: palette.silver,
+    // --- End of added colors ---
   },
   typography: {
     fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
@@ -97,6 +138,29 @@ export const darkTheme = createTheme({
       primary: palette.offWhite,
       secondary: palette.silver,
     },
+    // --- Added standard palette colors to resolve the error ---
+    info: {
+      main: '#2196F3',
+      light: '#64B5F6',
+      dark: '#1565C0',
+    },
+    success: {
+      main: '#4CAF50',
+      light: '#81C784',
+      dark: '#2E7D32',
+    },
+    warning: {
+      main: '#FF9800',
+      light: '#FFB74D',
+      dark: '#EF6C00',
+    },
+    error: {
+      main: '#F44336',
+      light: '#E57373',
+      dark: '#D32F2F',
+    },
+    divider: '#3E3E3E',
+    // --- End of added colors ---
   },
   typography: {
     fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',

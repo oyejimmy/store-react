@@ -4,6 +4,7 @@ import { Product } from "./productSlice";
 export interface CartItem {
   id: number;
   product: Product;
+  category: string;
   quantity: number;
   price: number;
   name: string;
@@ -46,6 +47,7 @@ const cartSlice = createSlice({
           price,
           name: product.name,
           image_url: product.images[0] || '',
+          category: ""
         });
       }
 

@@ -33,8 +33,18 @@ import {
   DarkMode,
   ExpandLess,
   ExpandMore,
+  Diamond,
+  LocalOffer,
+  MonetizationOn,
+  CropLandscape,
+  Favorite,
+  Watch,
+  Link,
+  AutoAwesome,
+  Hearing,
+  Lens,
 } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";
 import { logout } from "../../store/slices/authSlice";
@@ -62,9 +72,15 @@ const Header: React.FC<HeaderProps> = ({
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(
     null
   );
+  const [shopMenuAnchor, setShopMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
+  const [offersMenuAnchor, setOffersMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [shopMenuOpen, setShopMenuOpen] = useState(false);
-  const [offersMenuOpen, setOffersMenuOpen] = useState(false);
+  const [shopMobileMenuOpen, setShopMobileMenuOpen] = useState(false);
+  const [offersMobileMenuOpen, setOffersMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,22 +96,30 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const shopCategories = [
-    { name: "Anklets", path: "/shop/anklets" },
-    { name: "Bangles", path: "/shop/bangles" },
-    { name: "Bracelets", path: "/shop/bracelets" },
-    { name: "Combos", path: "/shop/combos" },
-    { name: "Ear Studs", path: "/shop/ear-studs" },
-    { name: "Earrings", path: "/shop/earrings" },
-    { name: "Hoops", path: "/shop/hoops" },
-    { name: "Pendants", path: "/shop/pendants" },
-    { name: "Rings", path: "/shop/rings" },
-    { name: "Wall Frame Designs", path: "/shop/wall-frames" },
+    { name: "Anklets", path: "/shop/anklets", icon: <Favorite /> },
+    { name: "Bangles", path: "/shop/bangles", icon: <Watch /> },
+    { name: "Bracelets", path: "/shop/bracelets", icon: <Link /> },
+    { name: "Combos", path: "/shop/combos", icon: <AutoAwesome /> },
+    { name: "Ear Studs", path: "/shop/ear-studs", icon: <Hearing /> },
+    { name: "Earrings", path: "/shop/earrings", icon: <Diamond /> },
+    { name: "Hoops", path: "/shop/hoops", icon: <Lens /> },
+    { name: "Pendants", path: "/shop/pendants", icon: <Favorite /> },
+    { name: "Rings", path: "/shop/rings", icon: <Diamond /> },
+    { name: "Wall frames", path: "/shop/wall-frames", icon: <CropLandscape /> },
   ];
 
   const offers = [
-    { name: "Under 299", path: "/offers/under-299" },
-    { name: "Special Deals", path: "/offers/special-deals" },
-    { name: "Deal of the Month", path: "/offers/deal-of-month" },
+    { name: "Under 299", path: "/offers/under-299", icon: <MonetizationOn /> },
+    {
+      name: "Special Deals",
+      path: "/offers/special-deals",
+      icon: <LocalOffer />,
+    },
+    {
+      name: "Deal of Month",
+      path: "/offers/deal-of-month",
+      icon: <CardGiftcard />,
+    },
   ];
 
   // Colors for light and dark modes
@@ -104,7 +128,7 @@ const Header: React.FC<HeaderProps> = ({
     text: "#1E1B4B",
     accent: "#1E1B4B",
     buttonText: "#F8FAFC",
-    bannerBg: "#000000", // Black for banner
+    bannerBg: "#000000",
     bannerText: "#FFFFFF",
   };
 
@@ -113,7 +137,7 @@ const Header: React.FC<HeaderProps> = ({
     text: "#F8FAFC",
     accent: "#F8FAFC",
     buttonText: "#1E1B4B",
-    bannerBg: "#000000", // Black for banner
+    bannerBg: "#000000",
     bannerText: "#FFFFFF",
   };
 
@@ -131,7 +155,7 @@ const Header: React.FC<HeaderProps> = ({
         <List>
           <ListItem
             button
-            component={Link}
+            component={RouterLink}
             to="/"
             onClick={() => setMobileDrawerOpen(false)}
           >
@@ -143,38 +167,34 @@ const Header: React.FC<HeaderProps> = ({
 
           <ListItem
             button
-            component={Link}
-            to="/shop"
-            onClick={() => setMobileDrawerOpen(false)}
+            onClick={() => setShopMobileMenuOpen(!shopMobileMenuOpen)}
           >
             <ListItemIcon>
               <Store sx={{ color: colors.text }} />
             </ListItemIcon>
-            <ListItemText primary="All Products" sx={{ color: colors.text }} />
-          </ListItem>
-
-          <ListItem button onClick={() => setShopMenuOpen(!shopMenuOpen)}>
-            <ListItemIcon>
-              <Store sx={{ color: colors.text }} />
-            </ListItemIcon>
-            <ListItemText primary="Categories" sx={{ color: colors.text }} />
-            {shopMenuOpen ? (
+            <ListItemText primary="Shop" sx={{ color: colors.text }} />
+            {shopMobileMenuOpen ? (
               <ExpandLess sx={{ color: colors.text }} />
             ) : (
               <ExpandMore sx={{ color: colors.text }} />
             )}
           </ListItem>
-          <Collapse in={shopMenuOpen}>
+          <Collapse in={shopMobileMenuOpen}>
             <List component="div" disablePadding>
               {shopCategories.map((category) => (
                 <ListItem
                   key={category.path}
                   button
-                  component={Link}
+                  component={RouterLink}
                   to={category.path}
                   sx={{ pl: 4 }}
                   onClick={() => setMobileDrawerOpen(false)}
                 >
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    {React.cloneElement(category.icon, {
+                      sx: { color: colors.text, fontSize: "1.25rem" },
+                    })}
+                  </ListItemIcon>
                   <ListItemText
                     primary={category.name}
                     sx={{ color: colors.text }}
@@ -184,7 +204,10 @@ const Header: React.FC<HeaderProps> = ({
             </List>
           </Collapse>
 
-          <ListItem button onClick={() => setOffersMenuOpen(!offersMenuOpen)}>
+          <ListItem
+            button
+            onClick={() => setOffersMobileMenuOpen(!offersMobileMenuOpen)}
+          >
             <ListItemIcon>
               <CardGiftcard sx={{ color: colors.text }} />
             </ListItemIcon>
@@ -192,23 +215,28 @@ const Header: React.FC<HeaderProps> = ({
               primary="Special Offers"
               sx={{ color: colors.text }}
             />
-            {offersMenuOpen ? (
+            {offersMobileMenuOpen ? (
               <ExpandLess sx={{ color: colors.text }} />
             ) : (
               <ExpandMore sx={{ color: colors.text }} />
             )}
           </ListItem>
-          <Collapse in={offersMenuOpen}>
+          <Collapse in={offersMobileMenuOpen}>
             <List component="div" disablePadding>
               {offers.map((offer) => (
                 <ListItem
                   key={offer.path}
                   button
-                  component={Link}
+                  component={RouterLink}
                   to={offer.path}
                   sx={{ pl: 4 }}
                   onClick={() => setMobileDrawerOpen(false)}
                 >
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    {React.cloneElement(offer.icon, {
+                      sx: { color: colors.text, fontSize: "1.25rem" },
+                    })}
+                  </ListItemIcon>
                   <ListItemText
                     primary={offer.name}
                     sx={{ color: colors.text }}
@@ -220,19 +248,33 @@ const Header: React.FC<HeaderProps> = ({
 
           <ListItem
             button
-            component={Link}
+            component={RouterLink}
             to="/shop/hair-accessories"
             onClick={() => setMobileDrawerOpen(false)}
           >
+            <ListItemIcon>
+              <Store sx={{ color: colors.text }} />
+            </ListItemIcon>
             <ListItemText
               primary="Hair Accessories"
               sx={{ color: colors.text }}
             />
           </ListItem>
+          <ListItem
+            button
+            component={RouterLink}
+            to="/shop"
+            onClick={() => setMobileDrawerOpen(false)}
+          >
+            <ListItemIcon>
+              <Store sx={{ color: colors.text }} />
+            </ListItemIcon>
+            <ListItemText primary="All Products" sx={{ color: colors.text }} />
+          </ListItem>
 
           <ListItem
             button
-            component={Link}
+            component={RouterLink}
             to="/contact"
             onClick={() => setMobileDrawerOpen(false)}
           >
@@ -244,7 +286,7 @@ const Header: React.FC<HeaderProps> = ({
 
           <ListItem
             button
-            component={Link}
+            component={RouterLink}
             to="/about"
             onClick={() => setMobileDrawerOpen(false)}
           >
@@ -257,7 +299,7 @@ const Header: React.FC<HeaderProps> = ({
           {isAuthenticated && (
             <ListItem
               button
-              component={Link}
+              component={RouterLink}
               to="/profile"
               onClick={() => setMobileDrawerOpen(false)}
             >
@@ -294,8 +336,8 @@ const Header: React.FC<HeaderProps> = ({
             padding: "3.8px",
             gap: 1,
             transition: "top 0.3s ease",
-            background: colors.bannerBg, // Black background for banner
-            color: colors.bannerText, // White text for banner
+            background: colors.bannerBg,
+            color: colors.bannerText,
           }}
         >
           <span style={{ fontSize: "16px" }}>🚚</span>
@@ -319,7 +361,7 @@ const Header: React.FC<HeaderProps> = ({
           {/* Logo */}
           <Typography
             variant="h4"
-            component={Link}
+            component={RouterLink}
             to="/"
             sx={{
               fontWeight: 800,
@@ -346,42 +388,111 @@ const Header: React.FC<HeaderProps> = ({
             <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
               <Button
                 color="inherit"
-                component={Link}
+                component={RouterLink}
                 to="/"
                 startIcon={<Home sx={{ color: colors.text }} />}
                 sx={{ color: colors.text }}
               >
                 Home
               </Button>
+
               <Button
                 color="inherit"
-                component={Link}
-                to="/shop"
+                onClick={(e) => setShopMenuAnchor(e.currentTarget)}
                 startIcon={<Store sx={{ color: colors.text }} />}
+                endIcon={shopMenuAnchor ? <ExpandLess /> : <ExpandMore />}
                 sx={{ color: colors.text }}
               >
-                All Products
+                Shop
               </Button>
+              <Menu
+                anchorEl={shopMenuAnchor}
+                open={Boolean(shopMenuAnchor)}
+                onClose={() => setShopMenuAnchor(null)}
+                PaperProps={{
+                  sx: {
+                    bgcolor: colors.background,
+                    color: colors.text,
+                  },
+                }}
+              >
+                {shopCategories.map((category) => (
+                  <MenuItem
+                    key={category.path}
+                    onClick={() => {
+                      navigate(category.path);
+                      setShopMenuAnchor(null);
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {React.cloneElement(category.icon, {
+                        sx: { color: colors.text },
+                      })}
+                    </ListItemIcon>
+                    <ListItemText primary={category.name} />
+                  </MenuItem>
+                ))}
+              </Menu>
+
               <Button
                 color="inherit"
-                component={Link}
-                to="/offers/under-299"
+                onClick={(e) => setOffersMenuAnchor(e.currentTarget)}
                 startIcon={<CardGiftcard sx={{ color: colors.text }} />}
+                endIcon={offersMenuAnchor ? <ExpandLess /> : <ExpandMore />}
                 sx={{ color: colors.text }}
               >
-                Offers
+                Special Offers
               </Button>
+              <Menu
+                anchorEl={offersMenuAnchor}
+                open={Boolean(offersMenuAnchor)}
+                onClose={() => setOffersMenuAnchor(null)}
+                PaperProps={{
+                  sx: {
+                    bgcolor: colors.background,
+                    color: colors.text,
+                  },
+                }}
+              >
+                {offers.map((offer) => (
+                  <MenuItem
+                    key={offer.path}
+                    onClick={() => {
+                      navigate(offer.path);
+                      setOffersMenuAnchor(null);
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {React.cloneElement(offer.icon, {
+                        sx: { color: colors.text },
+                      })}
+                    </ListItemIcon>
+                    <ListItemText primary={offer.name} />
+                  </MenuItem>
+                ))}
+              </Menu>
               <Button
                 color="inherit"
-                component={Link}
+                component={RouterLink}
                 to="/shop/hair-accessories"
+                startIcon={<Store sx={{ color: colors.text }} />}
                 sx={{ color: colors.text }}
               >
                 Hair Accessories
               </Button>
               <Button
                 color="inherit"
-                component={Link}
+                component={RouterLink}
+                to="/shop"
+                startIcon={<Store sx={{ color: colors.text }} />}
+                sx={{ color: colors.text }}
+              >
+                All Products
+              </Button>
+
+              <Button
+                color="inherit"
+                component={RouterLink}
                 to="/contact"
                 startIcon={<Phone sx={{ color: colors.text }} />}
                 sx={{ color: colors.text }}
@@ -390,12 +501,12 @@ const Header: React.FC<HeaderProps> = ({
               </Button>
               <Button
                 color="inherit"
-                component={Link}
+                component={RouterLink}
                 to="/about"
                 startIcon={<Info sx={{ color: colors.text }} />}
                 sx={{ color: colors.text }}
               >
-                About
+                About Us
               </Button>
             </Box>
           )}
@@ -419,7 +530,11 @@ const Header: React.FC<HeaderProps> = ({
               )}
             </IconButton>
 
-            <IconButton component={Link} to="/cart" sx={{ color: colors.text }}>
+            <IconButton
+              component={RouterLink}
+              to="/cart"
+              sx={{ color: colors.text }}
+            >
               <Badge
                 badgeContent={itemCount}
                 sx={{

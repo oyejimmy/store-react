@@ -3,58 +3,40 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { fetchOffersByType } from "../../store/slices/offerSlice";
-import { Card, Row, Col, Typography, Tag, Button, Empty, Spin } from "antd";
-import { ShoppingCartOutlined, FireOutlined } from "@ant-design/icons";
-import styled from "styled-components";
-
-const { Title, Text, Paragraph } = Typography;
-
-const OffersContainer = styled.div`
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const OfferCard = styled(Card)`
-  margin-bottom: 16px;
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const ProductImage = styled.img`
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 4px;
-`;
-
-const Price = styled.div`
-  font-size: 18px;
-  font-weight: bold;
-  color: #d4af37;
-`;
-
-const OriginalPrice = styled.span`
-  text-decoration: line-through;
-  color: #999;
-  margin-right: 8px;
-`;
-
-const DiscountTag = styled(Tag)`
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  margin-left: 8px;
-`;
+import {
+  Container,
+  Grid,
+  Typography,
+  Card,
+  CardContent,
+  CardMedia,
+  CardActions,
+  Button,
+  Chip,
+  Box,
+  useTheme,
+  CircularProgress,
+  Fade,
+  Slide,
+  Grow,
+  Divider,
+  IconButton,
+} from "@mui/material";
+import {
+  ShoppingCart,
+  FavoriteBorder,
+  LocalFireDepartment,
+  Visibility,
+  ArrowForward,
+  LocalOffer,
+  AccessTime,
+} from "@mui/icons-material";
 
 const OffersPage: React.FC = () => {
   const { type } = useParams<{ type: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const { offers, loading } = useSelector((state: RootState) => state.offers);
+  const theme = useTheme();
 
   useEffect(() => {
     if (type) {
@@ -65,7 +47,7 @@ const OffersPage: React.FC = () => {
   const getOfferTitle = (type: string) => {
     switch (type) {
       case "under-299":
-        return "Under ₹299";
+        return "Under 299PKR";
       case "special-deals":
         return "Special Deals";
       case "deal-of-month":
@@ -78,7 +60,7 @@ const OffersPage: React.FC = () => {
   const getOfferDescription = (type: string) => {
     switch (type) {
       case "under-299":
-        return "Amazing jewelry pieces under ₹299. Perfect for gifting or treating yourself!";
+        return "Amazing jewelry pieces under 299PKR. Perfect for gifting or treating yourself!";
       case "special-deals":
         return "Limited time offers on our premium jewelry collection. Don't miss out!";
       case "deal-of-month":
@@ -88,91 +70,359 @@ const OffersPage: React.FC = () => {
     }
   };
 
+  const calculateDiscount = (originalPrice: number, currentPrice: number) => {
+    if (originalPrice > currentPrice) {
+      return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    }
+    return 0;
+  };
+
   if (loading) {
     return (
-      <OffersContainer>
-        <div style={{ textAlign: "center", padding: "50px" }}>
-          <Spin size="large" />
-        </div>
-      </OffersContainer>
+      <Box
+        sx={{
+          minHeight: "60vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: theme.palette.background.default,
+        }}
+      >
+        <CircularProgress size={60} thickness={4} />
+      </Box>
     );
   }
 
   return (
-    <OffersContainer>
-      <div style={{ textAlign: "center", marginBottom: "32px" }}>
-        <Title level={1}>
-          <FireOutlined style={{ color: "#ff4d4f", marginRight: "8px" }} />
-          {getOfferTitle(type || "")}
-        </Title>
-        <Paragraph style={{ fontSize: "16px", color: "#666" }}>
-          {getOfferDescription(type || "")}
-        </Paragraph>
-      </div>
-
-      {offers.length === 0 ? (
-        <Empty
-          description="No offers available at the moment"
-          style={{ marginTop: "50px" }}
-        />
-      ) : (
-        <Row gutter={[16, 16]}>
-          {offers.map((offer: any) => (
-            <Col xs={24} sm={12} md={8} lg={6} key={offer.id}>
-              <OfferCard
-                hoverable
-                cover={<ProductImage src={offer.image_url} alt={offer.title} />}
-                actions={[
-                  <Button
-                    key="add-to-cart"
-                    type="primary"
-                    size="small"
-                    icon={<ShoppingCartOutlined />}
-                  >
-                    Add to Cart
-                  </Button>,
-                  <Button key="view-details" size="small">
-                    View Details
-                  </Button>,
-                ]}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: theme.palette.background.default,
+        py: 6,
+        transition: "background-color 0.3s ease",
+      }}
+    >
+      <Container maxWidth="lg">
+        {/* Header Section */}
+        <Fade in={true} timeout={800}>
+          <Box sx={{ textAlign: "center", mb: 6 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+              }}
+            >
+              <LocalFireDepartment
+                sx={{
+                  fontSize: 48,
+                  color:
+                    theme.palette.mode === "dark"
+                      ? "#FF6B6B"
+                      : theme.palette.primary.main,
+                  mr: 2,
+                }}
+              />
+              <Typography
+                variant="h2"
+                sx={{
+                  fontWeight: 800,
+                  background:
+                    theme.palette.mode === "light"
+                      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #4C4A73 100%)`
+                      : `linear-gradient(135deg, #FF6B6B 0%, #F8FAFC 100%)`,
+                  backgroundClip: "text",
+                  textFillColor: "transparent",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
               >
-                <Card.Meta
-                  title={
-                    <div>
-                      {offer.title}
-                      {offer.discount > 0 && (
-                        <DiscountTag>{offer.discount}% OFF</DiscountTag>
+                {getOfferTitle(type || "")}
+              </Typography>
+            </Box>
+            <Typography
+              variant="h6"
+              sx={{
+                color: theme.palette.text.secondary,
+                maxWidth: 600,
+                margin: "0 auto",
+                mb: 3,
+              }}
+            >
+              {getOfferDescription(type || "")}
+            </Typography>
+            <Chip
+              icon={<LocalOffer />}
+              label={`${offers.length} Offers Available`}
+              variant="outlined"
+              sx={{
+                borderColor: theme.palette.primary.main,
+                color: theme.palette.primary.main,
+                fontWeight: 500,
+              }}
+            />
+          </Box>
+        </Fade>
+
+        {offers.length === 0 ? (
+          <Fade in={true} timeout={800}>
+            <Box
+              sx={{
+                textAlign: "center",
+                py: 10,
+                color: theme.palette.text.secondary,
+              }}
+            >
+              <LocalFireDepartment sx={{ fontSize: 64, mb: 2, opacity: 0.5 }} />
+              <Typography variant="h5" gutterBottom>
+                No offers available at the moment
+              </Typography>
+              <Typography variant="body1">
+                Check back later for new offers and promotions
+              </Typography>
+            </Box>
+          </Fade>
+        ) : (
+          <Grid container spacing={4}>
+            {offers.map((offer: any, index: number) => {
+              const discount = calculateDiscount(
+                offer.original_price,
+                offer.price
+              );
+
+              return (
+                <Grid item xs={12} sm={6} md={4} key={offer.id}>
+                  <Grow
+                    in={true}
+                    timeout={1000}
+                    style={{ transitionDelay: `${index * 100}ms` }}
+                  >
+                    <Card
+                      sx={{
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        transition: "all 0.3s ease",
+                        backgroundColor: theme.palette.background.paper,
+                        border: `1px solid ${theme.palette.divider}`,
+                        borderRadius: 3,
+                        "&:hover": {
+                          transform: "translateY(-8px)",
+                          boxShadow: theme.shadows[8],
+                          borderColor: theme.palette.primary.main,
+                        },
+                      }}
+                    >
+                      {/* Discount Badge */}
+                      {discount > 0 && (
+                        <Chip
+                          label={`${discount}% OFF`}
+                          color="error"
+                          sx={{
+                            position: "absolute",
+                            top: 12,
+                            left: 12,
+                            zIndex: 2,
+                            fontWeight: "bold",
+                          }}
+                        />
                       )}
-                    </div>
-                  }
-                  description={
-                    <div>
-                      <Paragraph style={{ marginBottom: "8px" }}>
-                        {offer.description}
-                      </Paragraph>
-                      <Price>
-                        {offer.original_price > offer.price && (
-                          <OriginalPrice>₹{offer.original_price}</OriginalPrice>
+
+                      {/* Favorite Button */}
+                      <IconButton
+                        sx={{
+                          position: "absolute",
+                          top: 12,
+                          right: 12,
+                          zIndex: 2,
+                          backgroundColor: "rgba(255, 255, 255, 0.9)",
+                          "&:hover": {
+                            backgroundColor: theme.palette.primary.main,
+                            color: theme.palette.primary.contrastText,
+                          },
+                        }}
+                      >
+                        <FavoriteBorder />
+                      </IconButton>
+
+                      <CardMedia
+                        component="img"
+                        height="240"
+                        image={
+                          offer.image_url ||
+                          "https://via.placeholder.com/300x200?text=Product+Image"
+                        }
+                        alt={offer.title}
+                        sx={{
+                          objectFit: "cover",
+                          transition: "transform 0.3s ease",
+                          "&:hover": {
+                            transform: "scale(1.05)",
+                          },
+                        }}
+                      />
+
+                      <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 600,
+                            color: theme.palette.text.primary,
+                            mb: 1,
+                            minHeight: 64,
+                          }}
+                        >
+                          {offer.title}
+                        </Typography>
+
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: theme.palette.text.secondary,
+                            mb: 2,
+                            minHeight: 40,
+                          }}
+                        >
+                          {offer.description}
+                        </Typography>
+
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", mb: 2 }}
+                        >
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontWeight: "bold",
+                              color: theme.palette.primary.main,
+                            }}
+                          >
+                            ₹{offer.price}
+                          </Typography>
+                          {offer.original_price > offer.price && (
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                textDecoration: "line-through",
+                                color: theme.palette.text.secondary,
+                                ml: 1,
+                              }}
+                            >
+                              ₹{offer.original_price}
+                            </Typography>
+                          )}
+                        </Box>
+
+                        {offer.valid_until && (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              mt: 2,
+                              p: 1,
+                              backgroundColor:
+                                theme.palette.mode === "dark"
+                                  ? "rgba(255, 255, 255, 0.05)"
+                                  : "rgba(0, 0, 0, 0.02)",
+                              borderRadius: 1,
+                            }}
+                          >
+                            <AccessTime
+                              sx={{
+                                fontSize: 16,
+                                color: theme.palette.text.secondary,
+                                mr: 1,
+                              }}
+                            />
+                            <Typography
+                              variant="caption"
+                              sx={{ color: theme.palette.text.secondary }}
+                            >
+                              Valid until:{" "}
+                              {new Date(offer.valid_until).toLocaleDateString()}
+                            </Typography>
+                          </Box>
                         )}
-                        ₹{offer.price}
-                      </Price>
-                      {offer.valid_until && (
-                        <div style={{ marginTop: "8px" }}>
-                          <Text type="secondary">
-                            Valid until:{" "}
-                            {new Date(offer.valid_until).toLocaleDateString()}
-                          </Text>
-                        </div>
-                      )}
-                    </div>
-                  }
-                />
-              </OfferCard>
-            </Col>
-          ))}
-        </Row>
-      )}
-    </OffersContainer>
+                      </CardContent>
+
+                      <Divider />
+
+                      <CardActions
+                        sx={{ p: 2, justifyContent: "space-between" }}
+                      >
+                        <Button
+                          variant="contained"
+                          startIcon={<ShoppingCart />}
+                          size="small"
+                          sx={{
+                            borderRadius: 2,
+                            px: 2,
+                            backgroundColor: theme.palette.primary.main,
+                            "&:hover": {
+                              backgroundColor: theme.palette.primary.dark,
+                            },
+                          }}
+                        >
+                          Add to Cart
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          endIcon={<Visibility />}
+                          size="small"
+                          sx={{
+                            borderRadius: 2,
+                            px: 2,
+                            borderColor: theme.palette.primary.main,
+                            color: theme.palette.primary.main,
+                            "&:hover": {
+                              backgroundColor: theme.palette.primary.main,
+                              color: theme.palette.primary.contrastText,
+                            },
+                          }}
+                        >
+                          Details
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grow>
+                </Grid>
+              );
+            })}
+          </Grid>
+        )}
+
+        {/* Quick Navigation */}
+        {offers.length > 0 && (
+          <Fade in={true} timeout={1000} style={{ transitionDelay: "500ms" }}>
+            <Box sx={{ textAlign: "center", mt: 8, p: 4 }}>
+              <Typography
+                variant="h6"
+                sx={{ color: theme.palette.text.primary, mb: 2 }}
+              >
+                Explore More Collections
+              </Typography>
+              <Button
+                variant="outlined"
+                endIcon={<ArrowForward />}
+                sx={{
+                  borderRadius: 3,
+                  px: 4,
+                  py: 1,
+                  borderColor: theme.palette.primary.main,
+                  color: theme.palette.primary.main,
+                  "&:hover": {
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
+                  },
+                }}
+              >
+                View All Products
+              </Button>
+            </Box>
+          </Fade>
+        )}
+      </Container>
+    </Box>
   );
 };
 

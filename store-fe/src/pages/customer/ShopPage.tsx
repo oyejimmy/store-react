@@ -33,13 +33,26 @@ import {
   InputAdornment,
   Paper,
   IconButton,
+  useTheme,
+  Fade,
+  Slide,
+  Grow,
+  Container,
+  FormGroup,
 } from "@mui/material";
 import {
   ShoppingCart,
   Visibility,
   Close as CloseIcon,
+  FilterList,
+  Sort,
+  Search,
+  Diamond,
+  LocalOffer,
+  Inventory,
+  PriceChange,
+  CheckCircle,
 } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
 import { COLORS } from "../../utils/contstant";
 
 type AvailabilityFilter = "in_stock" | "out_of_stock";
@@ -64,6 +77,7 @@ const ShopPage = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 799]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
 
   useEffect(() => {
     const categoryParam = searchParams.get("category") || category;
@@ -80,15 +94,28 @@ const ShopPage = () => {
     setOpenSnackbar(true);
   };
 
-  const handleCloseSnackbar = (_: any, reason: any) => {
+  const handleCloseSnackbar = (
+    event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
     if (reason === "clickaway") {
       return;
     }
     setOpenSnackbar(false);
   };
 
+  const handleSnackbarButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setOpenSnackbar(false);
+  };
+
   const handleViewDetails = (productId: any) => {
     navigate(`/product/${productId}`);
+  };
+
+  const handleOutOfStockClick = () => {
+    navigate("/contact");
   };
 
   const resetFilters = () => {
@@ -151,7 +178,7 @@ const ShopPage = () => {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "50vh",
-          bgcolor: "background.default", // Apply background color for loading state
+          backgroundColor: theme.palette.background.default,
         }}
       >
         <CircularProgress size={60} />
@@ -165,477 +192,751 @@ const ShopPage = () => {
       categoryParam.slice(1).replace("-", " ")
     : "All Products";
 
-  const snackbarStyle = {
-    backgroundColor: theme.palette.mode === "dark" ? "#1E1B4B" : "#F8FAFC",
-    color: theme.palette.mode === "dark" ? "#94A3B8" : "#1E1B4B",
-  };
-
-  const cardButtonStyle = {
-    flex: 1,
-    height: "48px", // Consistent height for all buttons
-    fontWeight: "bold",
-    borderRadius: "8px",
-  };
   const accentColor =
     theme.palette.mode === "light" ? COLORS.deepNavy : COLORS.offWhite;
 
   return (
-    // Main container with dynamic background color
     <Box
       sx={{
-        bgcolor: theme.palette.background.default,
+        backgroundColor: theme.palette.background.default,
         minHeight: "100vh",
         pb: 10,
+        transition: "background-color 0.3s ease",
       }}
     >
-      <Box sx={{ margin: 4, p: 3, maxWidth: 1600, mx: "auto", mb: 10 }}>
-        <Typography
-          variant="h3"
-          sx={{
-            textAlign: "center",
-            color: theme.palette.text.primary,
-            mb: 5,
-            fontWeight: "bold",
-            textTransform: "uppercase",
-            textShadow: `2px 2px 4px ${accentColor}40`,
-            fontSize: { xs: "2rem", md: "3rem" },
-            letterSpacing: "2px",
-            position: "relative",
-            "&::after": {
-              content: '""',
-              display: "block",
-              width: "100px",
-              height: "2px",
-              background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
-              margin: "10px auto 0",
-              boxShadow: `0 2px 10px ${accentColor}40`,
-            },
-          }}
-        >
-          {pageTitle}
-        </Typography>
-
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={3}>
-            <Paper elevation={4} sx={{ p: 2, mb: 3, borderRadius: "12px" }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 2,
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{ color: theme.palette.text.primary, fontWeight: "bold" }}
-                >
-                  Filters
-                </Typography>
-                <Button
-                  size="small"
-                  onClick={resetFilters}
-                  variant="text"
-                  color="secondary"
-                  sx={{
-                    borderRadius: "50px",
-                    backgroundColor: COLORS.silver,
-                    color: COLORS.deepNavy,
-                    "&:hover": {
-                      backgroundColor: COLORS.accent,
-                      color: COLORS.offWhite,
-                    },
-                  }}
-                >
-                  Reset
-                </Button>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                  Availability
-                </Typography>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={availabilityFilter.includes("in_stock")}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setAvailabilityFilter([
-                            ...availabilityFilter,
-                            "in_stock",
-                          ]);
-                        } else {
-                          setAvailabilityFilter(
-                            availabilityFilter.filter((f) => f !== "in_stock")
-                          );
-                        }
-                      }}
-                    />
-                  }
-                  label={`In stock (${
-                    products.filter(
-                      (p) => (p.stock_quantity || p.stock || 0) > 0
-                    ).length
-                  })`}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={availabilityFilter.includes("out_of_stock")}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setAvailabilityFilter([
-                            ...availabilityFilter,
-                            "out_of_stock",
-                          ]);
-                        } else {
-                          setAvailabilityFilter(
-                            availabilityFilter.filter(
-                              (f) => f !== "out_of_stock"
-                            )
-                          );
-                        }
-                      }}
-                    />
-                  }
-                  label={`Out of stock (${
-                    products.filter(
-                      (p) => (p.stock_quantity || p.stock || 0) === 0
-                    ).length
-                  })`}
-                />
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                  Price Range
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mb: 2, display: "block" }}
-                >
-                  The highest price is PKR 799.00
-                </Typography>
-                <Slider
-                  value={priceRange}
-                  onChange={(_, value) =>
-                    setPriceRange(value as [number, number])
-                  }
-                  valueLabelDisplay="auto"
-                  min={0}
-                  max={799}
-                  valueLabelFormat={(value) => `PKR ${value}`}
-                  sx={{ mb: 2 }}
-                />
-                <Grid container spacing={1}>
-                  <Grid item xs={6}>
-                    <TextField
-                      size="small"
-                      label="From"
-                      value={priceRange[0]}
-                      onChange={(e) =>
-                        setPriceRange([
-                          parseInt(e.target.value) || 0,
-                          priceRange[1],
-                        ])
-                      }
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">PKR</InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      size="small"
-                      label="To"
-                      value={priceRange[1]}
-                      onChange={(e) =>
-                        setPriceRange([
-                          priceRange[0],
-                          parseInt(e.target.value) || 799,
-                        ])
-                      }
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">PKR</InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-              </Box>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={9}>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        {/* Header Section */}
+        <Fade in={true} timeout={800}>
+          <Box sx={{ textAlign: "center", mb: 6 }}>
             <Box
               sx={{
                 display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+              }}
+            >
+              <Diamond
+                sx={{ fontSize: 48, color: theme.palette.primary.main, mr: 2 }}
+              />
+              <Typography
+                variant="h1"
+                sx={{
+                  fontWeight: 800,
+                  background:
+                    theme.palette.mode === "light"
+                      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #4C4A73 100%)`
+                      : `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, #CBD5E1 100%)`,
+                  backgroundClip: "text",
+                  textFillColor: "transparent",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  fontSize: { xs: "2.5rem", md: "4rem" },
+                }}
+              >
+                {pageTitle}
+              </Typography>
+            </Box>
+            <Typography
+              variant="h6"
+              sx={{
+                color: theme.palette.text.secondary,
+                maxWidth: 600,
+                mx: "auto",
+                mb: 3,
+              }}
+            >
+              Discover our exquisite collection of premium jewelry pieces
+            </Typography>
+          </Box>
+        </Fade>
+
+        <Grid container spacing={4}>
+          {/* Filters Sidebar */}
+          <Grid
+            item
+            xs={12}
+            md={3}
+            sx={{
+              display: { xs: isFilterVisible ? "block" : "none", md: "block" },
+            }}
+          >
+            <Slide direction="right" in={true} timeout={800}>
+              <Paper
+                sx={{
+                  p: 3,
+                  mb: 3,
+                  borderRadius: 3,
+                  backgroundColor: theme.palette.background.paper,
+                  border: `1px solid ${theme.palette.divider}`,
+                  boxShadow: theme.shadows[4],
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 3,
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <FilterList sx={{ color: theme.palette.primary.main }} />
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        color: theme.palette.text.primary,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Filters
+                    </Typography>
+                  </Box>
+                  <Button
+                    size="small"
+                    onClick={resetFilters}
+                    variant="outlined"
+                    sx={{
+                      borderRadius: "20px",
+                      px: 2,
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                {/* Search Field */}
+                <Box sx={{ mb: 3 }}>
+                  <TextField
+                    fullWidth
+                    placeholder="Search products..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    size="small"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search sx={{ color: theme.palette.text.secondary, fontSize: 20 }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      maxWidth: '280px',
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                      },
+                    }}
+                  />
+                </Box>
+
+                {/* Availability Filter - In one row */}
+                <Box sx={{ mb: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Inventory sx={{ fontSize: 18, color: theme.palette.primary.main }} />
+                    <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.text.primary, fontSize: '0.9rem' }}>
+                      Availability
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={availabilityFilter.includes("in_stock")}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setAvailabilityFilter([...availabilityFilter, "in_stock"]);
+                            } else {
+                              setAvailabilityFilter(availabilityFilter.filter(f => f !== "in_stock"));
+                            }
+                          }}
+                          size="small"
+                        />
+                      }
+                      label={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>In Stock</Typography>
+                          <Chip
+                            label={products.filter(p => (p.stock_quantity || p.stock || 0) > 0).length}
+                            size="small"
+                            variant="outlined"
+                            sx={{ 
+                              minWidth: '28px', 
+                              height: '22px',
+                              '& .MuiChip-label': {
+                                px: 0.5,
+                                fontSize: '0.75rem'
+                              }
+                            }}
+                          />
+                        </Box>
+                      }
+                      sx={{ m: 0 }}
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={availabilityFilter.includes("out_of_stock")}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setAvailabilityFilter([...availabilityFilter, "out_of_stock"]);
+                            } else {
+                              setAvailabilityFilter(availabilityFilter.filter(f => f !== "out_of_stock"));
+                            }
+                          }}
+                          size="small"
+                        />
+                      }
+                      label={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>Out of Stock</Typography>
+                          <Chip
+                            label={products.filter(p => (p.stock_quantity || p.stock || 0) === 0).length}
+                            size="small"
+                            variant="outlined"
+                            sx={{ 
+                              minWidth: '28px',
+                              height: '22px',
+                              color: theme.palette.error.main,
+                              borderColor: theme.palette.error.main,
+                              '& .MuiChip-label': {
+                                px: 0.5,
+                                fontSize: '0.75rem',
+                                color: theme.palette.error.main
+                              }
+                            }}
+                          />
+                        </Box>
+                      }
+                      sx={{ m: 0 }}
+                    />
+                  </Box>
+                </Box>
+
+                <Divider sx={{ my: 3 }} />
+
+                {/* Price Range Filter */}
+                <Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mb: 2,
+                    }}
+                  >
+                    <PriceChange
+                      sx={{ fontSize: 20, color: theme.palette.primary.main }}
+                    />
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        fontWeight: 600,
+                        color: theme.palette.text.primary,
+                      }}
+                    >
+                      Price Range
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mb: 2, display: "block" }}
+                  >
+                    The highest price is PKR 799.00
+                  </Typography>
+                  <Slider
+                    value={priceRange}
+                    onChange={(_, value) =>
+                      setPriceRange(value as [number, number])
+                    }
+                    valueLabelDisplay="auto"
+                    min={0}
+                    max={799}
+                    valueLabelFormat={(value) => `PKR ${value}`}
+                    sx={{ mb: 3 }}
+                  />
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <TextField
+                        size="small"
+                        label="From"
+                        value={priceRange[0]}
+                        onChange={(e) =>
+                          setPriceRange([
+                            parseInt(e.target.value) || 0,
+                            priceRange[1],
+                          ])
+                        }
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              PKR
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: 2,
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        size="small"
+                        label="To"
+                        value={priceRange[1]}
+                        onChange={(e) =>
+                          setPriceRange([
+                            priceRange[0],
+                            parseInt(e.target.value) || 799,
+                          ])
+                        }
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              PKR
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: 2,
+                          },
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Paper>
+            </Slide>
+          </Grid>
+
+          {/* Products Grid */}
+          <Grid item xs={12} md={9}>
+            {/* Mobile Filter Toggle */}
+            <Box
+              sx={{
+                display: { xs: "flex", md: "none" },
                 justifyContent: "space-between",
                 alignItems: "center",
                 mb: 3,
               }}
             >
-              <FormControl sx={{ minWidth: 300 }}>
-                <InputLabel>Sort by</InputLabel>
-                <Select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  label="Sort by"
-                >
-                  <MenuItem value="featured">Featured</MenuItem>
-                  <MenuItem value="alphabetical_az">
-                    Alphabetically, A-Z
-                  </MenuItem>
-                  <MenuItem value="alphabetical_za">
-                    Alphabetically, Z-A
-                  </MenuItem>
-                  <MenuItem value="price_low">Price, low to high</MenuItem>
-                  <MenuItem value="price_high">Price, high to low</MenuItem>
-                  <MenuItem value="best_selling">Best selling</MenuItem>
-                </Select>
-              </FormControl>
+              <Button
+                variant="outlined"
+                startIcon={<FilterList />}
+                onClick={() => setIsFilterVisible(!isFilterVisible)}
+                sx={{ borderRadius: 2 }}
+              >
+                {isFilterVisible ? "Hide Filters" : "Show Filters"}
+              </Button>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Sort sx={{ color: theme.palette.text.secondary }} />
+                <FormControl size="small" sx={{ minWidth: 150 }}>
+                  <InputLabel>Sort by</InputLabel>
+                  <Select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    label="Sort by"
+                    sx={{ borderRadius: 2 }}
+                  >
+                    <MenuItem value="featured">Featured</MenuItem>
+                    <MenuItem value="alphabetical_az">A-Z</MenuItem>
+                    <MenuItem value="alphabetical_za">Z-A</MenuItem>
+                    <MenuItem value="price_low">Price: Low to High</MenuItem>
+                    <MenuItem value="price_high">Price: High to Low</MenuItem>
+                    <MenuItem value="best_selling">Best Selling</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            </Box>
+
+            {/* Desktop Sort Controls */}
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 4,
+              }}
+            >
               <Typography variant="body2" color="text.secondary">
-                {sortedProducts.length} products
+                {sortedProducts.length} products found
               </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Sort sx={{ color: theme.palette.text.secondary }} />
+                <FormControl size="small" sx={{ minWidth: 200 }}>
+                  <InputLabel>Sort by</InputLabel>
+                  <Select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    label="Sort by"
+                    sx={{ borderRadius: 2 }}
+                  >
+                    <MenuItem value="featured">Featured</MenuItem>
+                    <MenuItem value="alphabetical_az">
+                      Alphabetically, A-Z
+                    </MenuItem>
+                    <MenuItem value="alphabetical_za">
+                      Alphabetically, Z-A
+                    </MenuItem>
+                    <MenuItem value="price_low">Price: Low to High</MenuItem>
+                    <MenuItem value="price_high">Price: High to Low</MenuItem>
+                    <MenuItem value="best_selling">Best Selling</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
             </Box>
 
             {paginatedProducts.length === 0 ? (
-              <Box sx={{ textAlign: "center", py: 8 }}>
-                <Typography variant="h6" color="text.secondary">
-                  No products found
-                </Typography>
-              </Box>
+              <Fade in={true} timeout={800}>
+                <Box sx={{ textAlign: "center", py: 8 }}>
+                  <Diamond
+                    sx={{
+                      fontSize: 64,
+                      color: theme.palette.text.secondary,
+                      mb: 2,
+                      opacity: 0.5,
+                    }}
+                  />
+                  <Typography variant="h5" color="text.secondary" gutterBottom>
+                    No products found
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    Try adjusting your filters or search terms
+                  </Typography>
+                </Box>
+              </Fade>
             ) : (
               <>
-                <Grid container spacing={4}>
-                  {paginatedProducts.map((product: any) => {
+                <Grid container spacing={3}>
+                  {paginatedProducts.map((product: any, index: number) => {
                     const isOutOfStock =
                       (product.stock_quantity || product.stock || 0) === 0;
+                    const originalPrice =
+                      product.original_price || product.retail_price;
+                    const currentPrice =
+                      product.offer_price ||
+                      product.price ||
+                      product.retail_price;
+                    const hasDiscount =
+                      originalPrice &&
+                      currentPrice &&
+                      originalPrice > currentPrice;
+                    const discountPercentage = hasDiscount
+                      ? Math.round(
+                          ((originalPrice - currentPrice) / originalPrice) * 100
+                        )
+                      : 0;
+
+                    // Determine product type for category label
+                    const getProductType = () => {
+                      const name = product.name.toLowerCase();
+                      if (name.includes("ring")) return "Ring";
+                      if (name.includes("hoop") || name.includes("earring"))
+                        return "Earrings";
+                      if (name.includes("necklace")) return "Necklace";
+                      if (name.includes("bracelet")) return "Bracelet";
+                      if (name.includes("pendant")) return "Pendant";
+                      return product.category || "Jewelry";
+                    };
 
                     return (
-                      <Grid item xs={12} sm={6} md={6} lg={4} key={product.id}>
-                        <Box sx={{ position: "relative" }}>
-                          {/* Out of Stock Overlay */}
-                          {isOutOfStock && (
-                            <Box
+                      <Grid item xs={12} sm={6} md={3} key={product.id}>
+                        <Grow
+                          in={true}
+                          timeout={800}
+                          style={{ transitionDelay: `${index * 100}ms` }}
+                        >
+                          <Box sx={{ position: "relative", height: "100%" }}>
+                            {/* Discount Badge */}
+                            {hasDiscount && (
+                              <Chip
+                                label={`${discountPercentage}% OFF`}
+                                color="primary"
+                                sx={{
+                                  position: "absolute",
+                                  top: 12,
+                                  left: 12,
+                                  zIndex: 2,
+                                  fontWeight: "bold",
+                                }}
+                              />
+                            )}
+
+                            <Card
                               sx={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
+                                height: "100%",
                                 display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                zIndex: 1,
-                                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                                flexDirection: "column",
                                 borderRadius: "16px",
+                                transition: "all 0.3s ease",
+                                backgroundColor: theme.palette.background.paper,
+                                border: `1px solid ${theme.palette.divider}`,
+                                boxShadow: theme.shadows[2],
+                                "&:hover": {
+                                  transform: isOutOfStock
+                                    ? "none"
+                                    : "translateY(-8px)",
+                                  boxShadow: theme.shadows[8],
+                                  borderColor: theme.palette.primary.main,
+                                },
+                                cursor: isOutOfStock ? "pointer" : "default",
                               }}
+                              onClick={
+                                isOutOfStock ? handleOutOfStockClick : undefined
+                              }
                             >
+                              {/* Out of Stock Overlay */}
+                              {isOutOfStock && (
+                                <Box
+                                  sx={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    zIndex: 3,
+                                    backgroundColor: "rgba(0, 0, 0, 0.7)",
+                                    borderRadius: "16px",
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      backgroundColor: theme.palette.error.main,
+                                      padding: "16px 24px",
+                                      borderRadius: "25px",
+                                      transform: "rotate(-5deg)",
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="h6"
+                                      sx={{
+                                        color: "white",
+                                        fontWeight: "bold",
+                                        textTransform: "uppercase",
+                                        letterSpacing: "1px",
+                                      }}
+                                    >
+                                      Out of Stock
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              )}
+
+                              {/* Clickable product image */}
                               <Box
                                 sx={{
-                                  backgroundColor: "#ff0000",
-                                  padding: "16px",
-                                  borderRadius: "50px",
-                                  transform: "rotate(-5deg)",
+                                  height: 280,
+                                  overflow: "hidden",
+                                  cursor: "pointer",
+                                }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (!isOutOfStock)
+                                    handleViewDetails(product.id);
                                 }}
                               >
-                                <Typography
-                                  variant="h5"
+                                <CardMedia
+                                  component="img"
+                                  height="280"
+                                  image={
+                                    product.images?.[0] ||
+                                    "https://via.placeholder.com/300x280?text=Jewelry"
+                                  }
+                                  alt={product.name}
                                   sx={{
-                                    color: "white",
-                                    fontWeight: "bold",
-                                    textTransform: "uppercase",
-                                    letterSpacing: "2px",
+                                    objectFit: "cover",
+                                    transition: "transform 0.3s ease",
+                                    "&:hover": {
+                                      transform: "scale(1.05)",
+                                    },
                                   }}
-                                >
-                                  Out of Stock
-                                </Typography>
-                              </Box>
-                            </Box>
-                          )}
-                          <Card
-                            elevation={4}
-                            sx={{
-                              height: "100%",
-                              display: "flex",
-                              flexDirection: "column",
-                              borderRadius: "16px",
-                              transition: "transform 0.2s",
-                              "&:hover": {
-                                transform: isOutOfStock
-                                  ? "none"
-                                  : "translateY(-8px)",
-                              },
-                              // Blur effect
-                              filter: isOutOfStock ? "blur(4px)" : "none",
-                            }}
-                          >
-                            <CardMedia
-                              component="img"
-                              height="240" // Slightly taller image
-                              image={product.images[0] || ""}
-                              alt={product.name}
-                              sx={{ objectFit: "cover" }}
-                            />
-                            <CardContent sx={{ flexGrow: 1, p: 2 }}>
-                              <Typography
-                                variant="h6"
-                                component="h3"
-                                gutterBottom
-                                sx={{ fontWeight: "bold" }}
-                              >
-                                {product.name}
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{ mb: 1, minHeight: 40 }}
-                              >
-                                {product.description?.substring(0, 60)}...
-                              </Typography>
-                              <Box sx={{ mb: 1 }}>
-                                <Chip
-                                  label={product.category || "Jewelry"}
-                                  size="small"
-                                  color="primary"
                                 />
-                                {isOutOfStock && (
-                                  <Chip
-                                    label="Out of Stock"
-                                    size="small"
-                                    color="error"
-                                    sx={{ ml: 1 }}
-                                  />
-                                )}
                               </Box>
-                              <Box>
-                                {(() => {
-                                  const originalPrice =
-                                    product.original_price ||
-                                    product.retail_price;
-                                  const currentPrice =
-                                    product.offer_price ||
-                                    product.price ||
-                                    product.retail_price;
-                                  return (
-                                    originalPrice &&
-                                    currentPrice &&
-                                    originalPrice > currentPrice && (
-                                      <Typography
-                                        variant="body2"
-                                        sx={{
-                                          textDecoration: "line-through",
-                                          color: "text.secondary",
-                                          mr: 1,
-                                        }}
-                                        component="span"
-                                      >
-                                        PKR {originalPrice}
-                                      </Typography>
-                                    )
-                                  );
-                                })()}
+
+                              <CardContent sx={{ flexGrow: 1, p: 2, pb: 1 }}>
                                 <Typography
                                   variant="h6"
+                                  component="h3"
+                                  gutterBottom
                                   sx={{
-                                    color: theme.palette.primary.main,
-                                    fontWeight: "bold",
+                                    fontWeight: 600,
+                                    color: theme.palette.text.primary,
+                                    minHeight: "auto",
+                                    fontSize: "1rem",
                                   }}
-                                  component="span"
                                 >
-                                  PKR{" "}
-                                  {product.offer_price ||
-                                    product.price ||
-                                    product.retail_price}
+                                  {product.name}
                                 </Typography>
-                              </Box>
-                            </CardContent>
-                            <CardActions
-                              sx={{
-                                p: 2,
-                                pt: 0,
-                                justifyContent: "space-between",
-                              }}
-                            >
-                              <Button
-                                size="small"
-                                variant="contained"
-                                startIcon={<ShoppingCart />}
-                                onClick={() => handleAddToCart(product)}
-                                disabled={isOutOfStock}
-                                sx={cardButtonStyle}
-                              >
-                                Add to Cart
-                              </Button>
-                              <Button
-                                size="small"
-                                variant="outlined"
-                                startIcon={<Visibility />}
-                                onClick={() => handleViewDetails(product.id)}
-                                sx={cardButtonStyle}
-                              >
-                                View Details
-                              </Button>
-                            </CardActions>
-                          </Card>
-                        </Box>
+
+                                <Box sx={{ mb: 1 }}>
+                                  <Chip
+                                    label={getProductType()}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{
+                                      borderColor: theme.palette.primary.main,
+                                      color: theme.palette.primary.main,
+                                      fontSize: "0.7rem",
+                                    }}
+                                  />
+                                </Box>
+
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    mb: 1,
+                                  }}
+                                >
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      color: theme.palette.primary.main,
+                                      fontWeight: "bold",
+                                      fontSize: "1.1rem",
+                                    }}
+                                  >
+                                    PKR {currentPrice}
+                                  </Typography>
+                                  {hasDiscount && (
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                        textDecoration: "line-through",
+                                        color: "text.secondary",
+                                        fontSize: "0.8rem",
+                                      }}
+                                    >
+                                      PKR {originalPrice}
+                                    </Typography>
+                                  )}
+                                </Box>
+                              </CardContent>
+                              <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
+                                <Button
+                                  variant="contained"
+                                  startIcon={<ShoppingCart />}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAddToCart(product);
+                                  }}
+                                  disabled={isOutOfStock}
+                                  sx={{
+                                    flex: 1,
+                                    borderRadius: "25px",
+                                    py: 0.8,
+                                    fontSize: "0.8rem",
+                                    backgroundColor: theme.palette.primary.main,
+                                    "&:hover": {
+                                      backgroundColor:
+                                        theme.palette.primary.dark,
+                                    },
+                                  }}
+                                >
+                                  Add to Cart
+                                </Button>
+                                <Button
+                                  variant="outlined"
+                                  startIcon={<Visibility />}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleViewDetails(product.id);
+                                  }}
+                                  sx={{
+                                    flex: 1,
+                                    borderRadius: "25px",
+                                    py: 0.8,
+                                    fontSize: "0.8rem",
+                                    borderColor: theme.palette.primary.main,
+                                    color: theme.palette.primary.main,
+                                    "&:hover": {
+                                      backgroundColor:
+                                        theme.palette.primary.main,
+                                      color: theme.palette.primary.contrastText,
+                                    },
+                                  }}
+                                >
+                                  Details
+                                </Button>
+                              </CardActions>
+                            </Card>
+                          </Box>
+                        </Grow>
                       </Grid>
                     );
                   })}
                 </Grid>
 
-                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-                  <Pagination
-                    count={Math.ceil(sortedProducts.length / pageSize)}
-                    page={currentPage}
-                    onChange={(_, page) => setCurrentPage(page)}
-                    color="primary"
-                  />
-                </Box>
+                {/* Pagination */}
+                {sortedProducts.length > pageSize && (
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", mt: 6 }}
+                  >
+                    <Pagination
+                      count={Math.ceil(sortedProducts.length / pageSize)}
+                      page={currentPage}
+                      onChange={(_, page) => {
+                        setCurrentPage(page);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      color="primary"
+                      size="large"
+                      sx={{
+                        "& .MuiPaginationItem-root": {
+                          borderRadius: 2,
+                          fontWeight: 600,
+                        },
+                      }}
+                    />
+                  </Box>
+                )}
               </>
             )}
           </Grid>
         </Grid>
+
+        {/* Snackbar Notification */}
         <Snackbar
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           open={openSnackbar}
-          autoHideDuration={6000}
+          autoHideDuration={3000}
           onClose={handleCloseSnackbar}
         >
-          <Box
+          <Paper
             sx={{
-              ...snackbarStyle,
               p: 2,
-              borderRadius: "8px",
+              borderRadius: 3,
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
               display: "flex",
               alignItems: "center",
+              gap: 2,
               boxShadow: theme.shadows[6],
+              border: `1px solid ${theme.palette.primary.main}30`,
             }}
           >
+            <CheckCircle sx={{ color: theme.palette.success.main }} />
             <Typography>{snackbarMessage}</Typography>
             <IconButton
-              key="close"
               size="small"
-              aria-label="close"
-              color="inherit"
-              onClick={(event) => handleCloseSnackbar(event, "clickaway")}
-              sx={{ ml: 2 }}
+              onClick={handleSnackbarButtonClick}
+              sx={{ ml: 1 }}
             >
               <CloseIcon fontSize="small" />
             </IconButton>
-          </Box>
+          </Paper>
         </Snackbar>
-      </Box>
+      </Container>
     </Box>
   );
 };
