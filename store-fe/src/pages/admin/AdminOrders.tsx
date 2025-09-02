@@ -23,7 +23,6 @@ import {
   CardContent,
   Grid,
   IconButton,
-  CircularProgress,
   Tooltip,
 } from "@mui/material";
 import { PDFViewer } from "@react-pdf/renderer";
@@ -33,7 +32,6 @@ import {
   Download as DownloadIcon,
   PictureAsPdf as PictureAsPdfIcon,
   Add as AddIcon,
-  ShoppingCart as ShoppingCartIcon,
 } from "@mui/icons-material";
 import { adminAPI } from "../../services/api";
 import OrderReceipt from "../../components/admin/OrderReceipt";
@@ -155,18 +153,6 @@ const AdminOrders: React.FC = () => {
         </IconButton>
       </Tooltip>
     </Box>
-  );
-
-  const renderPdfDownloadButton = (order: any) => (
-    <PdfDownloadButton
-      document={<OrderReceipt order={order} />}
-      fileName={generateOrderFileName(
-        order.order_number || `order-${order.id}`
-      )}
-      buttonText=""
-      size="small"
-      startIcon={<DownloadIcon fontSize="small" />}
-    />
   );
 
   return (

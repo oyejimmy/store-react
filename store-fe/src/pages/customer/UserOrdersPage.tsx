@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store';
-import { fetchUserOrders } from '../../store/slices/orderSlice';
-import { Card, Typography, Tag, Button, Table, Empty, Spin } from 'antd';
-import { EyeOutlined, ShoppingOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import { fetchUserOrders } from "../../store/slices/orderSlice";
+import { Card, Typography, Tag, Button, Table, Empty, Spin } from "antd";
+import { EyeOutlined, ShoppingOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 const { Title, Text } = Typography;
 
@@ -13,11 +13,6 @@ const OrdersContainer = styled.div`
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
-`;
-
-const OrderCard = styled(Card)`
-  margin-bottom: 16px;
-  border-radius: 8px;
 `;
 
 const UserOrdersPage: React.FC = () => {
@@ -31,53 +26,51 @@ const UserOrdersPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return 'orange';
-      case 'processing':
-        return 'blue';
-      case 'shipped':
-        return 'purple';
-      case 'delivered':
-        return 'green';
-      case 'cancelled':
-        return 'red';
+      case "pending":
+        return "orange";
+      case "processing":
+        return "blue";
+      case "shipped":
+        return "purple";
+      case "delivered":
+        return "green";
+      case "cancelled":
+        return "red";
       default:
-        return 'default';
+        return "default";
     }
   };
 
   const columns = [
     {
-      title: 'Order ID',
-      dataIndex: 'order_number',
-      key: 'order_number',
+      title: "Order ID",
+      dataIndex: "order_number",
+      key: "order_number",
       render: (text: string) => <Text strong>{text}</Text>,
     },
     {
-      title: 'Date',
-      dataIndex: 'created_at',
-      key: 'created_at',
+      title: "Date",
+      dataIndex: "created_at",
+      key: "created_at",
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Total',
-      dataIndex: 'total_amount',
-      key: 'total_amount',
+      title: "Total",
+      dataIndex: "total_amount",
+      key: "total_amount",
       render: (amount: number) => <Text strong>₹{amount}</Text>,
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       render: (status: string) => (
-        <Tag color={getStatusColor(status)}>
-          {status.toUpperCase()}
-        </Tag>
+        <Tag color={getStatusColor(status)}>{status.toUpperCase()}</Tag>
       ),
     },
     {
-      title: 'Actions',
-      key: 'actions',
+      title: "Actions",
+      key: "actions",
       render: (_: any, record: any) => (
         <Button
           type="primary"
@@ -94,7 +87,7 @@ const UserOrdersPage: React.FC = () => {
   if (loading) {
     return (
       <OrdersContainer>
-        <div style={{ textAlign: 'center', padding: '50px' }}>
+        <div style={{ textAlign: "center", padding: "50px" }}>
           <Spin size="large" />
         </div>
       </OrdersContainer>
@@ -103,20 +96,17 @@ const UserOrdersPage: React.FC = () => {
 
   return (
     <OrdersContainer>
-      <div style={{ marginBottom: '24px' }}>
+      <div style={{ marginBottom: "24px" }}>
         <Title level={2}>
-          <ShoppingOutlined style={{ marginRight: '8px' }} />
+          <ShoppingOutlined style={{ marginRight: "8px" }} />
           My Orders
         </Title>
         <Text type="secondary">Track your order history and status</Text>
       </div>
 
       {orders.length === 0 ? (
-        <Empty
-          description="No orders found"
-          style={{ marginTop: '50px' }}
-        >
-          <Button type="primary" onClick={() => navigate('/shop')}>
+        <Empty description="No orders found" style={{ marginTop: "50px" }}>
+          <Button type="primary" onClick={() => navigate("/shop")}>
             Start Shopping
           </Button>
         </Empty>

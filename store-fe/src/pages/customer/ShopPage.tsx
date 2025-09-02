@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
+// import { AppDispatch, RootState } from "../../store";
 import {
   fetchProducts,
   fetchProductsByCategory,
-  setFilters,
 } from "../../store/slices/productSlice";
 import { addToCart } from "../../store/slices/cartSlice";
 import {
@@ -35,10 +34,8 @@ import {
   IconButton,
 } from "@mui/material";
 import {
-  Search as SearchIcon,
   ShoppingCart,
   Visibility,
-  FilterList,
   Close as CloseIcon,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
@@ -246,8 +243,9 @@ const ShopPage = () => {
                     />
                   }
                   label={`In stock (${
-                    products.filter((p) => (p.stock_quantity || p.stock || 0) > 0)
-                      .length
+                    products.filter(
+                      (p) => (p.stock_quantity || p.stock || 0) > 0
+                    ).length
                   })`}
                 />
                 <FormControlLabel
@@ -262,7 +260,9 @@ const ShopPage = () => {
                           ]);
                         } else {
                           setAvailabilityFilter(
-                            availabilityFilter.filter((f) => f !== "out_of_stock")
+                            availabilityFilter.filter(
+                              (f) => f !== "out_of_stock"
+                            )
                           );
                         }
                       }}
@@ -357,8 +357,12 @@ const ShopPage = () => {
                   label="Sort by"
                 >
                   <MenuItem value="featured">Featured</MenuItem>
-                  <MenuItem value="alphabetical_az">Alphabetically, A-Z</MenuItem>
-                  <MenuItem value="alphabetical_za">Alphabetically, Z-A</MenuItem>
+                  <MenuItem value="alphabetical_az">
+                    Alphabetically, A-Z
+                  </MenuItem>
+                  <MenuItem value="alphabetical_za">
+                    Alphabetically, Z-A
+                  </MenuItem>
                   <MenuItem value="price_low">Price, low to high</MenuItem>
                   <MenuItem value="price_high">Price, high to low</MenuItem>
                   <MenuItem value="best_selling">Best selling</MenuItem>

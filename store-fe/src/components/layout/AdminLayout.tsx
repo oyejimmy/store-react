@@ -17,10 +17,8 @@ import {
   MenuItem,
   Breadcrumbs,
   Link as MuiLink,
-  useTheme,
-  ThemeProvider,
-  createTheme,
-  CssBaseline
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 import {
   Dashboard,
@@ -36,77 +34,160 @@ import {
   Public,
   Description,
   Collections,
+  Brightness4,
+  Brightness7,
 } from "@mui/icons-material";
-import { BrowserRouter, useNavigate, useLocation, Outlet, Routes, Route } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 
-// Theming functions moved to this file to make it self-contained
-const getAdminTheme = ({ primaryColor, secondaryColor, backgroundColor, fontFamily, mode }) => {
-  return createTheme({
-    palette: {
-      mode: mode,
-      primary: {
-        main: primaryColor,
-      },
-      secondary: {
-        main: secondaryColor,
-      },
-      background: {
-        default: backgroundColor,
-      },
-      text: {
-        primary: mode === 'light' ? '#121212' : '#F8FAFC',
-        secondary: mode === 'light' ? '#64748B' : '#94A3B8',
-      },
-    },
-    typography: {
-      fontFamily: fontFamily,
-      h1: {
-        fontWeight: 800,
-        letterSpacing: '-0.5px',
-      },
-      h2: {
-        fontWeight: 700,
-      },
-      h3: {
-        fontWeight: 600,
-      },
-    },
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            borderRadius: 8,
-            textTransform: 'none',
-            fontWeight: 500,
-          },
-        },
-      },
-      MuiAppBar: {
-        styleOverrides: {
-          root: {
-            backdropFilter: 'blur(10px)',
-          },
-        },
-      },
-    },
-  });
+// Brand colors
+const brandColors = {
+  primary: "#1E1B4B", // Deep navy blue
+  secondary: "#94A3B8", // Silver
+  background: "#F8FAFC", // Off-white
+  backgroundDark: "#0F172A", // Dark background for the dark theme
+  text: "#1E1B4B", // Default text color, deep navy
+  textLight: "#FFFFFF", // White text for dark backgrounds or primary buttons
 };
 
-export const adminLightTheme = getAdminTheme({
-  primaryColor: '#1E1B4B', // Deep navy
-  secondaryColor: '#94A3B8', // Silver accent
-  backgroundColor: '#F8FAFC', // Off-white
-  fontFamily: 'Inter',
-  mode: 'light'
-});
+// Admin Light Theme
+export const adminLightTheme = {
+  palette: {
+    mode: "light",
+    primary: {
+      main: brandColors.primary,
+      light: "#4C4A73",
+      dark: "#141238",
+      contrastText: brandColors.textLight,
+    },
+    secondary: {
+      main: brandColors.secondary,
+      light: "#CBD5E1",
+      dark: "#64748B",
+      contrastText: brandColors.text,
+    },
+    background: {
+      default: brandColors.background,
+      paper: "#FFFFFF",
+    },
+    text: {
+      primary: brandColors.text,
+      secondary: "#64748B",
+    },
+  },
+  typography: {
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    h1: {
+      fontWeight: 800,
+      letterSpacing: "-0.5px",
+    },
+    h2: {
+      fontWeight: 700,
+    },
+    h3: {
+      fontWeight: 600,
+    },
+  },
+  components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(10px)",
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+          borderBottom: `1px solid ${brandColors.secondary}`,
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          textTransform: "none",
+          fontWeight: 500,
+        },
+        contained: {
+          backgroundColor: brandColors.primary,
+          color: brandColors.textLight,
+          boxShadow: "0 4px 12px rgba(30, 27, 75, 0.3)",
+          "&:hover": {
+            backgroundColor: "#141238",
+            boxShadow: "0 6px 16px rgba(30, 27, 75, 0.4)",
+          },
+        },
+      },
+    },
+  },
+};
 
-export const adminDarkTheme = getAdminTheme({
-  primaryColor: '#94A3B8', // Silver accent
-  secondaryColor: '#1E1B4B', // Deep navy
-  backgroundColor: '#0F172A', // Dark background for contrast
-  fontFamily: 'Inter',
-  mode: 'dark'
-});
+// Admin Dark Theme
+export const adminDarkTheme = {
+  palette: {
+    mode: "dark",
+    primary: {
+      main: brandColors.secondary,
+      light: "#CBD5E1",
+      dark: "#64748B",
+      contrastText: brandColors.primary,
+    },
+    secondary: {
+      main: brandColors.primary,
+      light: "#4C4A73",
+      dark: "#141238",
+      contrastText: brandColors.textLight,
+    },
+    background: {
+      default: brandColors.backgroundDark,
+      paper: "#1E293B",
+    },
+    text: {
+      primary: "#E2E8F0",
+      secondary: brandColors.secondary,
+    },
+  },
+  typography: {
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    h1: {
+      fontWeight: 800,
+      letterSpacing: "-0.5px",
+    },
+    h2: {
+      fontWeight: 700,
+    },
+    h3: {
+      fontWeight: 600,
+    },
+  },
+  components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "rgba(15, 23, 42, 0.95)",
+          backdropFilter: "blur(10px)",
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.6)",
+          borderBottom: `1px solid ${brandColors.secondary}`,
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          textTransform: "none",
+          fontWeight: 500,
+        },
+        contained: {
+          backgroundColor: brandColors.secondary,
+          color: brandColors.primary,
+          boxShadow: "0 4px 12px rgba(148, 163, 184, 0.3)",
+          "&:hover": {
+            backgroundColor: "#CBD5E1",
+            boxShadow: "0 6px 16px rgba(148, 163, 184, 0.4)",
+          },
+        },
+      },
+    },
+  },
+};
 
 const drawerWidth = 280;
 const collapsedWidth = 64;
@@ -121,18 +202,18 @@ const AdminLayout: React.FC = () => {
   });
   const navigate = useNavigate();
   const location = useLocation();
-  const theme = useTheme();
 
-  // Mock user and logout functionality to resolve import errors
-  const [user, setUser] = useState({ full_name: "Admin" });
+  // Mock user data
+  const [user] = useState({ full_name: "Admin" });
+
   const handleLogout = () => {
-    setUser(null);
     navigate("/login");
   };
 
-  const toggleAdminTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    localStorage.setItem("admin-theme", !isDarkMode ? "dark" : "light");
+  const toggleTheme = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem("admin-theme", newMode ? "dark" : "light");
   };
 
   const menuItems = [
@@ -158,118 +239,207 @@ const AdminLayout: React.FC = () => {
 
   const getBreadcrumbTitle = () => {
     const path = location.pathname;
-    const item = menuItems.find(item => item.path === path);
+    const item = menuItems.find((item) => item.path === path);
     return item ? item.label : "Dashboard";
   };
 
+  // Create theme based on current mode
+  const theme = isDarkMode ? adminDarkTheme : adminLightTheme;
+
   return (
-    <ThemeProvider theme={isDarkMode ? adminDarkTheme : adminLightTheme}>
-      <Box sx={{ display: "flex", height: "100vh" }}>
-        {/* Sidebar */}
-        <Drawer
-          variant="permanent"
-          sx={{
+    <Box sx={{ display: "flex", height: "100vh" }}>
+      {/* Sidebar */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: collapsed ? collapsedWidth : drawerWidth,
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
             width: collapsed ? collapsedWidth : drawerWidth,
-            flexShrink: 0,
-            "& .MuiDrawer-paper": {
-              width: collapsed ? collapsedWidth : drawerWidth,
-              boxSizing: "border-box",
-              backgroundColor: theme.palette.primary.main,
-              borderRight: `2px solid ${theme.palette.secondary.main}`,
-              transition: "width 0.3s ease",
-            },
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.primary.main,
+            borderRight: `2px solid ${theme.palette.secondary.main}`,
+            transition: "width 0.3s ease",
+            overflowX: "hidden",
+          },
+        }}
+      >
+        {/* Logo Section */}
+        <Box
+          sx={{
+            p: 2,
+            textAlign: "center",
+            backgroundColor: theme.palette.secondary.main,
+            borderBottom: `2px solid ${theme.palette.primary.main}`,
           }}
         >
-          {/* Logo Section */}
-          <Box
+          <Typography
+            variant="h5"
             sx={{
-              p: 2,
-              textAlign: "center",
-              backgroundColor: theme.palette.secondary.main,
-              borderBottom: `2px solid ${theme.palette.primary.main}`,
+              color: theme.palette.primary.contrastText,
+              fontWeight: 800,
+              m: 0,
+              fontSize: collapsed ? "1.5rem" : "1.75rem",
             }}
           >
+            {collapsed ? "G" : "Gem-Heart"}
+          </Typography>
+          {!collapsed && (
             <Typography
-              variant="h5"
-              sx={{ color: theme.palette.text.primary, fontWeight: 800, m: 0 }}
+              variant="caption"
+              sx={{
+                color: theme.palette.primary.contrastText,
+                fontWeight: 600,
+                opacity: 0.9,
+                display: "block",
+                mt: 0.5,
+              }}
             >
-              {collapsed ? "G" : "Gem-Heart"}
+              Admin Panel
             </Typography>
-            {!collapsed && (
-              <Typography
-                variant="caption"
-                sx={{ color: theme.palette.text.secondary, fontWeight: 600, opacity: 0.9 }}
-              >
-                Admin Panel
-              </Typography>
-            )}
-          </Box>
+          )}
+        </Box>
 
-          {/* Menu Items */}
-          <List sx={{ pt: 1 }}>
-            {menuItems.map((item) => (
-              <ListItem key={item.path} disablePadding sx={{ px: 1 }}>
-                <ListItemButton
-                  selected={location.pathname === item.path}
-                  onClick={() => handleMenuClick(item.path)}
-                  sx={{
-                    borderRadius: 2,
-                    mx: 1,
-                    mb: 0.5,
-                    color: theme.palette.text.primary,
+        {/* Menu Items */}
+        <List sx={{ pt: 1, flexGrow: 1 }}>
+          {menuItems.map((item) => (
+            <ListItem key={item.path} disablePadding sx={{ px: 1 }}>
+              <ListItemButton
+                selected={location.pathname === item.path}
+                onClick={() => handleMenuClick(item.path)}
+                sx={{
+                  borderRadius: 2,
+                  mx: 1,
+                  mb: 0.5,
+                  color: theme.palette.primary.contrastText,
+                  "&:hover": {
+                    backgroundColor: theme.palette.secondary.main,
+                    color: theme.palette.secondary.contrastText,
+                    transform: "translateX(4px)",
+                  },
+                  "&.Mui-selected": {
+                    backgroundColor: theme.palette.secondary.main,
+                    color: theme.palette.secondary.contrastText,
+                    fontWeight: 600,
                     "&:hover": {
-                      backgroundColor: theme.palette.secondary.main,
-                      color: theme.palette.text.primary,
-                      transform: "translateX(4px)",
+                      backgroundColor: theme.palette.secondary.dark,
                     },
-                    "&.Mui-selected": {
-                      backgroundColor: theme.palette.secondary.main,
-                      color: theme.palette.text.primary,
-                      fontWeight: 600,
-                      "&:hover": {
-                        backgroundColor: theme.palette.secondary.main,
-                      },
-                    },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    color: "inherit",
+                    minWidth: collapsed ? 0 : 40,
+                    justifyContent: "center",
                   }}
                 >
-                  <ListItemIcon
-                    sx={{ color: "inherit", minWidth: collapsed ? 0 : 40 }}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
-                  {!collapsed && <ListItemText primary={item.label} />}
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
+                  {item.icon}
+                </ListItemIcon>
+                {!collapsed && (
+                  <ListItemText
+                    primary={item.label}
+                    sx={{
+                      "& .MuiTypography-root": {
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                      },
+                    }}
+                  />
+                )}
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
 
-        {/* Main Content */}
-        <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-          {/* Header */}
-          <AppBar
-            position="static"
-            sx={{
-              backgroundColor: theme.palette.primary.main,
-              boxShadow: `0 4px 12px ${theme.palette.primary.dark}30`,
-              borderBottom: `2px solid ${theme.palette.secondary.main}`,
-            }}
-          >
-            <Toolbar sx={{ justifyContent: "space-between" }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <IconButton
-                  onClick={() => setCollapsed(!collapsed)}
-                  sx={{ color: theme.palette.text.primary }}
+      {/* Main Content */}
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: theme.palette.secondary.main,
+        }}
+      >
+        {/* Header */}
+        <AppBar
+          position="static"
+          sx={{
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            borderBottom: `1px solid ${theme?.palette?.divider}`,
+          }}
+        >
+          <Toolbar sx={{ justifyContent: "space-between", gap: 2 }}>
+            {/* Theme Toggle in Sidebar */}
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <IconButton
+                onClick={() => setCollapsed(!collapsed)}
+                sx={{ color: theme.palette.text.primary }}
+              >
+                {collapsed ? <MenuIcon /> : <ChevronLeft />}
+              </IconButton>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: theme.palette.text.primary,
+                  fontWeight: 600,
+                  display: { xs: "none", sm: "block" },
+                }}
+              >
+                Admin Dashboard
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              {/* Theme Toggle in Header for mobile */}
+              <IconButton
+                onClick={toggleTheme}
+                sx={{
+                  color: theme.palette.text.primary,
+                  display: { xs: "flex", md: "none" },
+                }}
+              >
+                {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+              </IconButton>
+              {!collapsed && (
+                <Box
+                  sx={{
+                    p: 2,
+                    borderTop: `1px solid ${theme.palette.secondary.main}`,
+                  }}
                 >
-                  {collapsed ? <MenuIcon /> : <ChevronLeft />}
-                </IconButton>
-                <Typography
-                  variant="h5"
-                  sx={{ color: theme.palette.text.primary, fontWeight: 800 }}
-                >
-                  Admin Dashboard
-                </Typography>
-              </Box>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={isDarkMode}
+                        onChange={toggleTheme}
+                        icon={
+                          <Brightness7
+                            sx={{ color: theme.palette.primary.contrastText }}
+                          />
+                        }
+                        checkedIcon={
+                          <Brightness4
+                            sx={{ color: theme.palette.primary.contrastText }}
+                          />
+                        }
+                      />
+                    }
+                    label={
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.primary.contrastText }}
+                      >
+                        {isDarkMode ? "Dark" : "Light"} Mode
+                      </Typography>
+                    }
+                    sx={{ m: 0 }}
+                  />
+                </Box>
+              )}
 
               <Box
                 onClick={(e) => setUserMenuAnchor(e.currentTarget)}
@@ -280,22 +450,31 @@ const AdminLayout: React.FC = () => {
                   cursor: "pointer",
                   p: 1,
                   borderRadius: 2,
-                  background: theme.palette.mode === 'light' ? `rgba(148, 163, 184, 0.1)` : `rgba(30, 27, 75, 0.1)`,
+                  background:
+                    theme.palette.mode === "light"
+                      ? "rgba(148, 163, 184, 0.1)"
+                      : "rgba(30, 27, 75, 0.1)",
                   transition: "all 0.3s ease",
-                  "&:hover": { background: theme.palette.mode === 'light' ? `rgba(148, 163, 184, 0.2)` : `rgba(30, 27, 75, 0.2)` },
+                  "&:hover": {
+                    background:
+                      theme.palette.mode === "light"
+                        ? "rgba(148, 163, 184, 0.2)"
+                        : "rgba(30, 27, 75, 0.2)",
+                  },
                 }}
               >
                 <Avatar
                   sx={{
-                    bgcolor: theme.palette.secondary.main,
-                    color: theme.palette.primary.main,
+                    bgcolor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
                     width: 32,
                     height: 32,
+                    fontSize: "0.875rem",
                   }}
                 >
-                  <Person />
+                  {user?.full_name?.charAt(0) || "A"}
                 </Avatar>
-                <Box>
+                <Box sx={{ display: { xs: "none", md: "block" } }}>
                   <Typography
                     variant="body2"
                     sx={{ fontWeight: 600, color: theme.palette.text.primary }}
@@ -310,97 +489,79 @@ const AdminLayout: React.FC = () => {
                   </Typography>
                 </Box>
               </Box>
-
-              <Menu
-                anchorEl={userMenuAnchor}
-                open={Boolean(userMenuAnchor)}
-                onClose={() => setUserMenuAnchor(null)}
-              >
-                <MenuItem
-                  onClick={() => {
-                    navigate("/admin/profile");
-                    setUserMenuAnchor(null);
-                  }}
-                >
-                  <Person sx={{ mr: 1 }} /> Profile Settings
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  onClick={() => {
-                    handleLogout();
-                    setUserMenuAnchor(null);
-                  }}
-                  sx={{ color: "error.main" }}
-                >
-                  <Logout sx={{ mr: 1 }} /> Logout
-                </MenuItem>
-              </Menu>
-            </Toolbar>
-          </AppBar>
-
-          {/* Content Area */}
-          <Box
-            sx={{
-              flexGrow: 1,
-              bgcolor: theme.palette.background.default,
-              overflow: "auto",
-              maxHeight: "calc(100vh - 64px)",
-            }}
-          >
-            <Box sx={{ p: 3, minHeight: "100%" }}>
-              <Breadcrumbs sx={{ mb: 2 }}>
-                <MuiLink
-                  component="button"
-                  onClick={() => navigate("/admin")}
-                  underline="hover"
-                  sx={{ color: theme.palette.text.primary }}
-                >
-                  Admin
-                </MuiLink>
-                <Typography sx={{ color: theme.palette.text.primary }}>
-                  {getBreadcrumbTitle()}
-                </Typography>
-              </Breadcrumbs>
-              <Outlet />
             </Box>
+            <Menu
+              anchorEl={userMenuAnchor}
+              open={Boolean(userMenuAnchor)}
+              onClose={() => setUserMenuAnchor(null)}
+              PaperProps={{
+                sx: {
+                  mt: 1,
+                  minWidth: 200,
+                  backgroundColor: theme.palette.background.paper,
+                },
+              }}
+            >
+              <MenuItem
+                onClick={() => {
+                  navigate("/admin/profile");
+                  setUserMenuAnchor(null);
+                }}
+              >
+                <Person sx={{ mr: 1, fontSize: 20 }} /> Profile Settings
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  handleLogout();
+                  setUserMenuAnchor(null);
+                }}
+                sx={{ color: "error.main" }}
+              >
+                <Logout sx={{ mr: 1, fontSize: 20 }} /> Logout
+              </MenuItem>
+            </Menu>
+          </Toolbar>
+        </AppBar>
+
+        {/* Content Area */}
+        <Box
+          sx={{
+            flexGrow: 1,
+            bgcolor: theme.palette.background.default,
+            overflow: "auto",
+            maxHeight: "calc(100vh - 64px)",
+          }}
+        >
+          <Box sx={{ p: 3, minHeight: "100%" }}>
+            <Breadcrumbs sx={{ mb: 3 }}>
+              <MuiLink
+                component="button"
+                onClick={() => navigate("/admin")}
+                underline="hover"
+                sx={{
+                  color: theme.palette.text.primary,
+                  fontSize: "0.9rem",
+                }}
+              >
+                Admin
+              </MuiLink>
+              <Typography
+                sx={{
+                  color: theme.palette.text.primary,
+                  fontSize: "0.9rem",
+                  fontWeight: 500,
+                }}
+              >
+                {getBreadcrumbTitle()}
+              </Typography>
+            </Breadcrumbs>
+            <Outlet />
           </Box>
         </Box>
       </Box>
-    </ThemeProvider>
-  );
-};
-
-// A simple component to render in the Outlet
-const DashboardPage = () => {
-  return (
-    <Box sx={{ p: 2, background: 'rgba(212, 175, 55, 0.1)', borderRadius: 2 }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>Dashboard Content</Typography>
-      <Typography variant="body1">
-        Welcome to the admin dashboard. This is a placeholder for your main dashboard content.
-      </Typography>
     </Box>
   );
 };
 
-// Main App component to handle routing
-const App = () => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem("admin-theme") === "dark";
-  });
-
-  return (
-    <ThemeProvider theme={isDarkMode ? adminDarkTheme : adminLightTheme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<DashboardPage />} />
-            {/* Add more routes for other sections as needed */}
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
-  );
-};
-
-export default App;
+export default AdminLayout;

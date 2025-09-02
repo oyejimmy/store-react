@@ -10,14 +10,22 @@ import {
 const Footer: React.FC = () => {
   const theme = useTheme();
 
+  // Determine colors based on theme
+  const backgroundColor = theme.palette.background.paper;
+  const textColor = theme.palette.text.primary;
+  const borderColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(30, 27, 75, 0.2)';
+  const iconColor = theme.palette.text.primary;
+  const hoverColor = theme.palette.mode === 'dark' ? '#FF6B6B' : '#1E1B4B';
+
   return (
     <Box
       component="footer"
       sx={{
-        bgcolor: '#F8FAFC', // Updated background color
-        color: '#1E1B4B', // Updated text color to deep navy
+        bgcolor: backgroundColor,
+        color: textColor,
         mt: 'auto',
         py: 4,
+        transition: 'all 0.3s ease',
       }}
     >
       <Container maxWidth="lg">
@@ -25,12 +33,21 @@ const Footer: React.FC = () => {
           {/* Brand Section */}
           <Grid item xs={12} md={4}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Diamond sx={{ color: '#1E1B4B', mr: 1, fontSize: 32 }} /> {/* Updated icon color */}
-              <Typography variant="h5" sx={{ color: '#1E1B4B', fontWeight: 700 }}> {/* Updated text color */}
+              <Diamond sx={{ color: iconColor, mr: 1, fontSize: 32, transition: 'color 0.3s ease' }} />
+              <Typography variant="h5" sx={{ color: textColor, fontWeight: 700, transition: 'color 0.3s ease' }}>
                 Gem-Heart
               </Typography>
             </Box>
-            <Typography variant="body2" sx={{ color: '#1E1B4B', opacity: 0.8, mb: 3, lineHeight: 1.6 }}> {/* Updated text color */}
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: textColor, 
+                opacity: 0.8, 
+                mb: 3, 
+                lineHeight: 1.6,
+                transition: 'color 0.3s ease, opacity 0.3s ease'
+              }}
+            >
               True treasure handpicked from the most exceptional sources around the globe.
             </Typography>
             <Box sx={{ display: 'flex', gap: 1 }}>
@@ -38,7 +55,16 @@ const Footer: React.FC = () => {
                 component={MuiLink}
                 href="https://instagram.com/gem-heart"
                 target="_blank"
-                sx={{ color: '#1E1B4B', opacity: 0.8, '&:hover': { color: '#1E1B4B', opacity: 1 } }} // Updated icon colors
+                sx={{ 
+                  color: iconColor, 
+                  opacity: 0.8, 
+                  transition: 'all 0.3s ease',
+                  '&:hover': { 
+                    color: hoverColor, 
+                    opacity: 1,
+                    transform: 'translateY(-2px)'
+                  } 
+                }}
               >
                 <Instagram />
               </IconButton>
@@ -46,7 +72,16 @@ const Footer: React.FC = () => {
                 component={MuiLink}
                 href="https://facebook.com/gem-heart"
                 target="_blank"
-                sx={{ color: '#1E1B4B', opacity: 0.8, '&:hover': { color: '#1E1B4B', opacity: 1 } }} // Updated icon colors
+                sx={{ 
+                  color: iconColor, 
+                  opacity: 0.8, 
+                  transition: 'all 0.3s ease',
+                  '&:hover': { 
+                    color: hoverColor, 
+                    opacity: 1,
+                    transform: 'translateY(-2px)'
+                  } 
+                }}
               >
                 <Facebook />
               </IconButton>
@@ -55,7 +90,15 @@ const Footer: React.FC = () => {
 
           {/* Links Sections */}
           <Grid item xs={6} md={2}>
-            <Typography variant="h6" sx={{ color: '#1E1B4B', mb: 2, fontSize: '1rem' }}> {/* Updated text color */}
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                color: textColor, 
+                mb: 2, 
+                fontSize: '1rem',
+                transition: 'color 0.3s ease'
+              }}
+            >
               Products
             </Typography>
             {['Rings', 'Earrings', 'Bangles', 'Pendants'].map((item) => (
@@ -66,11 +109,16 @@ const Footer: React.FC = () => {
                 variant="body2"
                 sx={{
                   display: 'block',
-                  color: '#1E1B4B',
+                  color: textColor,
                   opacity: 0.8,
                   textDecoration: 'none',
                   mb: 1,
-                  '&:hover': { color: '#1E1B4B', opacity: 1 },
+                  transition: 'all 0.3s ease',
+                  '&:hover': { 
+                    color: hoverColor, 
+                    opacity: 1,
+                    paddingLeft: '4px'
+                  },
                 }}
               >
                 {item}
@@ -79,7 +127,15 @@ const Footer: React.FC = () => {
           </Grid>
 
           <Grid item xs={6} md={2}>
-            <Typography variant="h6" sx={{ color: '#1E1B4B', mb: 2, fontSize: '1rem' }}> {/* Updated text color */}
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                color: textColor, 
+                mb: 2, 
+                fontSize: '1rem',
+                transition: 'color 0.3s ease'
+              }}
+            >
               Services
             </Typography>
             {['Shop', 'Contact', 'About Us', 'Cart'].map((item) => (
@@ -90,11 +146,16 @@ const Footer: React.FC = () => {
                 variant="body2"
                 sx={{
                   display: 'block',
-                  color: '#1E1B4B',
+                  color: textColor,
                   opacity: 0.8,
                   textDecoration: 'none',
                   mb: 1,
-                  '&:hover': { color: '#1E1B4B', opacity: 1 },
+                  transition: 'all 0.3s ease',
+                  '&:hover': { 
+                    color: hoverColor, 
+                    opacity: 1,
+                    paddingLeft: '4px'
+                  },
                 }}
               >
                 {item}
@@ -103,7 +164,15 @@ const Footer: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <Typography variant="h6" sx={{ color: '#1E1B4B', mb: 2, fontSize: '1rem' }}> {/* Updated text color */}
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                color: textColor, 
+                mb: 2, 
+                fontSize: '1rem',
+                transition: 'color 0.3s ease'
+              }}
+            >
               About Us
             </Typography>
             {['Contact Us', 'Blogs', 'Privacy Policy', 'Terms and Conditions'].map((item) => (
@@ -114,11 +183,16 @@ const Footer: React.FC = () => {
                 variant="body2"
                 sx={{
                   display: 'block',
-                  color: '#1E1B4B',
+                  color: textColor,
                   opacity: 0.8,
                   textDecoration: 'none',
                   mb: 1,
-                  '&:hover': { color: '#1E1B4B', opacity: 1 },
+                  transition: 'all 0.3s ease',
+                  '&:hover': { 
+                    color: hoverColor, 
+                    opacity: 1,
+                    paddingLeft: '4px'
+                  },
                 }}
               >
                 {item}
@@ -128,9 +202,24 @@ const Footer: React.FC = () => {
         </Grid>
 
         {/* Copyright */}
-        <Box sx={{ borderTop: '1px solid rgba(30, 27, 75, 0.2)', pt: 3, mt: 3, textAlign: 'center' }}> {/* Updated border color */}
-          <Typography variant="body2" sx={{ color: '#1E1B4B', opacity: 0.8 }}> {/* Updated text color */}
-            {new Date().getFullYear()} ©Ceylon. All Rights Reserved
+        <Box 
+          sx={{ 
+            borderTop: `1px solid ${borderColor}`, 
+            pt: 3, 
+            mt: 3, 
+            textAlign: 'center',
+            transition: 'border-color 0.3s ease'
+          }}
+        >
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: textColor, 
+              opacity: 0.8,
+              transition: 'color 0.3s ease, opacity 0.3s ease'
+            }}
+          >
+            {new Date().getFullYear()} ©Jamil Ur Rahman. All Rights Reserved
           </Typography>
         </Box>
       </Container>

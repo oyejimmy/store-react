@@ -23,7 +23,6 @@ import {
   ShoppingCart,
   Favorite,
   Share,
-  Star,
   Add,
   Remove
 } from "@mui/icons-material";
@@ -38,7 +37,6 @@ const ProductDetailPage: React.FC = () => {
   const { currentProduct, loading } = useSelector(
     (state: RootState) => state.products
   );
-  const { items } = useSelector((state: RootState) => state.cart);
   const { items: wishlistItems } = useSelector((state: RootState) => state.wishlist);
 
   const [quantity, setQuantity] = useState(1);

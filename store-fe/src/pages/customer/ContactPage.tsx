@@ -7,8 +7,6 @@ import {
   CardContent,
   TextField,
   Button,
-  Paper,
-  Alert
 } from '@mui/material';
 import {
   Email,
@@ -56,7 +54,6 @@ const ContactPage: React.FC = () => {
     
     try {
       // Here you would typically send the form data to your backend
-      console.log('Contact form submitted:', formData);
       alert("Thank you for your message! We'll get back to you soon.");
       setFormData({
         firstName: '',
@@ -185,7 +182,7 @@ const ContactPage: React.FC = () => {
                 Get in Touch
               </Typography>
               <Typography variant="body1" paragraph>
-                We'd love to hear from you! Send us a message and we'll respond as soon as possible.
+                We&apos;d love to hear from you! Send us a message and we&apos;ll respond as soon as possible.
               </Typography>
               
               <Box sx={{ mb: 3 }}>

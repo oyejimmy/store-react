@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ThemeProvider, CssBaseline, Box } from "@mui/material";
@@ -76,7 +76,7 @@ function App() {
       <Routes>
         {/* Admin Login Route */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        
+
         {/* Admin Routes */}
         <Route
           path="/admin"
@@ -113,7 +113,11 @@ function App() {
                 backgroundColor: "#ffffff",
               }}
             >
-              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
+              <Header
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                showBanner={false}
+              />
               <Box
                 component="main"
                 sx={{
@@ -138,7 +142,11 @@ function App() {
                 backgroundColor: "#ffffff",
               }}
             >
-              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
+              <Header
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                showBanner={false}
+              />
               <Box
                 component="main"
                 sx={{
@@ -160,19 +168,19 @@ function App() {
                 minHeight: "100vh",
                 display: "flex",
                 flexDirection: "column",
-                overflow: "hidden",
                 backgroundColor: "#ffffff",
               }}
             >
-              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
+              <Header
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                showBanner={false}
+              />
               <Box
                 component="main"
                 sx={{
                   flex: 1,
                   pt: "70px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
                   backgroundColor: "#ffffff",
                 }}
               >
@@ -193,8 +201,15 @@ function App() {
                 backgroundColor: "#ffffff",
               }}
             >
-              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
-              <Box component="main" sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}>
+              <Header
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                showBanner={false}
+              />
+              <Box
+                component="main"
+                sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}
+              >
                 <TermsPage />
               </Box>
             </Box>
@@ -212,8 +227,15 @@ function App() {
                 backgroundColor: "#ffffff",
               }}
             >
-              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} showBanner={false} />
-              <Box component="main" sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}>
+              <Header
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                showBanner={false}
+              />
+              <Box
+                component="main"
+                sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}
+              >
                 <PrivacyPage />
               </Box>
             </Box>
@@ -233,11 +255,24 @@ function App() {
               }}
             >
               <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
-              <Box component="main" sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}>
+              <Box
+                component="main"
+                sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}
+              >
                 <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<HomePage />} />
-                  <Route path="/categories" element={<CategoriesPage />} />
+                  <Route
+                    path="/categories"
+                    element={
+                      <CategoriesPage
+                        isDarkMode={false}
+                        toggleTheme={function (): void {
+                          throw new Error("Function not implemented.");
+                        }}
+                      />
+                    }
+                  />
                   <Route path="/shop" element={<ShopPage />} />
                   <Route path="/shop/:category" element={<ShopPage />} />
                   <Route path="/product/:id" element={<ProductDetailPage />} />

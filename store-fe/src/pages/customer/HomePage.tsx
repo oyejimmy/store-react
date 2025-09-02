@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   Box,
   Grid,
@@ -11,8 +11,6 @@ import {
   Chip,
   Container,
   useTheme,
-  CircularProgress,
-  Alert,
   IconButton,
   Rating,
   Skeleton,
@@ -20,33 +18,16 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
+// import { AppDispatch, RootState } from "../../store";
 import { fetchProducts } from "../../store/slices/productSlice";
 import { fetchOffersByType } from "../../store/slices/offerSlice";
-import {
-  ShoppingCart,
-  Favorite,
-  FavoriteBorder,
-  Visibility,
-  Refresh,
-} from "@mui/icons-material";
-
-// Color constants
-const COLORS = {
-  offWhite: "#F8FAFC",
-  deepNavy: "#1E1B4B",
-  silver: "#94A3B8",
-  accent: "#FF6B6B",
-  success: "#4CAF50",
-  warning: "#FF9800",
-};
+import { ShoppingCart, FavoriteBorder, Visibility } from "@mui/icons-material";
+import { COLORS } from "../../utils/contstant";
 
 const HomePage = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { products, loading } = useSelector((state: any) => state.products);
-
-  console.log(products, loading);
 
   // Define color variables based on the current theme mode
   const primaryColor =
@@ -68,9 +49,9 @@ const HomePage = () => {
     dispatch(fetchOffersByType("deal_of_month"));
   }, [dispatch]);
 
-  const retryFetch = () => {
-    dispatch(fetchProducts({ limit: 8 }));
-  };
+  // const retryFetch = () => {
+  //   dispatch(fetchProducts({ limit: 8 }));
+  // };
 
   const bannerSlides = [
     {

@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store';
-import { fetchOffersByType } from '../../store/slices/offerSlice';
-import { Card, Row, Col, Typography, Tag, Button, Empty, Spin } from 'antd';
-import { ShoppingCartOutlined, FireOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
+import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import { fetchOffersByType } from "../../store/slices/offerSlice";
+import { Card, Row, Col, Typography, Tag, Button, Empty, Spin } from "antd";
+import { ShoppingCartOutlined, FireOutlined } from "@ant-design/icons";
+import styled from "styled-components";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -18,7 +18,7 @@ const OffersContainer = styled.div`
 const OfferCard = styled(Card)`
   margin-bottom: 16px;
   transition: transform 0.2s;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -64,34 +64,34 @@ const OffersPage: React.FC = () => {
 
   const getOfferTitle = (type: string) => {
     switch (type) {
-      case 'under-299':
-        return 'Under ₹299';
-      case 'special-deals':
-        return 'Special Deals';
-      case 'deal-of-month':
-        return 'Deal of the Month';
+      case "under-299":
+        return "Under ₹299";
+      case "special-deals":
+        return "Special Deals";
+      case "deal-of-month":
+        return "Deal of the Month";
       default:
-        return 'Special Offers';
+        return "Special Offers";
     }
   };
 
   const getOfferDescription = (type: string) => {
     switch (type) {
-      case 'under-299':
-        return 'Amazing jewelry pieces under ₹299. Perfect for gifting or treating yourself!';
-      case 'special-deals':
-        return 'Limited time offers on our premium jewelry collection. Don\'t miss out!';
-      case 'deal-of-month':
-        return 'This month\'s featured deals on our most popular jewelry items.';
+      case "under-299":
+        return "Amazing jewelry pieces under ₹299. Perfect for gifting or treating yourself!";
+      case "special-deals":
+        return "Limited time offers on our premium jewelry collection. Don't miss out!";
+      case "deal-of-month":
+        return "This month's featured deals on our most popular jewelry items.";
       default:
-        return 'Discover amazing offers on our jewelry collection.';
+        return "Discover amazing offers on our jewelry collection.";
     }
   };
 
   if (loading) {
     return (
       <OffersContainer>
-        <div style={{ textAlign: 'center', padding: '50px' }}>
+        <div style={{ textAlign: "center", padding: "50px" }}>
           <Spin size="large" />
         </div>
       </OffersContainer>
@@ -100,20 +100,20 @@ const OffersPage: React.FC = () => {
 
   return (
     <OffersContainer>
-      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+      <div style={{ textAlign: "center", marginBottom: "32px" }}>
         <Title level={1}>
-          <FireOutlined style={{ color: '#ff4d4f', marginRight: '8px' }} />
-          {getOfferTitle(type || '')}
+          <FireOutlined style={{ color: "#ff4d4f", marginRight: "8px" }} />
+          {getOfferTitle(type || "")}
         </Title>
-        <Paragraph style={{ fontSize: '16px', color: '#666' }}>
-          {getOfferDescription(type || '')}
+        <Paragraph style={{ fontSize: "16px", color: "#666" }}>
+          {getOfferDescription(type || "")}
         </Paragraph>
       </div>
 
       {offers.length === 0 ? (
-        <Empty 
+        <Empty
           description="No offers available at the moment"
-          style={{ marginTop: '50px' }}
+          style={{ marginTop: "50px" }}
         />
       ) : (
         <Row gutter={[16, 16]}>
@@ -123,10 +123,17 @@ const OffersPage: React.FC = () => {
                 hoverable
                 cover={<ProductImage src={offer.image_url} alt={offer.title} />}
                 actions={[
-                  <Button type="primary" size="small" icon={<ShoppingCartOutlined />}>
+                  <Button
+                    key="add-to-cart"
+                    type="primary"
+                    size="small"
+                    icon={<ShoppingCartOutlined />}
+                  >
                     Add to Cart
                   </Button>,
-                  <Button size="small">View Details</Button>
+                  <Button key="view-details" size="small">
+                    View Details
+                  </Button>,
                 ]}
               >
                 <Card.Meta
@@ -140,7 +147,7 @@ const OffersPage: React.FC = () => {
                   }
                   description={
                     <div>
-                      <Paragraph style={{ marginBottom: '8px' }}>
+                      <Paragraph style={{ marginBottom: "8px" }}>
                         {offer.description}
                       </Paragraph>
                       <Price>
@@ -150,9 +157,10 @@ const OffersPage: React.FC = () => {
                         ₹{offer.price}
                       </Price>
                       {offer.valid_until && (
-                        <div style={{ marginTop: '8px' }}>
+                        <div style={{ marginTop: "8px" }}>
                           <Text type="secondary">
-                            Valid until: {new Date(offer.valid_until).toLocaleDateString()}
+                            Valid until:{" "}
+                            {new Date(offer.valid_until).toLocaleDateString()}
                           </Text>
                         </div>
                       )}

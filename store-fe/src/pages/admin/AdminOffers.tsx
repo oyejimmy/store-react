@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import {
   Box,
-  Card,
-  CardContent,
-  CardHeader,
   Button,
   Table,
   TableBody,
@@ -33,13 +30,7 @@ import {
   Stack,
   InputAdornment,
 } from "@mui/material";
-import {
-  Add,
-  Edit,
-  Delete,
-  Refresh,
-  Image as ImageIcon,
-} from "@mui/icons-material";
+import { Add, Edit, Delete } from "@mui/icons-material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -256,7 +247,7 @@ const AdminOffers: React.FC = () => {
             onClick={handleAdd}
             size={isMobile ? "small" : "medium"}
             sx={{
-             borderColor: "#2c6e49",
+              borderColor: "#2c6e49",
               color: "#2c6e49",
               backgroundColor: "rgb(224, 220, 220)",
               "&:hover": {

@@ -38,19 +38,14 @@ import {
   Edit,
   Delete,
   Refresh,
-  Upload,
   ShoppingBag,
   Search,
-  FilterList,
-  Inventory,
   TrendingUp,
   Warning,
   AttachMoney,
-  Visibility,
   PhotoCamera,
   CloudUpload as CloudUploadIcon,
   Close as CloseIcon,
-  Image as ImageIcon,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { adminAPI } from "../../services/api";

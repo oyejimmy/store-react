@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Card,
-  CardContent,
   Button,
   Table,
   TableBody,
@@ -38,7 +36,6 @@ import {
   Delete,
   Refresh,
   Upload,
-  Collections,
   Visibility,
   Image as ImageIcon,
   Category,

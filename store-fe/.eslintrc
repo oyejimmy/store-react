@@ -11,6 +11,8 @@
     }
   },
   "plugins": ["@typescript-eslint", "react"],
+  // To disable all rules from the extended presets, you can comment out this section.
+  // This will turn off all recommended rules from ESLint, React, and TypeScript.
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -19,11 +21,15 @@
     "plugin:react/jsx-runtime"
   ],
   "rules": {
-    "no-unused-vars": "warn",
+    // You can also disable specific rules individually.
+    // The value can be "off", "warn", or "error".
+    "no-unused-vars": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-expressions": "off",
     "react/prop-types": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    // Example: Turn off a rule that flags console.log() statements
+    "no-console": "off"
   },
   "settings": {
     "react": {

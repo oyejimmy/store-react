@@ -1,8 +1,12 @@
-import React from 'react';
-import { Card, Typography, Button, Row, Col, Divider, Steps } from 'antd';
-import { CheckCircleOutlined, ShoppingOutlined, HomeOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import React from "react";
+import { Card, Typography, Button, Row, Col, Divider, Steps } from "antd";
+import {
+  CheckCircleOutlined,
+  ShoppingOutlined,
+  HomeOutlined,
+} from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 const { Title, Text, Paragraph } = Typography;
 const { Step } = Steps;
@@ -23,41 +27,43 @@ const OrderConfirmationPage: React.FC = () => {
   const navigate = useNavigate();
 
   // In a real app, you would get this from the order state or URL params
-  const orderNumber = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+  const orderNumber =
+    "ORD-" + Math.random().toString(36).substr(2, 9).toUpperCase();
 
   return (
     <ConfirmationContainer>
       <SuccessCard>
-        <div style={{ marginBottom: '32px' }}>
-          <CheckCircleOutlined 
-            style={{ 
-              fontSize: '64px', 
-              color: '#52c41a', 
-              marginBottom: '16px' 
-            }} 
+        <div style={{ marginBottom: "32px" }}>
+          <CheckCircleOutlined
+            style={{
+              fontSize: "64px",
+              color: "#52c41a",
+              marginBottom: "16px",
+            }}
           />
-          <Title level={2} style={{ color: '#52c41a', marginBottom: '8px' }}>
+          <Title level={2} style={{ color: "#52c41a", marginBottom: "8px" }}>
             Order Confirmed!
           </Title>
-          <Text type="secondary" style={{ fontSize: '16px' }}>
-            Thank you for your purchase. Your order has been successfully placed.
+          <Text type="secondary" style={{ fontSize: "16px" }}>
+            Thank you for your purchase. Your order has been successfully
+            placed.
           </Text>
         </div>
 
-        <div style={{ marginBottom: '32px' }}>
+        <div style={{ marginBottom: "32px" }}>
           <Title level={4}>Order Details</Title>
           <Row gutter={[16, 16]} justify="center">
             <Col xs={24} sm={12}>
-              <div style={{ textAlign: 'left' }}>
+              <div style={{ textAlign: "left" }}>
                 <Text strong>Order Number:</Text>
                 <br />
-                <Text style={{ fontSize: '18px', color: '#d4af37' }}>
+                <Text style={{ fontSize: "18px", color: "#d4af37" }}>
                   {orderNumber}
                 </Text>
               </div>
             </Col>
             <Col xs={24} sm={12}>
-              <div style={{ textAlign: 'left' }}>
+              <div style={{ textAlign: "left" }}>
                 <Text strong>Order Date:</Text>
                 <br />
                 <Text>{new Date().toLocaleDateString()}</Text>
@@ -68,28 +74,28 @@ const OrderConfirmationPage: React.FC = () => {
 
         <Divider />
 
-        <div style={{ marginBottom: '32px' }}>
-          <Title level={4}>What's Next?</Title>
-          <Steps 
-            direction="vertical" 
+        <div style={{ marginBottom: "32px" }}>
+          <Title level={4}>What&apos;s Next?</Title>
+          <Steps
+            direction="vertical"
             size="small"
-            style={{ maxWidth: '400px', margin: '0 auto' }}
+            style={{ maxWidth: "400px", margin: "0 auto" }}
           >
-            <Step 
-              title="Order Confirmed" 
+            <Step
+              title="Order Confirmed"
               description="Your order has been received and confirmed"
-              icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+              icon={<CheckCircleOutlined style={{ color: "#52c41a" }} />}
             />
-            <Step 
-              title="Processing" 
+            <Step
+              title="Processing"
               description="We're preparing your order for shipment"
             />
-            <Step 
-              title="Shipped" 
+            <Step
+              title="Shipped"
               description="Your order is on its way to you"
             />
-            <Step 
-              title="Delivered" 
+            <Step
+              title="Delivered"
               description="Your order has been delivered"
             />
           </Steps>
@@ -97,31 +103,44 @@ const OrderConfirmationPage: React.FC = () => {
 
         <Divider />
 
-        <div style={{ marginBottom: '24px' }}>
+        <div style={{ marginBottom: "24px" }}>
           <Title level={4}>Important Information</Title>
-          <Paragraph style={{ textAlign: 'left', maxWidth: '600px', margin: '0 auto' }}>
-            <ul style={{ lineHeight: '1.8' }}>
-              <li>You will receive an email confirmation with your order details</li>
-              <li>We'll send you tracking information once your order ships</li>
+          <Paragraph
+            style={{ textAlign: "left", maxWidth: "600px", margin: "0 auto" }}
+          >
+            <ul style={{ lineHeight: "1.8" }}>
+              <li>
+                You will receive an email confirmation with your order details
+              </li>
+              <li>
+                We&apos;ll send you tracking information once your order ships
+              </li>
               <li>Estimated delivery time: 3-5 business days</li>
               <li>For any questions, please contact our customer support</li>
             </ul>
           </Paragraph>
         </div>
 
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Button 
-            type="primary" 
+        <div
+          style={{
+            display: "flex",
+            gap: "16px",
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <Button
+            type="primary"
             size="large"
             icon={<HomeOutlined />}
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
           >
             Continue Shopping
           </Button>
-          <Button 
+          <Button
             size="large"
             icon={<ShoppingOutlined />}
-            onClick={() => navigate('/my-orders')}
+            onClick={() => navigate("/my-orders")}
           >
             View My Orders
           </Button>

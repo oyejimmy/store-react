@@ -34,7 +34,7 @@ import {
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";
 import { logout } from "../../store/slices/authSlice";
@@ -50,15 +50,13 @@ const Header: React.FC<HeaderProps> = ({
   toggleTheme,
   showBanner = true,
 }) => {
+  const theme = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector(
     (state: RootState) => state.auth
   );
   const { itemCount } = useSelector((state: RootState) => state.cart);
-  const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
-  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [bannerVisible, setBannerVisible] = useState(true);
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(
@@ -127,7 +125,9 @@ const Header: React.FC<HeaderProps> = ({
       open={mobileDrawerOpen}
       onClose={() => setMobileDrawerOpen(false)}
     >
-      <Box sx={{ width: 280, pt: 2, bgcolor: colors.background, height: "100%" }}>
+      <Box
+        sx={{ width: 280, pt: 2, bgcolor: colors.background, height: "100%" }}
+      >
         <List>
           <ListItem
             button
@@ -175,7 +175,10 @@ const Header: React.FC<HeaderProps> = ({
                   sx={{ pl: 4 }}
                   onClick={() => setMobileDrawerOpen(false)}
                 >
-                  <ListItemText primary={category.name} sx={{ color: colors.text }} />
+                  <ListItemText
+                    primary={category.name}
+                    sx={{ color: colors.text }}
+                  />
                 </ListItem>
               ))}
             </List>
@@ -185,7 +188,10 @@ const Header: React.FC<HeaderProps> = ({
             <ListItemIcon>
               <CardGiftcard sx={{ color: colors.text }} />
             </ListItemIcon>
-            <ListItemText primary="Special Offers" sx={{ color: colors.text }} />
+            <ListItemText
+              primary="Special Offers"
+              sx={{ color: colors.text }}
+            />
             {offersMenuOpen ? (
               <ExpandLess sx={{ color: colors.text }} />
             ) : (
@@ -203,7 +209,10 @@ const Header: React.FC<HeaderProps> = ({
                   sx={{ pl: 4 }}
                   onClick={() => setMobileDrawerOpen(false)}
                 >
-                  <ListItemText primary={offer.name} sx={{ color: colors.text }} />
+                  <ListItemText
+                    primary={offer.name}
+                    sx={{ color: colors.text }}
+                  />
                 </ListItem>
               ))}
             </List>
@@ -215,7 +224,10 @@ const Header: React.FC<HeaderProps> = ({
             to="/shop/hair-accessories"
             onClick={() => setMobileDrawerOpen(false)}
           >
-            <ListItemText primary="Hair Accessories" sx={{ color: colors.text }} />
+            <ListItemText
+              primary="Hair Accessories"
+              sx={{ color: colors.text }}
+            />
           </ListItem>
 
           <ListItem
@@ -311,7 +323,7 @@ const Header: React.FC<HeaderProps> = ({
             sx={{
               fontWeight: 800,
               textDecoration: "none",
-              background: isDarkMode 
+              background: isDarkMode
                 ? `linear-gradient(135deg, #F8FAFC, #E2E8F0)`
                 : `linear-gradient(135deg, #1E1B4B, #2d2a6b)`,
               WebkitBackgroundClip: "text",
@@ -389,19 +401,23 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Right Section */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <IconButton 
-              onClick={toggleTheme} 
-              sx={{ 
+            <IconButton
+              onClick={toggleTheme}
+              sx={{
                 color: colors.text,
                 bgcolor: colors.accent,
-                '&:hover': {
-                  bgcolor: isDarkMode ? '#E2E8F0' : '#2d2a6b',
-                }
+                "&:hover": {
+                  bgcolor: isDarkMode ? "#E2E8F0" : "#2d2a6b",
+                },
               }}
             >
-              {isDarkMode ? <LightMode sx={{ color: colors.buttonText }} /> : <DarkMode sx={{ color: colors.buttonText }} />}
+              {isDarkMode ? (
+                <LightMode sx={{ color: colors.buttonText }} />
+              ) : (
+                <DarkMode sx={{ color: colors.buttonText }} />
+              )}
             </IconButton>
-            
+
             <IconButton component={Link} to="/cart" sx={{ color: colors.text }}>
               <Badge
                 badgeContent={itemCount}
@@ -422,12 +438,14 @@ const Header: React.FC<HeaderProps> = ({
                   onClick={(e) => setUserMenuAnchor(e.currentTarget)}
                   sx={{ color: colors.text }}
                 >
-                  <Avatar sx={{ 
-                    width: 32, 
-                    height: 32, 
-                    bgcolor: colors.accent,
-                    color: colors.buttonText
-                  }}>
+                  <Avatar
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      bgcolor: colors.accent,
+                      color: colors.buttonText,
+                    }}
+                  >
                     <Person />
                   </Avatar>
                 </IconButton>
@@ -448,7 +466,8 @@ const Header: React.FC<HeaderProps> = ({
                       setUserMenuAnchor(null);
                     }}
                   >
-                    <Person sx={{ mr: 1, color: colors.text }} /> Profile Settings
+                    <Person sx={{ mr: 1, color: colors.text }} /> Profile
+                    Settings
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
@@ -494,7 +513,7 @@ const Header: React.FC<HeaderProps> = ({
                     bgcolor: colors.accent,
                     color: colors.buttonText,
                     "&:hover": {
-                      bgcolor: isDarkMode ? '#E2E8F0' : '#2d2a6b',
+                      bgcolor: isDarkMode ? "#E2E8F0" : "#2d2a6b",
                     },
                   }}
                 >

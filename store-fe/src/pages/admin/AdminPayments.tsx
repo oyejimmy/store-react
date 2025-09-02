@@ -3,7 +3,6 @@ import {
   Box,
   Card,
   CardContent,
-  CardHeader,
   Button,
   Table,
   TableBody,
@@ -17,7 +16,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   FormControl,
   InputLabel,
   Select,
@@ -31,14 +29,10 @@ import {
   useMediaQuery,
   useTheme,
   Stack,
-  Alert,
-  Divider,
 } from "@mui/material";
 import {
-  Add,
   Edit,
   Delete,
-  Refresh,
   Visibility,
   ContentCopy,
   AttachMoney,
@@ -85,8 +79,6 @@ const tableHeadingColor = {
 const AdminPayments: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-
   const [payments, setPayments] = useState<Payment[]>([]);
   const [analytics, setAnalytics] = useState<PaymentAnalytics>({
     totalReceived: 0,

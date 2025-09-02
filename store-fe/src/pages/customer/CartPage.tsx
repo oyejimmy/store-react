@@ -1,9 +1,13 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { AppDispatch, RootState } from '../../store';
-import { removeFromCart, updateQuantity, clearCart } from '../../store/slices/cartSlice';
-import { 
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import {
+  removeFromCart,
+  updateQuantity,
+  clearCart,
+} from "../../store/slices/cartSlice";
+import {
   Box,
   Card,
   CardContent,
@@ -17,16 +21,16 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Paper
-} from '@mui/material';
-import { 
+  Paper,
+} from "@mui/material";
+import {
   Delete,
   ShoppingBag,
   ArrowBack,
   Add,
-  Remove
-} from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
+  Remove,
+} from "@mui/icons-material";
+import { useTheme } from "@mui/material/styles";
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -45,40 +49,49 @@ const CartPage: React.FC = () => {
 
   const handleRemoveItem = (productId: number) => {
     dispatch(removeFromCart(productId));
-    alert('Item removed from cart');
+    alert("Item removed from cart");
     setRemoveDialogOpen(false);
     setItemToRemove(null);
   };
 
   const handleClearCart = () => {
     dispatch(clearCart());
-    alert('Cart cleared');
+    alert("Cart cleared");
     setClearDialogOpen(false);
   };
 
   const handleCheckout = () => {
     if (items.length > 0) {
-      navigate('/checkout');
+      navigate("/checkout");
     } else {
-      alert('Your cart is empty');
+      alert("Your cart is empty");
     }
   };
 
-  const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const subtotal = items.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
   const shipping = subtotal > 0 ? 50 : 0;
   const total = subtotal + shipping;
 
   if (items.length === 0) {
     return (
-      <Box sx={{ textAlign: 'center', py: 8, px: 3 }}>
-        <ShoppingBag sx={{ fontSize: 80, color: theme.palette.primary.main, mb: 2 }} />
+      <Box sx={{ textAlign: "center", py: 8, px: 3 }}>
+        <ShoppingBag
+          sx={{ fontSize: 80, color: theme.palette.primary.main, mb: 2 }}
+        />
         <Typography variant="h4" gutterBottom>
           Your cart is empty
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Looks like you haven't added anything to your cart yet
+          Looks like you haven&apos;t added anything to your cart yet
         </Typography>
-        <Button variant="contained" size="large" onClick={() => navigate('/shop')}>
+        <Button
+          variant="contained"
+          size="large"
+          onClick={() => navigate("/shop")}
+        >
           Start Shopping
         </Button>
       </Box>
@@ -86,10 +99,10 @@ const CartPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+    <Box sx={{ p: 3, maxWidth: 1200, mx: "auto" }}>
       <Box sx={{ mb: 3 }}>
-        <Button 
-          startIcon={<ArrowBack />} 
+        <Button
+          startIcon={<ArrowBack />}
           onClick={() => navigate(-1)}
           sx={{ mb: 2 }}
         >
@@ -112,10 +125,10 @@ const CartPage: React.FC = () => {
                       src={item.image_url}
                       alt={item.name}
                       sx={{
-                        width: '100%',
+                        width: "100%",
                         height: 100,
-                        objectFit: 'cover',
-                        borderRadius: 1
+                        objectFit: "cover",
+                        borderRadius: 1,
                       }}
                     />
                   </Grid>
@@ -128,15 +141,20 @@ const CartPage: React.FC = () => {
                     </Typography>
                   </Grid>
                   <Grid item xs={6} sm={2}>
-                    <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+                    <Typography
+                      variant="h6"
+                      sx={{ color: theme.palette.primary.main }}
+                    >
                       ₹{item.price}
                     </Typography>
                   </Grid>
                   <Grid item xs={6} sm={2}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <IconButton
                         size="small"
-                        onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                        onClick={() =>
+                          handleQuantityChange(item.id, item.quantity - 1)
+                        }
                         disabled={item.quantity <= 1}
                       >
                         <Remove />
@@ -150,15 +168,17 @@ const CartPage: React.FC = () => {
                             handleQuantityChange(item.id, value);
                           }
                         }}
-                        inputProps={{ 
-                          style: { textAlign: 'center', width: '40px' },
+                        inputProps={{
+                          style: { textAlign: "center", width: "40px" },
                           min: 1,
-                          max: 99
+                          max: 99,
                         }}
                       />
                       <IconButton
                         size="small"
-                        onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                        onClick={() =>
+                          handleQuantityChange(item.id, item.quantity + 1)
+                        }
                         disabled={item.quantity >= 99}
                       >
                         <Add />
@@ -166,7 +186,10 @@ const CartPage: React.FC = () => {
                     </Box>
                   </Grid>
                   <Grid item xs={6} sm={1}>
-                    <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+                    <Typography
+                      variant="h6"
+                      sx={{ color: theme.palette.primary.main }}
+                    >
                       ₹{item.price * item.quantity}
                     </Typography>
                   </Grid>
@@ -186,9 +209,9 @@ const CartPage: React.FC = () => {
             </Card>
           ))}
 
-          <Box sx={{ textAlign: 'right', mt: 2 }}>
-            <Button 
-              color="error" 
+          <Box sx={{ textAlign: "right", mt: 2 }}>
+            <Button
+              color="error"
               variant="outlined"
               onClick={() => setClearDialogOpen(true)}
             >
@@ -198,32 +221,43 @@ const CartPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} lg={4}>
-          <Paper sx={{ p: 3, position: 'sticky', top: 24 }}>
+          <Paper sx={{ p: 3, position: "sticky", top: 24 }}>
             <Typography variant="h5" gutterBottom>
               Order Summary
             </Typography>
             <Divider sx={{ my: 2 }} />
-            
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+            >
               <Typography>Subtotal ({items.length} items):</Typography>
               <Typography>₹{subtotal}</Typography>
             </Box>
-            
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+            >
               <Typography>Shipping:</Typography>
-              <Typography>{shipping === 0 ? 'Free' : `₹${shipping}`}</Typography>
+              <Typography>
+                {shipping === 0 ? "Free" : `₹${shipping}`}
+              </Typography>
             </Box>
-            
+
             <Divider sx={{ my: 2 }} />
-            
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}
+            >
               <Typography variant="h6">Total:</Typography>
-              <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+              <Typography
+                variant="h6"
+                sx={{ color: theme.palette.primary.main }}
+              >
                 ₹{total}
               </Typography>
             </Box>
-            
-            <Button 
+
+            <Button
               variant="contained"
               size="large"
               fullWidth
@@ -233,8 +267,12 @@ const CartPage: React.FC = () => {
             >
               Proceed to Checkout
             </Button>
-            
-            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ textAlign: "center" }}
+            >
               Secure checkout with SSL encryption
             </Typography>
           </Paper>
@@ -242,15 +280,20 @@ const CartPage: React.FC = () => {
       </Grid>
 
       {/* Remove Item Dialog */}
-      <Dialog open={removeDialogOpen} onClose={() => setRemoveDialogOpen(false)}>
+      <Dialog
+        open={removeDialogOpen}
+        onClose={() => setRemoveDialogOpen(false)}
+      >
         <DialogTitle>Remove Item</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to remove this item from your cart?</Typography>
+          <Typography>
+            Are you sure you want to remove this item from your cart?
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setRemoveDialogOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={() => itemToRemove && handleRemoveItem(itemToRemove)} 
+          <Button
+            onClick={() => itemToRemove && handleRemoveItem(itemToRemove)}
             color="error"
             variant="contained"
           >
@@ -263,7 +306,9 @@ const CartPage: React.FC = () => {
       <Dialog open={clearDialogOpen} onClose={() => setClearDialogOpen(false)}>
         <DialogTitle>Clear Cart</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to clear all items from your cart?</Typography>
+          <Typography>
+            Are you sure you want to clear all items from your cart?
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setClearDialogOpen(false)}>Cancel</Button>
