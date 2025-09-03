@@ -66,8 +66,10 @@ const Header: React.FC<HeaderProps> = ({
   const { isAuthenticated, user } = useSelector(
     (state: RootState) => state.auth
   );
+  console.log(isAuthenticated, user);
   const { itemCount } = useSelector((state: RootState) => state.cart);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [bannerVisible, setBannerVisible] = useState(true);
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(
     null
@@ -106,6 +108,12 @@ const Header: React.FC<HeaderProps> = ({
     { name: "Pendants", path: "/shop/pendants", icon: <Favorite /> },
     { name: "Rings", path: "/shop/rings", icon: <Diamond /> },
     { name: "Wall frames", path: "/shop/wall-frames", icon: <CropLandscape /> },
+    {
+      name: "Hair Accessories",
+      path: "/shop/hair-accessories",
+      icon: <Store />,
+    },
+    { name: "All Products", path: "/shop", icon: <Store /> },
   ];
 
   const offers = [
@@ -249,32 +257,6 @@ const Header: React.FC<HeaderProps> = ({
           <ListItem
             button
             component={RouterLink}
-            to="/shop/hair-accessories"
-            onClick={() => setMobileDrawerOpen(false)}
-          >
-            <ListItemIcon>
-              <Store sx={{ color: colors.text }} />
-            </ListItemIcon>
-            <ListItemText
-              primary="Hair Accessories"
-              sx={{ color: colors.text }}
-            />
-          </ListItem>
-          <ListItem
-            button
-            component={RouterLink}
-            to="/shop"
-            onClick={() => setMobileDrawerOpen(false)}
-          >
-            <ListItemIcon>
-              <Store sx={{ color: colors.text }} />
-            </ListItemIcon>
-            <ListItemText primary="All Products" sx={{ color: colors.text }} />
-          </ListItem>
-
-          <ListItem
-            button
-            component={RouterLink}
             to="/contact"
             onClick={() => setMobileDrawerOpen(false)}
           >
@@ -327,20 +309,20 @@ const Header: React.FC<HeaderProps> = ({
             zIndex: 1101,
             textAlign: "center",
             p: 1,
-            fontSize: "14px",
+            fontSize: isSmallMobile ? "12px" : "14px",
             fontWeight: 600,
             letterSpacing: "1px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "3.8px",
+            padding: isSmallMobile ? "5.8px" : "3.5px",
             gap: 1,
             transition: "top 0.3s ease",
             background: colors.bannerBg,
             color: colors.bannerText,
           }}
         >
-          <span style={{ fontSize: "16px" }}>🚚</span>
+          <span style={{ fontSize: isSmallMobile ? "14px" : "16px" }}>🚚</span>
           FREE SHIPPING ON ALL ORDERS ABOVE PKR 2999/-
         </Box>
       )}
@@ -357,7 +339,13 @@ const Header: React.FC<HeaderProps> = ({
           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, md: 4 } }}>
+        <Toolbar
+          sx={{
+            justifyContent: "space-between",
+            px: { xs: 1, sm: 2, md: 4 },
+            minHeight: { xs: "60px", md: "70px" },
+          }}
+        >
           {/* Logo */}
           <Typography
             variant="h4"
@@ -374,7 +362,7 @@ const Header: React.FC<HeaderProps> = ({
               backgroundClip: "text",
               letterSpacing: "-0.5px",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              fontSize: { xs: "1.5rem", md: "2rem" },
+              fontSize: { xs: "1.25rem", sm: "1.5rem", md: "2rem" },
               "&:hover": {
                 transform: "scale(1.05) translateY(-1px)",
               },
@@ -385,13 +373,20 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Desktop Navigation */}
           {!isMobile && (
-            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
               <Button
                 color="inherit"
                 component={RouterLink}
                 to="/"
-                startIcon={<Home sx={{ color: colors.text }} />}
-                sx={{ color: colors.text }}
+                startIcon={
+                  <Home sx={{ color: colors.text, fontSize: "20px" }} />
+                }
+                sx={{
+                  color: colors.text,
+                  fontSize: "0.875rem",
+                  minWidth: "auto",
+                  px: 1,
+                }}
               >
                 Home
               </Button>
@@ -399,9 +394,16 @@ const Header: React.FC<HeaderProps> = ({
               <Button
                 color="inherit"
                 onClick={(e) => setShopMenuAnchor(e.currentTarget)}
-                startIcon={<Store sx={{ color: colors.text }} />}
+                startIcon={
+                  <Store sx={{ color: colors.text, fontSize: "20px" }} />
+                }
                 endIcon={shopMenuAnchor ? <ExpandLess /> : <ExpandMore />}
-                sx={{ color: colors.text }}
+                sx={{
+                  color: colors.text,
+                  fontSize: "0.875rem",
+                  minWidth: "auto",
+                  px: 1,
+                }}
               >
                 Shop
               </Button>
@@ -413,6 +415,8 @@ const Header: React.FC<HeaderProps> = ({
                   sx: {
                     bgcolor: colors.background,
                     color: colors.text,
+                    maxHeight: 400,
+                    overflow: "auto",
                   },
                 }}
               >
@@ -437,11 +441,18 @@ const Header: React.FC<HeaderProps> = ({
               <Button
                 color="inherit"
                 onClick={(e) => setOffersMenuAnchor(e.currentTarget)}
-                startIcon={<CardGiftcard sx={{ color: colors.text }} />}
+                startIcon={
+                  <CardGiftcard sx={{ color: colors.text, fontSize: "20px" }} />
+                }
                 endIcon={offersMenuAnchor ? <ExpandLess /> : <ExpandMore />}
-                sx={{ color: colors.text }}
+                sx={{
+                  color: colors.text,
+                  fontSize: "0.875rem",
+                  minWidth: "auto",
+                  px: 1,
+                }}
               >
-                Special Offers
+                Offers
               </Button>
               <Menu
                 anchorEl={offersMenuAnchor}
@@ -471,31 +482,20 @@ const Header: React.FC<HeaderProps> = ({
                   </MenuItem>
                 ))}
               </Menu>
-              <Button
-                color="inherit"
-                component={RouterLink}
-                to="/shop/hair-accessories"
-                startIcon={<Store sx={{ color: colors.text }} />}
-                sx={{ color: colors.text }}
-              >
-                Hair Accessories
-              </Button>
-              <Button
-                color="inherit"
-                component={RouterLink}
-                to="/shop"
-                startIcon={<Store sx={{ color: colors.text }} />}
-                sx={{ color: colors.text }}
-              >
-                All Products
-              </Button>
 
               <Button
                 color="inherit"
                 component={RouterLink}
                 to="/contact"
-                startIcon={<Phone sx={{ color: colors.text }} />}
-                sx={{ color: colors.text }}
+                startIcon={
+                  <Phone sx={{ color: colors.text, fontSize: "20px" }} />
+                }
+                sx={{
+                  color: colors.text,
+                  fontSize: "0.875rem",
+                  minWidth: "auto",
+                  px: 1,
+                }}
               >
                 Contact
               </Button>
@@ -503,16 +503,29 @@ const Header: React.FC<HeaderProps> = ({
                 color="inherit"
                 component={RouterLink}
                 to="/about"
-                startIcon={<Info sx={{ color: colors.text }} />}
-                sx={{ color: colors.text }}
+                startIcon={
+                  <Info sx={{ color: colors.text, fontSize: "20px" }} />
+                }
+                sx={{
+                  color: colors.text,
+                  fontSize: "0.875rem",
+                  minWidth: "auto",
+                  px: 1,
+                }}
               >
-                About Us
+                About
               </Button>
             </Box>
           )}
 
           {/* Right Section */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: { xs: 0.5, sm: 1 },
+            }}
+          >
             <IconButton
               onClick={toggleTheme}
               sx={{
@@ -521,19 +534,35 @@ const Header: React.FC<HeaderProps> = ({
                 "&:hover": {
                   bgcolor: isDarkMode ? "#E2E8F0" : "#2d2a6b",
                 },
+                width: { xs: 32, sm: 40 },
+                height: { xs: 32, sm: 40 },
               }}
             >
               {isDarkMode ? (
-                <LightMode sx={{ color: colors.buttonText }} />
+                <LightMode
+                  sx={{
+                    color: colors.buttonText,
+                    fontSize: { xs: "18px", sm: "24px" },
+                  }}
+                />
               ) : (
-                <DarkMode sx={{ color: colors.buttonText }} />
+                <DarkMode
+                  sx={{
+                    color: colors.buttonText,
+                    fontSize: { xs: "18px", sm: "24px" },
+                  }}
+                />
               )}
             </IconButton>
 
             <IconButton
               component={RouterLink}
               to="/cart"
-              sx={{ color: colors.text }}
+              sx={{
+                color: colors.text,
+                width: { xs: 32, sm: 40 },
+                height: { xs: 32, sm: 40 },
+              }}
             >
               <Badge
                 badgeContent={itemCount}
@@ -541,10 +570,13 @@ const Header: React.FC<HeaderProps> = ({
                   "& .MuiBadge-badge": {
                     backgroundColor: colors.accent,
                     color: colors.buttonText,
+                    fontSize: { xs: "0.6rem", sm: "0.75rem" },
+                    height: { xs: 16, sm: 20 },
+                    minWidth: { xs: 16, sm: 20 },
                   },
                 }}
               >
-                <ShoppingCart />
+                <ShoppingCart sx={{ fontSize: { xs: "20px", sm: "24px" } }} />
               </Badge>
             </IconButton>
 
@@ -552,17 +584,26 @@ const Header: React.FC<HeaderProps> = ({
               <>
                 <IconButton
                   onClick={(e) => setUserMenuAnchor(e.currentTarget)}
-                  sx={{ color: colors.text }}
+                  sx={{
+                    color: colors.text,
+                    width: { xs: 32, sm: 40 },
+                    height: { xs: 32, sm: 40 },
+                  }}
                 >
                   <Avatar
                     sx={{
-                      width: 32,
-                      height: 32,
+                      width: { xs: 24, sm: 32 },
+                      height: { xs: 24, sm: 32 },
                       bgcolor: colors.accent,
                       color: colors.buttonText,
+                      fontSize: { xs: "0.75rem", sm: "1rem" },
                     }}
                   >
-                    <Person />
+                    {user?.name ? (
+                      user.name.charAt(0).toUpperCase()
+                    ) : (
+                      <Person />
+                    )}
                   </Avatar>
                 </IconButton>
                 <Menu
@@ -583,7 +624,6 @@ const Header: React.FC<HeaderProps> = ({
                     }}
                   >
                     <Person sx={{ mr: 1, color: colors.text }} /> Profile
-                    Settings
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
@@ -614,11 +654,16 @@ const Header: React.FC<HeaderProps> = ({
                 </Menu>
               </>
             ) : (
-              <Box sx={{ display: "flex", gap: 1 }}>
+              <Box sx={{ display: "flex", gap: 0.5 }}>
                 <Button
                   color="inherit"
                   onClick={() => navigate("/login")}
-                  sx={{ color: colors.text }}
+                  sx={{
+                    color: colors.text,
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    minWidth: "auto",
+                    px: { xs: 0.5, sm: 1 },
+                  }}
                 >
                   Login
                 </Button>
@@ -631,6 +676,9 @@ const Header: React.FC<HeaderProps> = ({
                     "&:hover": {
                       bgcolor: isDarkMode ? "#E2E8F0" : "#2d2a6b",
                     },
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    minWidth: "auto",
+                    px: { xs: 0.5, sm: 1 },
                   }}
                 >
                   Sign Up
@@ -640,10 +688,14 @@ const Header: React.FC<HeaderProps> = ({
 
             {isMobile && (
               <IconButton
-                sx={{ color: colors.text }}
+                sx={{
+                  color: colors.text,
+                  width: { xs: 32, sm: 40 },
+                  height: { xs: 32, sm: 40 },
+                }}
                 onClick={() => setMobileDrawerOpen(true)}
               >
-                <MenuIcon />
+                <MenuIcon sx={{ fontSize: { xs: "20px", sm: "24px" } }} />
               </IconButton>
             )}
           </Box>

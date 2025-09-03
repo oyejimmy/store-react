@@ -163,7 +163,7 @@ const AboutPage: React.FC = () => {
                 },
               }}
             >
-              About Saiyaara
+              About Gem Heart
             </Typography>
             <Typography
               variant="h6"

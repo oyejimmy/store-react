@@ -8,6 +8,7 @@ import {
   fetchProductsByCategory,
 } from "../../store/slices/productSlice";
 import { addToCart } from "../../store/slices/cartSlice";
+import { productAPI } from "../../services/api";
 import {
   Box,
   Card,
@@ -52,6 +53,7 @@ import {
   Inventory,
   PriceChange,
   CheckCircle,
+  Refresh,
 } from "@mui/icons-material";
 import { COLORS } from "../../utils/contstant";
 
@@ -63,10 +65,19 @@ const ShopPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const theme = useTheme();
+  const [headerVisible, setHeaderVisible] = useState(false);
 
-  const { products, loading, filters } = useSelector(
-    (state: RootState) => state.products
-  );
+  const { loading, products, filters } = useSelector((state: RootState) => ({
+    loading: state.products.loading,
+    filters: state.products.filters,
+    products: Array.isArray(state.products.products)
+      ? state.products.products
+      : [],
+  }));
+
+  // Track initial load
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [hasData, setHasData] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("featured");
@@ -78,15 +89,64 @@ const ShopPage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
+  // Set header visible immediately on mount
   useEffect(() => {
-    const categoryParam = searchParams.get("category") || category;
-    if (categoryParam) {
-      dispatch(fetchProductsByCategory({ category: categoryParam }));
-    } else {
-      dispatch(fetchProducts({}));
-    }
-  }, [dispatch, category, searchParams]);
+    setHeaderVisible(true);
+  }, []);
+
+  // Optimized product loading
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const loadProducts = async () => {
+      if (!isMounted) return;
+      
+      const categoryParam = searchParams.get("category") || category;
+      const shouldLoad = !hasData || categoryParam !== category;
+      
+      if (!shouldLoad) return;
+      
+      setApiError(null);
+      setIsInitialLoad(true);
+
+      try {
+        const action = categoryParam 
+          ? fetchProductsByCategory({ 
+              category: categoryParam, 
+              signal: controller.signal 
+            })
+          : fetchProducts({ signal: controller.signal });
+        
+        const result = await dispatch(action);
+        
+        if (isMounted && result.meta.requestStatus === "fulfilled") {
+          setHasData(true);
+        }
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.error("Error loading products:", error);
+          const errorMessage = error.response?.data?.message || error.message || "Failed to load products";
+          setApiError(errorMessage);
+          setSnackbarMessage(`Error: ${errorMessage}`);
+          setOpenSnackbar(true);
+        }
+      } finally {
+        if (isMounted) {
+          setIsInitialLoad(false);
+        }
+      }
+    };
+
+    loadProducts();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [category, searchParams.toString()]);
 
   const handleAddToCart = (product: any) => {
     dispatch(addToCart({ product, quantity: 1 }));
@@ -111,7 +171,35 @@ const ShopPage = () => {
   };
 
   const handleViewDetails = (productId: any) => {
-    navigate(`/product/${productId}`);
+    // Find the product to ensure we have the correct data structure
+    const product = products.find((p) => p.id === productId);
+    if (!product) {
+      navigate(`/product/${productId}`);
+      return;
+    }
+
+    // Create a deep clone of the product to avoid reference issues
+    const productClone = JSON.parse(JSON.stringify(product));
+
+    // Handle category which can be either string or Category object
+    if (productClone.category) {
+      productClone.category =
+        typeof productClone.category === "object"
+          ? productClone.category.name || "Uncategorized"
+          : productClone.category;
+    }
+
+    // Ensure other object properties are properly handled
+    if (productClone.images && !Array.isArray(productClone.images)) {
+      productClone.images = [];
+    }
+
+    // Navigate with the cleaned product data
+    navigate(`/product/${productId}`, {
+      state: {
+        product: productClone,
+      },
+    });
   };
 
   const handleOutOfStockClick = () => {
@@ -170,18 +258,106 @@ const ShopPage = () => {
     currentPage * pageSize
   );
 
-  if (loading) {
+  // Show loading state when loading data and no data is available yet
+  if ((isInitialLoad || loading) && !hasData) {
+    return (
+      <Box
+        sx={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          zIndex: 9999,
+          backdropFilter: "blur(4px)",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 3,
+            p: 4,
+            borderRadius: 4,
+            boxShadow: 3,
+            backgroundColor: theme.palette.background.paper,
+            maxWidth: "90%",
+            width: 400,
+            textAlign: "center",
+          }}
+        >
+          <CircularProgress
+            size={60}
+            thickness={4}
+            sx={{
+              color: theme.palette.primary.main,
+              "& .MuiCircularProgress-circle": {
+                strokeLinecap: "round",
+              },
+            }}
+          />
+          <Box>
+            <Typography
+              variant="h6"
+              color="text.primary"
+              sx={{
+                fontWeight: 600,
+                mb: 1,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Loading Products
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ maxWidth: 300, mx: "auto" }}
+            >
+              Please wait while we fetch the latest collection for you...
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (apiError) {
     return (
       <Box
         sx={{
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
           minHeight: "50vh",
           backgroundColor: theme.palette.background.default,
+          gap: 2,
+          p: 3,
+          textAlign: "center",
         }}
       >
-        <CircularProgress size={60} />
+        <Typography variant="h5" color="error">
+          Failed to load products
+        </Typography>
+        <Typography color="text.secondary" sx={{ mb: 2 }}>
+          {apiError}
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => window.location.reload()}
+          startIcon={<Refresh />}
+        >
+          Retry
+        </Button>
       </Box>
     );
   }
@@ -206,51 +382,51 @@ const ShopPage = () => {
     >
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header Section */}
-        <Fade in={true} timeout={800}>
-          <Box sx={{ textAlign: "center", mb: 6 }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                mb: 2,
-              }}
-            >
-              <Diamond
-                sx={{ fontSize: 48, color: theme.palette.primary.main, mr: 2 }}
-              />
-              <Typography
-                variant="h1"
-                sx={{
-                  fontWeight: 800,
-                  background:
-                    theme.palette.mode === "light"
-                      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #4C4A73 100%)`
-                      : `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, #CBD5E1 100%)`,
-                  backgroundClip: "text",
-                  textFillColor: "transparent",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  fontSize: { xs: "2.5rem", md: "4rem" },
-                }}
-              >
-                {pageTitle}
-              </Typography>
-            </Box>
+        <Box
+          sx={{
+            textAlign: "center",
+            mb: 6,
+            p: 3,
+            mx: "auto",
+            backgroundColor: theme.palette.background.default,
+            transition: "opacity 300ms ease, transform 300ms ease",
+            opacity: headerVisible ? 1 : 0,
+            transform: headerVisible ? "translateY(0)" : "translateY(20px)",
+          }}
+        >
+          <Box
+            sx={{
+              textAlign: "center",
+              mb: 6,
+            }}
+          >
             <Typography
-              variant="h6"
+              variant="h1"
               sx={{
-                color: theme.palette.text.secondary,
-                maxWidth: 600,
-                mx: "auto",
-                mb: 3,
+                textAlign: "center",
+                color: theme.palette.text.primary,
+                mb: 5,
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                textShadow: `2px 2px 4px ${accentColor}40`,
+                fontSize: { xs: "2rem", md: "3rem" },
+                letterSpacing: "2px",
+                position: "relative",
+                "&::after": {
+                  content: '""',
+                  display: "block",
+                  width: "100px",
+                  height: "2px",
+                  background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+                  margin: "10px auto 0",
+                  boxShadow: `0 2px 10px ${accentColor}40`,
+                },
               }}
             >
-              Discover our exquisite collection of premium jewelry pieces
+              {pageTitle}
             </Typography>
           </Box>
-        </Fade>
-
+        </Box>
         <Grid container spacing={4}>
           {/* Filters Sidebar */}
           <Grid
@@ -318,12 +494,17 @@ const ShopPage = () => {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <Search sx={{ color: theme.palette.text.secondary, fontSize: 20 }} />
+                          <Search
+                            sx={{
+                              color: theme.palette.text.secondary,
+                              fontSize: 20,
+                            }}
+                          />
                         </InputAdornment>
                       ),
                     }}
                     sx={{
-                      maxWidth: '280px',
+                      maxWidth: "280px",
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
                       },
@@ -333,41 +514,79 @@ const ShopPage = () => {
 
                 {/* Availability Filter - In one row */}
                 <Box sx={{ mb: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <Inventory sx={{ fontSize: 18, color: theme.palette.primary.main }} />
-                    <Typography variant="body1" sx={{ fontWeight: 600, color: theme.palette.text.primary, fontSize: '0.9rem' }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mb: 1,
+                    }}
+                  >
+                    <Inventory
+                      sx={{ fontSize: 18, color: theme.palette.primary.main }}
+                    />
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: 600,
+                        color: theme.palette.text.primary,
+                        fontSize: "0.9rem",
+                      }}
+                    >
                       Availability
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                  <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                     <FormControlLabel
                       control={
                         <Checkbox
                           checked={availabilityFilter.includes("in_stock")}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setAvailabilityFilter([...availabilityFilter, "in_stock"]);
+                              setAvailabilityFilter([
+                                ...availabilityFilter,
+                                "in_stock",
+                              ]);
                             } else {
-                              setAvailabilityFilter(availabilityFilter.filter(f => f !== "in_stock"));
+                              setAvailabilityFilter(
+                                availabilityFilter.filter(
+                                  (f) => f !== "in_stock"
+                                )
+                              );
                             }
                           }}
                           size="small"
                         />
                       }
                       label={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>In Stock</Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{ fontSize: "0.85rem" }}
+                          >
+                            In Stock
+                          </Typography>
                           <Chip
-                            label={products.filter(p => (p.stock_quantity || p.stock || 0) > 0).length}
+                            label={
+                              products.filter(
+                                (p) => (p.stock_quantity || p.stock || 0) > 0
+                              ).length
+                            }
                             size="small"
                             variant="outlined"
-                            sx={{ 
-                              minWidth: '28px', 
-                              height: '22px',
-                              '& .MuiChip-label': {
+                            sx={{
+                              minWidth: "28px",
+                              height: "22px",
+                              "& .MuiChip-label": {
                                 px: 0.5,
-                                fontSize: '0.75rem'
-                              }
+                                fontSize: "0.75rem",
+                              },
                             }}
                           />
                         </Box>
@@ -380,31 +599,53 @@ const ShopPage = () => {
                           checked={availabilityFilter.includes("out_of_stock")}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setAvailabilityFilter([...availabilityFilter, "out_of_stock"]);
+                              setAvailabilityFilter([
+                                ...availabilityFilter,
+                                "out_of_stock",
+                              ]);
                             } else {
-                              setAvailabilityFilter(availabilityFilter.filter(f => f !== "out_of_stock"));
+                              setAvailabilityFilter(
+                                availabilityFilter.filter(
+                                  (f) => f !== "out_of_stock"
+                                )
+                              );
                             }
                           }}
                           size="small"
                         />
                       }
                       label={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>Out of Stock</Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{ fontSize: "0.85rem" }}
+                          >
+                            Out of Stock
+                          </Typography>
                           <Chip
-                            label={products.filter(p => (p.stock_quantity || p.stock || 0) === 0).length}
+                            label={
+                              products.filter(
+                                (p) => (p.stock_quantity || p.stock || 0) === 0
+                              ).length
+                            }
                             size="small"
                             variant="outlined"
-                            sx={{ 
-                              minWidth: '28px',
-                              height: '22px',
+                            sx={{
+                              minWidth: "28px",
+                              height: "22px",
                               color: theme.palette.error.main,
                               borderColor: theme.palette.error.main,
-                              '& .MuiChip-label': {
+                              "& .MuiChip-label": {
                                 px: 0.5,
-                                fontSize: '0.75rem',
-                                color: theme.palette.error.main
-                              }
+                                fontSize: "0.75rem",
+                                color: theme.palette.error.main,
+                              },
                             }}
                           />
                         </Box>
@@ -635,14 +876,37 @@ const ShopPage = () => {
 
                     // Determine product type for category label
                     const getProductType = () => {
-                      const name = product.name.toLowerCase();
+                      // Ensure we're working with a string
+                      let category = product.category;
+
+                      // If category is an object with a name property, use that
+                      if (
+                        category &&
+                        typeof category === "object" &&
+                        category !== null
+                      ) {
+                        category = category.name || "";
+                      }
+
+                      // If we have a string category, use it
+                      if (
+                        typeof category === "string" &&
+                        category.trim() !== ""
+                      ) {
+                        return category;
+                      }
+
+                      // Otherwise, fall back to the name-based detection
+                      const name = (product.name || "").toLowerCase();
                       if (name.includes("ring")) return "Ring";
                       if (name.includes("hoop") || name.includes("earring"))
                         return "Earrings";
                       if (name.includes("necklace")) return "Necklace";
                       if (name.includes("bracelet")) return "Bracelet";
                       if (name.includes("pendant")) return "Pendant";
-                      return product.category || "Jewelry";
+
+                      // Default fallback
+                      return "Jewelry";
                     };
 
                     return (

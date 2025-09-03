@@ -129,10 +129,11 @@ const AdminInventory: React.FC = () => {
         purchased_from: item.purchased_from || item.supplier || "Unknown",
         total_available:
           item.stock_quantity || item.stock || item.total_qty || 0,
-        category:
-          typeof item.category === "object"
-            ? item.category?.name
-            : item.category || item.subcategory || "General",
+        category: item.category
+          ? typeof item.category === 'object'
+            ? item.category.name
+            : item.category
+          : item.subcategory || "General",
         status: getStockStatus(item.stock_quantity || item.stock || 0),
       }));
       setInventory(processedData);

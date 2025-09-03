@@ -7,7 +7,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database URL - use PostgreSQL in production, SQLite for development
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./saiyaara.db")
+import pathlib
+BASE_DIR = pathlib.Path(__file__).parent.parent
+# Convert to absolute path and normalize for Windows
+DB_PATH = (BASE_DIR / "saiyaara.db").resolve().as_posix()
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DB_PATH}")
+print(f"Using database at: {DB_PATH}")  # Debug print
 
 engine = create_engine(
     DATABASE_URL,

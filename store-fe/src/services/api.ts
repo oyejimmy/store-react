@@ -1,14 +1,21 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+  process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
+    "Expires": "0"
   },
+  withCredentials: true,
+  timeout: 15000, // Increased timeout to 15 seconds
+  validateStatus: (status) => status < 500, // Reject only if status is 500 or higher
 });
 
 // Request interceptor to add auth token
@@ -25,7 +32,54 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle auth errors
+// Response interceptor to handle errors and logging
+api.interceptors.response.use(
+  (response) => {
+    console.log(`[API] ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+      status: response.status,
+      data: response.data
+    });
+    return response;
+  },
+  (error) => {
+    if (error.response) {
+      // Server responded with a status code outside 2xx
+      console.error('[API Error] Response:', {
+        url: error.config.url,
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data,
+        headers: error.response.headers
+      });
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error('[API Error] No response received:', {
+        url: error.config.url,
+        message: error.message,
+        code: error.code
+      });
+    } else {
+      // Something happened in setting up the request
+      console.error('[API Error] Request setup error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Request interceptor for logging
+api.interceptors.request.use(
+  (config) => {
+    console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`, {
+      params: config.params,
+      data: config.data
+    });
+    return config;
+  },
+  (error) => {
+    console.error('[API] Request error:', error);
+    return Promise.reject(error);
+  }
+);
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -56,21 +110,20 @@ export const authAPI = {
 // Product API
 export const productAPI = {
   getProducts: (filters?: any) =>
-    api.get("/products", { params: filters }).then((res) => res.data),
-
+    api.get("/api/products/", { params: filters }).then((res) => res.data),
   getProductById: (id: number) =>
-    api.get(`/products/${id}`).then((res) => res.data),
-
-  getCategories: () => api.get("/products/categories").then((res) => res.data),
-
+    api.get(`/api/products/${id}/`).then((res) => res.data),
+  getCategories: () => api.get("/api/categories/").then((res) => res.data),
   getSubcategories: (category?: string) =>
     api
-      .get("/products/subcategories", { params: { category } })
+      .get("/api/products/subcategories/", { params: { category } })
       .then((res) => res.data),
-
-  getProductsByCategory: (category: string, subcategory?: string) =>
+  getProductsByCategory: (category: string, subcategory?: string, signal?: AbortSignal) =>
     api
-      .get(`/products/category/${category}`, { params: { subcategory } })
+      .get(`/api/products/category/${category}`, { 
+        params: { subcategory },
+        signal 
+      })
       .then((res) => res.data),
 };
 

@@ -40,13 +40,24 @@ const HomePage = () => {
     theme.palette.mode === "light" ? COLORS.deepNavy : COLORS.offWhite;
 
   useEffect(() => {
-    // Fetch featured products
-    dispatch(fetchProducts({ limit: 8 }));
+    // Fetch products using Redux thunk
+    const fetchInitialData = async () => {
+      try {
+        // Fetch products with a limit of 8 items
+        await dispatch(fetchProducts({ limit: 8 }));
+        
+        // Fetch special offers
+        await Promise.all([
+          dispatch(fetchOffersByType("under_299")),
+          dispatch(fetchOffersByType("special_deals")),
+          dispatch(fetchOffersByType("deal_of_month"))
+        ]);
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
+      }
+    };
 
-    // Fetch special offers
-    dispatch(fetchOffersByType("under_299"));
-    dispatch(fetchOffersByType("special_deals"));
-    dispatch(fetchOffersByType("deal_of_month"));
+    fetchInitialData();
   }, [dispatch]);
 
   // const retryFetch = () => {

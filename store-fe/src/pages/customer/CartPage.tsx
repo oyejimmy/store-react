@@ -29,6 +29,9 @@ import {
   Grow,
   Zoom,
   Container,
+  Badge,
+  Avatar,
+  Tooltip,
 } from "@mui/material";
 import {
   Delete,
@@ -40,7 +43,13 @@ import {
   Security,
   Diamond,
   ShoppingCartCheckout,
+  FavoriteBorder,
+  CompareArrows,
+  Visibility,
+  Inventory,
+  Discount,
 } from "@mui/icons-material";
+import { COLORS } from "../../utils/contstant";
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -54,6 +63,22 @@ const CartPage: React.FC = () => {
   const handleQuantityChange = (productId: number, quantity: number) => {
     if (quantity > 0 && quantity <= 99) {
       dispatch(updateQuantity({ itemId: productId, quantity }));
+    }
+  };
+
+  const handleIncrement = (productId: number, currentQuantity: number) => {
+    if (currentQuantity < 99) {
+      dispatch(
+        updateQuantity({ itemId: productId, quantity: currentQuantity + 1 })
+      );
+    }
+  };
+
+  const handleDecrement = (productId: number, currentQuantity: number) => {
+    if (currentQuantity > 1) {
+      dispatch(
+        updateQuantity({ itemId: productId, quantity: currentQuantity - 1 })
+      );
     }
   };
 
@@ -74,14 +99,33 @@ const CartPage: React.FC = () => {
     }
   };
 
+  const handleQuickView = (productId: number) => {
+    navigate(`/product/${productId}`);
+  };
+
   const formatCurrency = (amount: number) => {
     return `PKR ${amount.toLocaleString()}`;
   };
 
-  const subtotal = items.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
+  // Calculate subtotal, savings, and total
+  const { subtotal, totalSavings } = items.reduce(
+    (acc, item) => {
+      const itemTotal = item.offer_price 
+        ? item.offer_price * item.quantity 
+        : item.price * item.quantity;
+      const originalTotal = item.price * item.quantity;
+      const itemSavings = item.offer_price 
+        ? (item.price - item.offer_price) * item.quantity 
+        : 0;
+      
+      return {
+        subtotal: acc.subtotal + itemTotal,
+        totalSavings: acc.totalSavings + itemSavings
+      };
+    },
+    { subtotal: 0, totalSavings: 0 }
   );
+  
   const shipping = subtotal > 2999 ? 0 : 150;
   const total = subtotal + shipping;
 
@@ -99,23 +143,43 @@ const CartPage: React.FC = () => {
         <Container maxWidth="md">
           <Fade in={true} timeout={800}>
             <Box sx={{ textAlign: "center", py: 10, px: 3 }}>
-              <ShoppingBag
+              <Box
                 sx={{
-                  fontSize: 80,
-                  color: theme.palette.primary.main,
+                  position: "relative",
+                  display: "inline-block",
                   mb: 3,
-                  opacity: 0.8,
                 }}
-              />
+              >
+                <ShoppingBag
+                  sx={{
+                    fontSize: 80,
+                    color: COLORS.deepNavy,
+                    mb: 3,
+                  }}
+                />
+                <Badge
+                  badgeContent="0"
+                  color="error"
+                  sx={{
+                    position: "absolute",
+                    top: -10,
+                    right: -10,
+                    "& .MuiBadge-badge": {
+                      fontSize: "1rem",
+                      height: 30,
+                      minWidth: 30,
+                      borderRadius: "50%",
+                      backgroundColor: COLORS.accent,
+                    },
+                  }}
+                />
+              </Box>
               <Typography
                 variant="h3"
                 gutterBottom
                 sx={{
                   fontWeight: 700,
-                  background:
-                    theme.palette.mode === "light"
-                      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #4C4A73 100%)`
-                      : `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, #CBD5E1 100%)`,
+                  background: `linear-gradient(135deg, ${COLORS.deepNavy} 0%, ${COLORS.accent} 100%)`,
                   backgroundClip: "text",
                   textFillColor: "transparent",
                   WebkitBackgroundClip: "text",
@@ -143,10 +207,10 @@ const CartPage: React.FC = () => {
                   py: 1.5,
                   fontSize: "1.1rem",
                   borderRadius: 3,
-                  backgroundColor: theme.palette.primary.main,
+                  background: `linear-gradient(135deg, ${COLORS.deepNavy} 0%, ${COLORS.accent} 100%)`,
                   "&:hover": {
-                    backgroundColor: theme.palette.primary.dark,
                     transform: "translateY(-2px)",
+                    boxShadow: `0 8px 25px ${COLORS.accent}40`,
                   },
                   transition: "all 0.3s ease",
                 }}
@@ -189,36 +253,46 @@ const CartPage: React.FC = () => {
               Continue Shopping
             </Button>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-              <ShoppingBag
-                sx={{ fontSize: 40, color: theme.palette.primary.main }}
-              />
               <Typography
                 variant="h3"
                 sx={{
-                  fontWeight: 700,
-                  background:
-                    theme.palette.mode === "light"
-                      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #4C4A73 100%)`
-                      : `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, #CBD5E1 100%)`,
-                  backgroundClip: "text",
-                  textFillColor: "transparent",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
+                  textAlign: "center",
+                  color: theme.palette.text.primary,
+                  mb: 5,
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  textShadow: `2px 2px 4px ${COLORS.deepNavy}40`,
+                  fontSize: { xs: "2rem", md: "3rem" },
+                  letterSpacing: "2px",
+                  position: "relative",
+                  "&::after": {
+                    content: '""',
+                    display: "block",
+                    width: "100px",
+                    height: "2px",
+                    background: `linear-gradient(90deg, transparent, ${COLORS.deepNavy}, transparent)`,
+                    margin: "10px auto 0",
+                    boxShadow: `0 2px 10px ${COLORS.deepNavy}40`,
+                  },
                 }}
               >
                 Shopping Cart
               </Typography>
               <Chip
-                label={`${items.length} items`}
-                color="primary"
-                variant="filled"
-                sx={{ fontSize: "1rem", py: 1 }}
+                label={`${items.reduce((total, item) => total + item.quantity, 0)} items`}
+                sx={{
+                  fontSize: "1rem",
+                  py: 1,
+                  background: `linear-gradient(135deg, ${COLORS.deepNavy} 0%, ${COLORS.accent} 100%)`,
+                  color: "white",
+                  fontWeight: "bold",
+                }}
               />
             </Box>
           </Box>
         </Fade>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
           {/* Cart Items */}
           <Grid item xs={12} lg={8}>
             {items.map((item, index) => (
@@ -237,7 +311,7 @@ const CartPage: React.FC = () => {
                     transition: "all 0.3s ease",
                     "&:hover": {
                       boxShadow: theme.shadows[8],
-                      transform: "translateY(-2px)",
+                      transform: "translateY(-4px)",
                     },
                   }}
                 >
@@ -245,23 +319,62 @@ const CartPage: React.FC = () => {
                     <Grid container spacing={3} alignItems="center">
                       <Grid item xs={12} sm={3}>
                         <Box
-                          component="img"
-                          src={
-                            item.image_url ||
-                            "https://via.placeholder.com/150x150?text=Jewelry"
-                          }
-                          alt={item.name}
                           sx={{
-                            width: "100%",
-                            height: 120,
-                            objectFit: "cover",
+                            position: "relative",
                             borderRadius: 2,
-                            transition: "transform 0.3s ease",
-                            "&:hover": {
-                              transform: "scale(1.05)",
-                            },
+                            overflow: "hidden",
+                            cursor: "pointer",
                           }}
-                        />
+                          onClick={() => handleQuickView(item.id)}
+                        >
+                          <Box
+                            component="img"
+                            src={
+                              item.image_url ||
+                              "https://via.placeholder.com/150x150?text=Jewelry"
+                            }
+                            alt={item.name}
+                            sx={{
+                              width: "100%",
+                              height: 120,
+                              objectFit: "cover",
+                              transition: "transform 0.3s ease",
+                              "&:hover": {
+                                transform: "scale(1.1)",
+                              },
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              top: 8,
+                              left: 8,
+                              display: "flex",
+                              gap: 1,
+                            }}
+                          >
+                            {item.offer_price && (
+                              <Chip
+                                label={`${Math.round(
+                                  (1 - item.offer_price / item.price) * 100
+                                )}% OFF`}
+                                size="small"
+                                sx={{
+                                  backgroundColor: COLORS.accent,
+                                  color: "white",
+                                  fontWeight: "bold",
+                                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                                  animation: "pulse 2s infinite",
+                                  "@keyframes pulse": {
+                                    "0%": { transform: "scale(1)" },
+                                    "50%": { transform: "scale(1.05)" },
+                                    "100%": { transform: "scale(1)" },
+                                  },
+                                }}
+                              />
+                            )}
+                          </Box>
+                        </Box>
                       </Grid>
 
                       <Grid item xs={12} sm={5}>
@@ -271,7 +384,12 @@ const CartPage: React.FC = () => {
                           sx={{
                             fontWeight: 600,
                             color: theme.palette.text.primary,
+                            cursor: "pointer",
+                            "&:hover": {
+                              color: COLORS.deepNavy,
+                            },
                           }}
+                          onClick={() => handleQuickView(item.id)}
                         >
                           {item.name}
                         </Typography>
@@ -282,15 +400,62 @@ const CartPage: React.FC = () => {
                         >
                           Premium Quality Jewelry
                         </Typography>
-                        <Chip
-                          label={item.category || "Jewelry"}
-                          size="small"
-                          variant="outlined"
+                        <Box
                           sx={{
-                            borderColor: theme.palette.primary.main,
-                            color: theme.palette.primary.main,
+                            display: "flex",
+                            gap: 1,
+                            flexWrap: "wrap",
+                            mb: 1,
                           }}
-                        />
+                        >
+                          <Chip
+                            label={item.category || "Jewelry"}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              borderColor: COLORS.deepNavy,
+                              color: COLORS.deepNavy,
+                            }}
+                          />
+                          {item.stock && (
+                            <Chip
+                              icon={<Inventory sx={{ fontSize: 16 }} />}
+                              label="In Stock"
+                              size="small"
+                              variant="filled"
+                              color="success"
+                            />
+                          )}
+                        </Box>
+
+                        {/* Quick Actions */}
+                        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+                          <Tooltip title="Add to Wishlist">
+                            <IconButton
+                              size="small"
+                              sx={{ color: COLORS.accent }}
+                            >
+                              <FavoriteBorder fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Compare">
+                            <IconButton
+                              size="small"
+                              sx={{ color: COLORS.deepNavy }}
+                            >
+                              <CompareArrows fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Quick View">
+                            <IconButton
+                              size="small"
+                              sx={{ color: COLORS.silver }}
+                              onClick={() => handleQuickView(item.id)}
+                            >
+                              <Visibility fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       </Grid>
 
                       <Grid item xs={12} sm={4}>
@@ -308,27 +473,62 @@ const CartPage: React.FC = () => {
                               alignItems: "center",
                             }}
                           >
-                            <Typography
-                              variant="h6"
-                              sx={{
-                                color: theme.palette.primary.main,
-                                fontWeight: 600,
-                              }}
-                            >
-                              {formatCurrency(item.price)}
-                            </Typography>
+                            <Box>
+                              {item.offer_price ? (
+                                <>
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      color: COLORS.accent,
+                                      fontWeight: 700,
+                                    }}
+                                  >
+                                    {formatCurrency(item.offer_price)}
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      textDecoration: "line-through",
+                                      color: COLORS.silver,
+                                    }}
+                                  >
+                                    {formatCurrency(item.price)}
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: COLORS.success,
+                                      fontWeight: 600,
+                                      display: 'block',
+                                    }}
+                                  >
+                                    Save {formatCurrency(item.price - item.offer_price)}
+                                  </Typography>
+                                </>
+                              ) : (
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    color: COLORS.deepNavy,
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {formatCurrency(item.price)}
+                                </Typography>
+                              )}
+                            </Box>
 
                             <IconButton
-                              color="error"
+                              sx={{
+                                color: COLORS.accent,
+                                "&:hover": {
+                                  backgroundColor: COLORS.accent,
+                                  color: "white",
+                                },
+                              }}
                               onClick={() => {
                                 setItemToRemove(item.id);
                                 setRemoveDialogOpen(true);
-                              }}
-                              sx={{
-                                "&:hover": {
-                                  backgroundColor: theme.palette.error.main,
-                                  color: theme.palette.error.contrastText,
-                                },
                               }}
                             >
                               <Delete />
@@ -341,19 +541,22 @@ const CartPage: React.FC = () => {
                               alignItems: "center",
                               gap: 1,
                               justifyContent: "center",
+                              p: 1,
+                              backgroundColor: theme.palette.action.hover,
+                              borderRadius: 2,
                             }}
                           >
                             <IconButton
                               size="small"
                               onClick={() =>
-                                handleQuantityChange(item.id, item.quantity - 1)
+                                handleDecrement(item.id, item.quantity)
                               }
                               disabled={item.quantity <= 1}
                               sx={{
                                 border: `1px solid ${theme.palette.divider}`,
                                 "&:hover": {
-                                  backgroundColor: theme.palette.primary.main,
-                                  color: theme.palette.primary.contrastText,
+                                  backgroundColor: COLORS.deepNavy,
+                                  color: "white",
                                 },
                               }}
                             >
@@ -375,6 +578,7 @@ const CartPage: React.FC = () => {
                                   textAlign: "center",
                                   width: "50px",
                                   fontWeight: 600,
+                                  color: COLORS.deepNavy,
                                 },
                                 min: 1,
                                 max: 99,
@@ -382,6 +586,9 @@ const CartPage: React.FC = () => {
                               sx={{
                                 "& .MuiOutlinedInput-root": {
                                   borderRadius: 2,
+                                  "& fieldset": {
+                                    borderColor: theme.palette.divider,
+                                  },
                                 },
                               }}
                             />
@@ -389,14 +596,14 @@ const CartPage: React.FC = () => {
                             <IconButton
                               size="small"
                               onClick={() =>
-                                handleQuantityChange(item.id, item.quantity + 1)
+                                handleIncrement(item.id, item.quantity)
                               }
                               disabled={item.quantity >= 99}
                               sx={{
                                 border: `1px solid ${theme.palette.divider}`,
                                 "&:hover": {
-                                  backgroundColor: theme.palette.primary.main,
-                                  color: theme.palette.primary.contrastText,
+                                  backgroundColor: COLORS.deepNavy,
+                                  color: "white",
                                 },
                               }}
                             >
@@ -404,16 +611,38 @@ const CartPage: React.FC = () => {
                             </IconButton>
                           </Box>
 
-                          <Typography
-                            variant="subtitle1"
-                            sx={{
-                              textAlign: "center",
-                              fontWeight: 600,
-                              color: theme.palette.text.primary,
-                            }}
-                          >
-                            Total: {formatCurrency(item.price * item.quantity)}
-                          </Typography>
+                          <Box sx={{ textAlign: 'center' }}>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{
+                                fontWeight: 600,
+                                color: COLORS.deepNavy,
+                                p: 1,
+                                backgroundColor: theme.palette.action.selected,
+                                borderRadius: 2,
+                              }}
+                            >
+                              Total: {formatCurrency(
+                                item.offer_price 
+                                  ? item.offer_price * item.quantity 
+                                  : item.price * item.quantity
+                              )}
+                              {item.offer_price && (
+                                <Typography
+                                  component="span"
+                                  variant="caption"
+                                  sx={{
+                                    display: 'block',
+                                    color: COLORS.success,
+                                    fontWeight: 600,
+                                    mt: 0.5,
+                                  }}
+                                >
+                                  Save {formatCurrency((item.price - item.offer_price) * item.quantity)}
+                                </Typography>
+                              )}
+                            </Typography>
+                          </Box>
                         </Box>
                       </Grid>
                     </Grid>
@@ -433,9 +662,11 @@ const CartPage: React.FC = () => {
                     borderRadius: 3,
                     px: 3,
                     py: 1,
+                    borderColor: COLORS.accent,
+                    color: COLORS.accent,
                     "&:hover": {
-                      backgroundColor: theme.palette.error.main,
-                      color: theme.palette.error.contrastText,
+                      backgroundColor: COLORS.accent,
+                      color: "white",
                     },
                   }}
                 >
@@ -456,14 +687,25 @@ const CartPage: React.FC = () => {
                   borderRadius: 3,
                   backgroundColor: theme.palette.background.paper,
                   border: `1px solid ${theme.palette.divider}`,
-                  boxShadow: theme.shadows[4],
+                  boxShadow: `0 8px 32px ${COLORS.deepNavy}20`,
+                  background:
+                    theme.palette.mode === "light"
+                      ? `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${COLORS.offWhite} 100%)`
+                      : undefined,
                 }}
               >
                 <Typography
                   variant="h5"
                   gutterBottom
-                  sx={{ fontWeight: 700, color: theme.palette.text.primary }}
+                  sx={{
+                    fontWeight: 700,
+                    color: COLORS.deepNavy,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
                 >
+                  <ShoppingBag sx={{ color: COLORS.accent }} />
                   Order Summary
                 </Typography>
                 <Divider sx={{ my: 3 }} />
@@ -478,7 +720,11 @@ const CartPage: React.FC = () => {
                   <Typography variant="body1">
                     Subtotal ({items.length} items):
                   </Typography>
-                  <Typography variant="body1" fontWeight={600}>
+                  <Typography
+                    variant="body1"
+                    fontWeight={600}
+                    color={COLORS.deepNavy}
+                  >
                     {formatCurrency(subtotal)}
                   </Typography>
                 </Box>
@@ -492,14 +738,14 @@ const CartPage: React.FC = () => {
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <LocalShipping
-                      sx={{ fontSize: 20, color: theme.palette.text.secondary }}
+                      sx={{ fontSize: 20, color: COLORS.silver }}
                     />
                     <Typography variant="body1">Shipping:</Typography>
                   </Box>
                   <Typography
                     variant="body1"
                     fontWeight={600}
-                    color={shipping === 0 ? "success.main" : "text.primary"}
+                    color={shipping === 0 ? COLORS.success : COLORS.deepNavy}
                   >
                     {shipping === 0 ? "FREE" : formatCurrency(shipping)}
                   </Typography>
@@ -510,23 +756,60 @@ const CartPage: React.FC = () => {
                     sx={{
                       mb: 3,
                       p: 2,
-                      backgroundColor: theme.palette.success.light,
+                      backgroundColor: COLORS.success + "20",
                       borderRadius: 2,
+                      border: `1px solid ${COLORS.success}30`,
                     }}
                   >
                     <Typography
                       variant="body2"
                       sx={{
-                        color: theme.palette.success.dark,
+                        color: COLORS.success,
                         textAlign: "center",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 1,
                       }}
                     >
+                      <Discount sx={{ fontSize: 20 }} />
                       🎉 Free shipping on orders over PKR 2,999!
                     </Typography>
                   </Box>
                 )}
 
                 <Divider sx={{ my: 3 }} />
+
+                {/* Total Savings */}
+                {totalSavings > 0 && (
+                  <>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
+                      <Typography variant="body1">You Save:</Typography>
+                      <Typography variant="body1" sx={{ color: COLORS.success, fontWeight: 600 }}>
+                        -{formatCurrency(totalSavings)}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        mb: 2,
+                        p: 1.5,
+                        backgroundColor: COLORS.success + '15',
+                        borderRadius: 2,
+                        border: `1px solid ${COLORS.success}30`,
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ color: COLORS.success, textAlign: 'center' }}>
+                        🎉 You're saving {formatCurrency(totalSavings)} on this order!
+                      </Typography>
+                    </Box>
+                  </>
+                )}
 
                 <Box
                   sx={{
@@ -535,11 +818,13 @@ const CartPage: React.FC = () => {
                     mb: 4,
                   }}
                 >
-                  <Typography variant="h6">Total Amount:</Typography>
+                  <Typography variant="h6" color={COLORS.deepNavy}>
+                    Total Amount:
+                  </Typography>
                   <Typography
                     variant="h5"
                     sx={{
-                      color: theme.palette.primary.main,
+                      color: COLORS.accent,
                       fontWeight: 700,
                     }}
                   >
@@ -558,10 +843,10 @@ const CartPage: React.FC = () => {
                     borderRadius: 3,
                     fontSize: "1.1rem",
                     fontWeight: 600,
-                    backgroundColor: theme.palette.primary.main,
+                    background: `linear-gradient(135deg, ${COLORS.deepNavy} 0%, ${COLORS.accent} 100%)`,
                     "&:hover": {
-                      backgroundColor: theme.palette.primary.dark,
                       transform: "translateY(-2px)",
+                      boxShadow: `0 8px 25px ${COLORS.accent}40`,
                     },
                     transition: "all 0.3s ease",
                     mb: 2,
@@ -577,18 +862,65 @@ const CartPage: React.FC = () => {
                     justifyContent: "center",
                     gap: 1,
                     mt: 2,
+                    p: 2,
+                    backgroundColor: theme.palette.action.hover,
+                    borderRadius: 2,
                   }}
                 >
-                  <Security
-                    sx={{ fontSize: 20, color: theme.palette.success.main }}
-                  />
+                  <Security sx={{ fontSize: 20, color: COLORS.success }} />
                   <Typography
                     variant="body2"
-                    color="text.secondary"
+                    color={COLORS.silver}
                     sx={{ textAlign: "center" }}
                   >
                     Secure checkout with SSL encryption
                   </Typography>
+                </Box>
+
+                {/* Promo Code Section */}
+                <Box
+                  sx={{
+                    mt: 3,
+                    p: 2,
+                    backgroundColor: theme.palette.action.selected,
+                    borderRadius: 2,
+                    border: `1px dashed ${COLORS.silver}50`,
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    color={COLORS.deepNavy}
+                    gutterBottom
+                  >
+                    Have a promo code?
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <TextField
+                      size="small"
+                      placeholder="Enter code"
+                      fullWidth
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        borderRadius: 2,
+                        borderColor: COLORS.deepNavy,
+                        color: COLORS.deepNavy,
+                        "&:hover": {
+                          backgroundColor: COLORS.deepNavy,
+                          color: "white",
+                        },
+                      }}
+                    >
+                      Apply
+                    </Button>
+                  </Box>
                 </Box>
               </Paper>
             </Slide>
@@ -606,28 +938,33 @@ const CartPage: React.FC = () => {
             },
           }}
         >
-          <DialogTitle
-            sx={{ color: theme.palette.text.primary, fontWeight: 600 }}
-          >
+          <DialogTitle sx={{ color: COLORS.deepNavy, fontWeight: 600 }}>
+            <Delete sx={{ mr: 1, color: COLORS.accent }} />
             Remove Item
           </DialogTitle>
           <DialogContent>
-            <Typography sx={{ color: theme.palette.text.secondary }}>
+            <Typography sx={{ color: theme.palette.text.secondary, mt: 1 }}>
               Are you sure you want to remove this item from your cart?
             </Typography>
           </DialogContent>
           <DialogActions>
             <Button
               onClick={() => setRemoveDialogOpen(false)}
-              sx={{ borderRadius: 2 }}
+              sx={{ borderRadius: 2, color: COLORS.silver }}
             >
               Cancel
             </Button>
             <Button
               onClick={() => itemToRemove && handleRemoveItem(itemToRemove)}
-              color="error"
               variant="contained"
-              sx={{ borderRadius: 2 }}
+              sx={{
+                borderRadius: 2,
+                backgroundColor: COLORS.accent,
+                "&:hover": {
+                  backgroundColor: COLORS.accent,
+                  opacity: 0.9,
+                },
+              }}
             >
               Remove Item
             </Button>
@@ -645,13 +982,12 @@ const CartPage: React.FC = () => {
             },
           }}
         >
-          <DialogTitle
-            sx={{ color: theme.palette.text.primary, fontWeight: 600 }}
-          >
+          <DialogTitle sx={{ color: COLORS.deepNavy, fontWeight: 600 }}>
+            <Delete sx={{ mr: 1, color: COLORS.accent }} />
             Clear Shopping Cart
           </DialogTitle>
           <DialogContent>
-            <Typography sx={{ color: theme.palette.text.secondary }}>
+            <Typography sx={{ color: theme.palette.text.secondary, mt: 1 }}>
               Are you sure you want to remove all items from your cart? This
               action cannot be undone.
             </Typography>
@@ -659,15 +995,21 @@ const CartPage: React.FC = () => {
           <DialogActions>
             <Button
               onClick={() => setClearDialogOpen(false)}
-              sx={{ borderRadius: 2 }}
+              sx={{ borderRadius: 2, color: COLORS.silver }}
             >
               Keep Items
             </Button>
             <Button
               onClick={handleClearCart}
-              color="error"
               variant="contained"
-              sx={{ borderRadius: 2 }}
+              sx={{
+                borderRadius: 2,
+                backgroundColor: COLORS.accent,
+                "&:hover": {
+                  backgroundColor: COLORS.accent,
+                  opacity: 0.9,
+                },
+              }}
             >
               Clear All Items
             </Button>

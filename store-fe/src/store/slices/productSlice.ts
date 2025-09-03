@@ -1,7 +1,20 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { productAPI } from "../../services/api";
 
+export interface Category {
+  id: number;
+  name: string;
+  slug?: string;
+  description?: string;
+  image?: string;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Product {
+  total_qty: number;
+  sell_price: number | undefined;
   id: number;
   name: string;
   full_name?: string;
@@ -17,11 +30,11 @@ export interface Product {
   available: number;
   sold: number;
   category_id: number;
+  category?: Category | string; // Can be either Category object or string for backward compatibility
   
   // Legacy fields for backward compatibility
   price?: number;
   original_price?: number;
-  category?: string;
   subcategory?: string;
   stock_quantity?: number;
   is_active?: boolean;
@@ -113,16 +126,23 @@ export const fetchSubcategories = createAsyncThunk(
   }
 );
 
+interface FetchProductsByCategoryArgs {
+  category: string;
+  subcategory?: string;
+  signal?: AbortSignal;
+}
+
 export const fetchProductsByCategory = createAsyncThunk(
   "products/fetchProductsByCategory",
   async (
-    { category, subcategory }: { category: string; subcategory?: string },
-    { rejectWithValue }: any
+    { category, subcategory, signal }: FetchProductsByCategoryArgs,
+    { rejectWithValue }
   ) => {
     try {
       const response = await productAPI.getProductsByCategory(
         category,
-        subcategory
+        subcategory,
+        signal
       );
       return response;
     } catch (error: any) {

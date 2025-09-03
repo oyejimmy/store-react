@@ -31,6 +31,7 @@ import {
   LocalOffer,
   AccessTime,
 } from "@mui/icons-material";
+import { accentColor } from "../../utils/helpers";
 
 const OffersPage: React.FC = () => {
   const { type } = useParams<{ type: string }>();
@@ -105,37 +106,44 @@ const OffersPage: React.FC = () => {
       <Container maxWidth="lg">
         {/* Header Section */}
         <Fade in={true} timeout={800}>
-          <Box sx={{ textAlign: "center", mb: 6 }}>
+          <Box
+            sx={{
+              textAlign: "center",
+              mb: 6,
+            }}
+          >
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 mb: 2,
+                p: 3,
+                mx: "auto",
+                backgroundColor: theme.palette.background.default,
               }}
             >
-              <LocalFireDepartment
-                sx={{
-                  fontSize: 48,
-                  color:
-                    theme.palette.mode === "dark"
-                      ? "#FF6B6B"
-                      : theme.palette.primary.main,
-                  mr: 2,
-                }}
-              />
               <Typography
                 variant="h2"
                 sx={{
-                  fontWeight: 800,
-                  background:
-                    theme.palette.mode === "light"
-                      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #4C4A73 100%)`
-                      : `linear-gradient(135deg, #FF6B6B 0%, #F8FAFC 100%)`,
-                  backgroundClip: "text",
-                  textFillColor: "transparent",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
+                  textAlign: "center",
+                  color: theme.palette.text.primary,
+                  mb: 5,
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  textShadow: `2px 2px 4px ${accentColor}40`,
+                  fontSize: { xs: "2rem", md: "3rem" },
+                  letterSpacing: "2px",
+                  position: "relative",
+                  "&::after": {
+                    content: '""',
+                    display: "block",
+                    width: "100px",
+                    height: "2px",
+                    background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+                    margin: "10px auto 0",
+                    boxShadow: `0 2px 10px ${accentColor}40`,
+                  },
                 }}
               >
                 {getOfferTitle(type || "")}
