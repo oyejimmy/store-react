@@ -52,15 +52,18 @@ const LoginPage: React.FC = () => {
 
     try {
       const result = await dispatch(login(formData)).unwrap();
-
-      // Redirect admin users to admin panel
-      if (result.user && result.user.is_admin) {
-        window.location.href = "http://localhost:3000/admin";
+      
+      // Redirect based on the redirectUrl from the login response
+      if (result.redirectUrl) {
+        // Use window.location.href for full page reload to ensure all auth state is properly initialized
+        window.location.href = result.redirectUrl;
       } else {
-        navigate("/");
+        // Fallback to default redirect if no redirectUrl is provided
+        navigate("/", { replace: true });
       }
     } catch (error: any) {
       // Error is handled by the error state
+      console.error("Login error:", error);
     }
   };
 

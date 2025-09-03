@@ -35,10 +35,7 @@ import {
 } from "@mui/icons-material";
 import { adminAPI } from "../../services/api";
 import OrderReceipt from "../../components/admin/OrderReceipt";
-import {
-  PdfDownloadButton,
-  generateOrderFileName,
-} from "../../components/PdfDownloadButton";
+import PdfDownloadButton, { generateOrderFileName } from "../../components/PdfDownloadButton";
 
 const tableHeadingColor = {
   backgroundColor: "#2c6e49",

@@ -124,7 +124,6 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
     } catch (error) {
       message.error('Payment processing failed. Please try again.');
-      console.error('Payment error:', error);
     } finally {
       setLoading(false);
     }

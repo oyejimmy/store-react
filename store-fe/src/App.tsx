@@ -60,10 +60,20 @@ function App() {
   });
 
   useEffect(() => {
-    if (token && isAuthenticated) {
-      dispatch(getCurrentUser());
-    }
-  }, [dispatch, token, isAuthenticated]);
+    const loadUser = async () => {
+      if (token) {
+        try {
+          await dispatch(getCurrentUser()).unwrap();
+        } catch (error) {
+          console.error('Failed to load user data:', error);
+          // Clear invalid token if user data can't be loaded
+          localStorage.removeItem('token');
+        }
+      }
+    };
+    
+    loadUser();
+  }, [dispatch, token]);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);

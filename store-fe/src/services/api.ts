@@ -3,7 +3,7 @@ import axios from "axios";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:8000";
 
-// Create axios instance
+// Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -13,21 +13,40 @@ const api = axios.create({
     "Pragma": "no-cache",
     "Expires": "0"
   },
-  withCredentials: true,
-  timeout: 15000, // Increased timeout to 15 seconds
+  withCredentials: true, // This is crucial for sending cookies
+  timeout: 30000, // 30 seconds
   validateStatus: (status) => status < 500, // Reject only if status is 500 or higher
 });
 
-// Request interceptor to add auth token
+// Add a request interceptor to add auth token to headers if it exists in localStorage
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Request interceptor to add auth token and log requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
+        headers: config.headers,
+        data: config.data
+      });
+    } else {
+      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url} (No token)`);
     }
     return config;
   },
   (error) => {
+    console.error('[API Request Error]', error);
     return Promise.reject(error);
   }
 );
@@ -94,7 +113,7 @@ api.interceptors.response.use(
 // Auth API
 export const authAPI = {
   login: (credentials: { email: string; password: string }) =>
-    api.post("/auth/login", credentials).then((res) => res.data),
+    api.post("/api/auth/login", credentials).then((res) => res.data),
 
   signup: (userData: {
     email: string;
@@ -102,9 +121,11 @@ export const authAPI = {
     password: string;
     full_name: string;
     phone: string;
-  }) => api.post("/auth/signup", userData).then((res) => res.data),
+  }) => api.post("/api/auth/signup", userData).then((res) => res.data),
 
-  getCurrentUser: () => api.get("/auth/me").then((res) => res.data),
+  getCurrentUser: () => api.get(`/api/auth/me`).then((res) => res.data),
+
+  checkUserRole: () => api.get("/api/auth/me/role").then((res) => res.data),
 };
 
 // Product API

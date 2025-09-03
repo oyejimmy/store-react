@@ -8,6 +8,17 @@ from typing import Optional
 import logging
 import os
 
+# Import routers
+from app.routers import (
+    auth_router,
+    products_router,
+    admin_router,
+    collections_router,
+    offers_router,
+    orders_router,
+    payments_router
+)
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -58,14 +69,19 @@ app = CustomFastAPI(
 )
 
 # CORS middleware configuration
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-    max_age=600  # Cache preflight requests for 10 minutes
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+    expose_headers=["*"],  # Expose all headers
+    max_age=86400  # 24 hours
 )
 
 # Mount static files for product images
@@ -82,13 +98,13 @@ async def log_requests(request: Request, call_next):
 
 # Include routers with proper ordering
 routers = [
-    (auth.router, "/api/auth", ["Authentication"]),
-    (products.router, "", ["Products"]),  # No prefix needed as prefix is set in the router
-    (orders.router, "/api/orders", ["Orders"]),
-    (admin.router, "/api/admin", ["Admin"]),
-    (offers.router, "/api/offers", ["Offers"]),
-    (payments.router, "/api/payments", ["Payments"]),
-    (collections.router, "/api/collections", ["Collections"])
+    (auth_router, "/api/auth", ["auth"]),
+    (products_router, "/api/products", ["products"]),
+    (orders_router, "/api/orders", ["Orders"]),
+    (admin_router, "/api/admin", ["Admin"]),
+    (offers_router, "/api/offers", ["Offers"]),
+    (payments_router, "/api/payments", ["Payments"]),
+    (collections_router, "/api/collections", ["Collections"])
 ]
 
 # Log and include all routers

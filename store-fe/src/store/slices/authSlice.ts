@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { authAPI } from "../../services/api";
+import api, { authAPI } from "../../services/api";
 
 export interface User {
   id: number;
@@ -34,14 +34,39 @@ export const login = createAsyncThunk(
   "auth/login",
   async (
     credentials: { email: string; password: string },
-    { rejectWithValue }: any
+    { rejectWithValue, dispatch }: any
   ) => {
     try {
-      const response = await authAPI.login(credentials);
-      localStorage.setItem("token", response.access_token);
-      return response;
+      // First, perform the login
+      const loginResponse = await authAPI.login(credentials);
+      
+      // Store the token
+      const { access_token, user } = loginResponse;
+      if (access_token) {
+        localStorage.setItem("token", access_token);
+      }
+      
+      // Store user data in local storage
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+      
+      // Check user role
+      try {
+        const roleResponse = await authAPI.checkUserRole();
+        return { ...loginResponse, redirectUrl: roleResponse.redirect_url };
+      } catch (roleError) {
+        console.error("Role check failed:", roleError);
+        // If role check fails, still return the login success but with default redirect
+        return { ...loginResponse, redirectUrl: "/" };
+      }
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.detail || "Login failed");
+      console.error("Login error:", error);
+      return rejectWithValue(
+        error.response?.data?.detail ||
+        error.message ||
+        "Login failed. Please check your credentials and try again."
+      );
     }
   }
 );
@@ -67,16 +92,51 @@ export const signup = createAsyncThunk(
   }
 );
 
+// Helper function to decode JWT token
+const parseJwt = (token: string) => {
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    return null;
+  }
+};
+
 export const getCurrentUser = createAsyncThunk(
   "auth/getCurrentUser",
-  async (_, { rejectWithValue }: any) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await authAPI.getCurrentUser();
-      return response;
+      const token = localStorage.getItem("token");
+      console.log('Current token from localStorage:', token);
+      
+      if (!token) {
+        console.log('No token found in localStorage');
+        throw new Error("No token found");
+      }
+      
+      try {
+        console.log('Attempting to fetch current user...');
+        const response = await authAPI.getCurrentUser();
+        console.log('Current user response:', response);
+        return response;
+      } catch (apiError: any) {
+        console.error('API Error in getCurrentUser:', {
+          message: apiError.message,
+          response: apiError.response?.data,
+          status: apiError.response?.status,
+        });
+        
+        // Clear invalid token
+        if (apiError.response?.status === 401) {
+          console.log('Clearing invalid token due to 401 response');
+          localStorage.removeItem('token');
+        }
+        
+        throw apiError; // Re-throw to be caught by outer catch
+      }
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.detail || "Failed to get user"
-      );
+      const errorMessage = error.response?.data?.detail || error.message || "Failed to get user";
+      console.error('Error in getCurrentUser:', errorMessage, error);
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -90,6 +150,7 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
     },
     clearError: (state) => {
       state.error = null;
@@ -105,7 +166,9 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.access_token;
+        state.user = action.payload.user;
         state.isAuthenticated = true;
+        localStorage.setItem("token", action.payload.access_token);
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -129,6 +192,8 @@ const authSlice = createSlice({
       })
       .addCase(getCurrentUser.fulfilled, (state, action) => {
         state.loading = false;
+        state.user = action.payload;
+        state.isAuthenticated = true;
         state.user = action.payload;
       })
       .addCase(getCurrentUser.rejected, (state) => {

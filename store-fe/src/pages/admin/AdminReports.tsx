@@ -27,7 +27,15 @@ import {
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import 'jspdf-autotable';
+// No need to import jspdf.plugin.autotable separately as it's included in jspdf-autotable
+
+// Extend the jsPDF type to include autoTable
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+  }
+}
 
 // Define the types for your data to resolve TypeScript errors.
 interface Product {
@@ -298,13 +306,25 @@ const AdminReports = () => {
   };
 
   const handleExportPDF = () => {
+    // Create PDF
     const doc = new jsPDF();
     doc.text("Admin Reports", 14, 15);
     const { headers, data } = formatTableDataForExport();
-    doc.autoTable({
+    
+    // Use type assertion to access autoTable
+    (doc as any).autoTable({
       head: [headers],
       body: data,
       startY: 20,
+      styles: {
+        fontSize: 10,
+        cellPadding: 2,
+      },
+      headStyles: {
+        fillColor: [44, 110, 73],
+        textColor: 255,
+        fontStyle: "bold",
+      },
     });
     doc.save("reports.pdf");
   };
@@ -321,11 +341,6 @@ const AdminReports = () => {
         fontFamily: "Roboto, sans-serif",
       }}
     >
-      {/* CDN scripts for export libraries */}
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.0/papaparse.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
       <Box
         sx={{

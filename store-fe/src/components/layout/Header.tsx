@@ -315,7 +315,7 @@ const Header: React.FC<HeaderProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: isSmallMobile ? "5.8px" : "3.5px",
+            padding: isSmallMobile ? "6px" : "3.5px",
             gap: 1,
             transition: "top 0.3s ease",
             background: colors.bannerBg,
@@ -599,8 +599,8 @@ const Header: React.FC<HeaderProps> = ({
                       fontSize: { xs: "0.75rem", sm: "1rem" },
                     }}
                   >
-                    {user?.name ? (
-                      user.name.charAt(0).toUpperCase()
+                    {user?.username ? (
+                      user.username.charAt(0).toUpperCase()
                     ) : (
                       <Person />
                     )}

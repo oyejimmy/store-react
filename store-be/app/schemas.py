@@ -36,6 +36,10 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
+class UserRoleResponse(BaseModel):
+    is_admin: bool
+    redirect_url: str
+
 # Category schemas
 class CategoryBase(BaseModel):
     name: str

@@ -1,38 +1,44 @@
 import React from 'react';
-import { Button, Box, Typography, Paper } from '@mui/material';
-import { htmlToPdf } from '../../utils/pdfGenerator';
+import { Box, Typography, Button } from '@mui/material';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 
 const TestPdf: React.FC = () => {
-  const generatePdfFromString = async () => {
-    const htmlContent = `
-      <div style="padding: 20px; font-family: Arial, sans-serif;">
-        <h1>Test PDF Generation</h1>
-        <p>This is a test PDF generated from an HTML string.</p>
-        <p>Current date: ${new Date().toLocaleDateString()}</p>
-        <ul>
-          <li>Item 1</li>
-          <li>Item 2</li>
-          <li>Item 3</li>
-        </ul>
-      </div>
-    `;
+  const handleGeneratePdf = () => {
+    const doc = new jsPDF();
     
-    try {
-      await htmlToPdf(htmlContent, 'test-from-string.pdf');
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    }
-  };
-
-  const generatePdfFromElement = async () => {
-    const element = document.getElementById('pdf-content');
-    if (element) {
-      try {
-        await htmlToPdf(element, 'test-from-element.pdf');
-      } catch (error) {
-        console.error('Error generating PDF:', error);
-      }
-    }
+    // Add title
+    doc.setFontSize(18);
+    doc.text('Test PDF Document', 14, 15);
+    
+    // Add some content
+    doc.setFontSize(12);
+    doc.text('This is a test PDF document generated from the admin panel.', 14, 30);
+    
+    // Add a simple table
+    const headers = ['ID', 'Name', 'Value'];
+    const data = [
+      ['1', 'Item 1', 'Value 1'],
+      ['2', 'Item 2', 'Value 2'],
+      ['3', 'Item 3', 'Value 3'],
+    ];
+    
+    (doc as any).autoTable({
+      head: [headers],
+      body: data,
+      startY: 40,
+      styles: {
+        fontSize: 10,
+        cellPadding: 2,
+      },
+      headStyles: {
+        fillColor: [44, 110, 73],
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+    });
+    
+    doc.save('test_document.pdf');
   };
 
   return (
@@ -40,51 +46,19 @@ const TestPdf: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         PDF Generation Test
       </Typography>
-      
-      <Box sx={{ mb: 4, display: 'flex', gap: 2 }}>
-        <Button 
-          variant="contained" 
-          color="primary" 
-          onClick={generatePdfFromString}
-        >
-          Generate PDF from String
-        </Button>
-        
-        <Button 
-          variant="outlined" 
-          color="primary" 
-          onClick={generatePdfFromElement}
-        >
-          Generate PDF from Element
-        </Button>
-      </Box>
-
-      <Paper 
-        id="pdf-content" 
-        elevation={3} 
-        sx={{ p: 3, maxWidth: '800px', margin: '0 auto' }}
+      <Button 
+        variant="contained" 
+        color="primary"
+        onClick={handleGeneratePdf}
+        sx={{ 
+          bgcolor: '#2c6e49',
+          '&:hover': {
+            bgcolor: '#1e4f35',
+          },
+        }}
       >
-        <Typography variant="h5" gutterBottom>
-          Test Content for PDF
-        </Typography>
-        <Typography paragraph>
-          This is a test content section that will be converted to PDF.
-          The PDF should preserve the styling and layout of this element.
-        </Typography>
-        <Typography paragraph>
-          Current time: {new Date().toLocaleString()}
-        </Typography>
-        <Box component="ul" sx={{ pl: 3 }}>
-          <li>List item 1</li>
-          <li>List item 2 with some longer content to test text wrapping</li>
-          <li>List item 3</li>
-        </Box>
-        <Box sx={{ mt: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
-          <Typography variant="subtitle2" color="textSecondary">
-            This is a styled box within the content
-          </Typography>
-        </Box>
-      </Paper>
+        Generate Test PDF
+      </Button>
     </Box>
   );
 };

@@ -48,7 +48,7 @@ const ProfilePage: React.FC = () => {
   const theme = useTheme();
   const { user } = useSelector((state: RootState) => state.auth);
   const [editing, setEditing] = useState(false);
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[] | null>(null);
   const [orderDetailOpen, setOrderDetailOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
@@ -579,8 +579,33 @@ const ProfilePage: React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {orders.map((order) => (
-                      <TableRow key={order.id}>
+                    {(() => {
+                      if (!orders) {
+                        return (
+                          <TableRow key="loading">
+                            <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
+                              <Typography color="text.secondary" sx={{ transition: 'color 0.3s ease' }}>
+                                Loading orders...
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
+                      
+                      if (orders.length === 0) {
+                        return (
+                          <TableRow key="no-orders">
+                            <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
+                              <Typography color="text.secondary" sx={{ transition: 'color 0.3s ease' }}>
+                                No orders found. Start shopping to see your orders here!
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
+                      
+                      return orders.map((order) => (
+                        <TableRow key={order.id}>
                         <TableCell
                           sx={{
                             color: theme.palette.text.primary,
@@ -631,23 +656,8 @@ const ProfilePage: React.FC = () => {
                           </IconButton>
                         </TableCell>
                       </TableRow>
-                    ))}
-                    {orders.length === 0 && (
-                      <TableRow>
-                        <TableCell
-                          colSpan={6}
-                          sx={{ textAlign: "center", py: 4 }}
-                        >
-                          <Typography
-                            color="text.secondary"
-                            sx={{ transition: "color 0.3s ease" }}
-                          >
-                            No orders found. Start shopping to see your orders
-                            here!
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    )}
+                      ));
+                    })()}
                   </TableBody>
                 </Table>
               </TableContainer>
