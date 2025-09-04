@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
 
-// Keyframe animations
+// ========== KEYFRAME ANIMATIONS ==========
 const floatAnimation = keyframes`
   0% { transform: translateY(0px); }
   50% { transform: translateY(-15px); }
@@ -29,7 +29,7 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-// Styled components for animations
+// ========== STYLED COMPONENTS ==========
 const AnimatedContainer = styled(Container)`
   min-height: 100vh;
   display: flex;
@@ -54,6 +54,36 @@ const GlowingButton = styled(Button)`
   animation: ${glowAnimation} 2s ease-in-out infinite;
 `;
 
+// ========== STYLE CONSTANTS ==========
+// Reusable style objects extracted as constants
+const FLEX_CENTER_STYLES = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const FULL_HEIGHT_STYLES = {
+  minHeight: "100vh",
+  ...FLEX_CENTER_STYLES,
+};
+
+const NUMBER_STYLES = {
+  fontWeight: "bold",
+  lineHeight: 1,
+} as const;
+
+const BUTTON_BASE_STYLES = {
+  py: 1.5,
+  px: 4,
+  fontWeight: "bold",
+  borderRadius: 2,
+  transition: "all 0.3s ease",
+  "&:hover": {
+    transform: "scale(1.05)",
+  },
+} as const;
+
+// ========== COMPONENTS ==========
 // Floating decorative element component
 const FloatingDot: React.FC<{
   top?: number;
@@ -80,10 +110,12 @@ const FloatingDot: React.FC<{
   />
 );
 
+// ========== MAIN COMPONENT ==========
 const NotFound = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("lg"));
   
   // Check if the current theme is dark mode
   const isDarkMode = theme.palette.mode === "dark";
@@ -94,6 +126,13 @@ const NotFound = () => {
     text: theme.palette.text.primary,
     accent: isDarkMode ? theme.palette.common.white : theme.palette.primary.main,
     buttonText: isDarkMode ? theme.palette.primary.main : theme.palette.common.white,
+  };
+
+  // Responsive font sizes
+  const getResponsiveFontSize = (mobileSize: string, desktopSize: string) => {
+    if (isMobile) return mobileSize;
+    if (isTablet) return `calc(${mobileSize} + 1rem)`;
+    return desktopSize;
   };
 
   // Handle navigation with error handling
@@ -107,16 +146,46 @@ const NotFound = () => {
     }
   };
 
+  // Get button styles based on theme
+  const getButtonStyles = () => {
+    const baseStyles = {
+      ...BUTTON_BASE_STYLES,
+    };
+
+    if (isDarkMode) {
+      return {
+        ...baseStyles,
+        border: `2px solid ${colors.accent}`,
+        color: colors.accent,
+        background: "transparent",
+        "&:hover": {
+          ...baseStyles["&:hover"],
+          background: colors.accent,
+          color: colors.buttonText,
+          border: `2px solid ${colors.accent}`,
+        },
+      };
+    }
+
+    return {
+      ...baseStyles,
+      background: colors.accent,
+      color: colors.buttonText,
+      "&:hover": {
+        ...baseStyles["&:hover"],
+        background: "#2d2a6b", // darker navy
+      },
+    };
+  };
+
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        ...FULL_HEIGHT_STYLES,
         backgroundColor: colors.background,
         overflow: "hidden",
         transition: "background-color 0.3s ease",
+        px: 2, // Add horizontal padding for mobile
       }}
     >
       <AnimatedContainer maxWidth="lg">
@@ -137,10 +206,9 @@ const NotFound = () => {
                 variant="h1"
                 delay="0s"
                 sx={{
-                  fontSize: isMobile ? "6rem" : "10rem",
-                  fontWeight: "bold",
+                  fontSize: getResponsiveFontSize("5rem", "10rem"),
+                  ...NUMBER_STYLES,
                   color: theme.palette.primary.main,
-                  lineHeight: 1,
                 }}
               >
                 4
@@ -149,10 +217,9 @@ const NotFound = () => {
                 variant="h1"
                 delay="0.3s"
                 sx={{
-                  fontSize: isMobile ? "6rem" : "10rem",
-                  fontWeight: "bold",
+                  fontSize: getResponsiveFontSize("5rem", "10rem"),
+                  ...NUMBER_STYLES,
                   color: isDarkMode ? "#94A3B8" : theme.palette.secondary.main,
-                  lineHeight: 1,
                 }}
               >
                 0
@@ -161,10 +228,9 @@ const NotFound = () => {
                 variant="h1"
                 delay="0.6s"
                 sx={{
-                  fontSize: isMobile ? "6rem" : "10rem",
-                  fontWeight: "bold",
+                  fontSize: getResponsiveFontSize("5rem", "10rem"),
+                  ...NUMBER_STYLES,
                   color: theme.palette.primary.main,
-                  lineHeight: 1,
                 }}
               >
                 4
@@ -173,16 +239,16 @@ const NotFound = () => {
 
             {/* Decorative elements */}
             <FloatingDot
-              top={-15}
-              right={-15}
-              size={30}
+              top={isMobile ? -10 : -15}
+              right={isMobile ? -10 : -15}
+              size={isMobile ? 20 : 30}
               color={isDarkMode ? "#94A3B8" : theme.palette.secondary.main}
               animationDelay="0.5s"
             />
             <FloatingDot
-              bottom={-10}
-              left={-20}
-              size={20}
+              bottom={isMobile ? -5 : -10}
+              left={isMobile ? -15 : -20}
+              size={isMobile ? 15 : 20}
               color={theme.palette.primary.light}
               animationDelay="1s"
             />
@@ -196,7 +262,7 @@ const NotFound = () => {
             }}
           >
             <Typography
-              variant="h4"
+              variant={isMobile ? "h5" : "h4"}
               component="h2"
               gutterBottom
               sx={{
@@ -213,6 +279,7 @@ const NotFound = () => {
               color="text.secondary"
               sx={{
                 mb: 3,
+                fontSize: isMobile ? "0.9rem" : "1rem",
               }}
             >
               Sorry, the page you're looking for doesn't exist or has been
@@ -224,34 +291,8 @@ const NotFound = () => {
                 variant={isDarkMode ? "outlined" : "contained"}
                 size="large"
                 onClick={handleNavigateHome}
-                sx={{
-                  py: 1.5,
-                  px: 4,
-                  fontWeight: "bold",
-                  borderRadius: 2,
-                  // Light mode styles
-                  ...(!isDarkMode && {
-                    background: colors.accent,
-                    color: colors.buttonText,
-                    "&:hover": {
-                      background: "#2d2a6b", // darker navy
-                      transform: "scale(1.05)",
-                    },
-                  }),
-                  // Dark mode styles
-                  ...(isDarkMode && {
-                    border: `2px solid ${colors.accent}`,
-                    color: colors.accent,
-                    background: "transparent",
-                    "&:hover": {
-                      background: colors.accent,
-                      color: colors.buttonText,
-                      border: `2px solid ${colors.accent}`,
-                      transform: "scale(1.05)",
-                    },
-                  }),
-                  transition: "all 0.3s ease",
-                }}
+                sx={getButtonStyles()}
+                fullWidth={isMobile} // Make button full width on mobile
               >
                 Back to Home
               </GlowingButton>
