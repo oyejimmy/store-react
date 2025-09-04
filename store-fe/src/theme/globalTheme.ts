@@ -1,4 +1,6 @@
+// globalTheme.ts
 import { createTheme, PaletteColorOptions, PaletteColor } from "@mui/material/styles";
+import { keyframes } from '@emotion/react';
 
 // Define the core color variables for the brand
 export const brandColors = {
@@ -9,6 +11,13 @@ export const brandColors = {
   text: "#1E1B4B", // Default text color, deep navy
   textLight: "#FFFFFF", // White text for dark backgrounds or primary buttons
 };
+
+// Keyframe animation for background
+export const backgroundAnimation = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
 
 // Extend the palette to include other standard colors for better type safety
 declare module "@mui/material/styles" {
@@ -88,6 +97,15 @@ export const lightTheme = createTheme({
     },
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: `linear-gradient(270deg, ${brandColors.background}, ${brandColors.secondary}, ${brandColors.background})`,
+          backgroundSize: '200% 200%',
+          animation: `${backgroundAnimation} 15s ease infinite`,
+        },
+      },
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {
@@ -160,24 +178,24 @@ export const darkTheme = createTheme({
     info: {
       main: "#2196F3",
       light: "#64B5F6",
-      dark: "#1565C0",
+      dark: '#1565C0',
     },
     success: {
-      main: "#4CAF50",
-      light: "#81C784",
-      dark: "#2E7D32",
+      main: '#4CAF50',
+      light: '#81C784',
+      dark: '#2E7D32',
     },
     warning: {
-      main: "#FF9800",
-      light: "#FFB74D",
-      dark: "#EF6C00",
+      main: '#FF9800',
+      light: '#FFB74D',
+      dark: '#EF6C00',
     },
     error: {
-      main: "#F44336",
-      light: "#E57373",
-      dark: "#D32F2F",
+      main: '#F44336',
+      light: '#E57373',
+      dark: '#D32F2F',
     },
-    divider: "#3E3E3E",
+    divider: '#3E3E3E',
   },
   typography: {
     fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
@@ -193,6 +211,15 @@ export const darkTheme = createTheme({
     },
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: `linear-gradient(270deg, ${brandColors.backgroundDark}, #0a1929, ${brandColors.backgroundDark})`,
+          backgroundSize: '200% 200%',
+          animation: `${backgroundAnimation} 15s ease infinite`,
+        },
+      },
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {
@@ -278,7 +305,7 @@ export const globalTheme = createTheme({
       main: brandColors.primary,
       contrastText: brandColors.textLight,
     },
-    divider: brandColors.secondary, // Added divider color
+    divider: brandColors.secondary,
   },
   typography: {
     fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
@@ -315,6 +342,15 @@ export const globalTheme = createTheme({
     },
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: `linear-gradient(270deg, ${brandColors.background}, ${brandColors.secondary}, ${brandColors.background})`,
+          backgroundSize: '200% 200%',
+          animation: `${backgroundAnimation} 15s ease infinite`,
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
@@ -327,7 +363,7 @@ export const globalTheme = createTheme({
           backgroundColor: brandColors.primary,
           color: brandColors.textLight,
           "&:hover": {
-            backgroundColor: "#1e4d33", // Adjusted to a darker navy
+            backgroundColor: "#1e4d33",
             transform: "translateY(-2px)",
             boxShadow: "0 6px 20px rgba(30, 27, 75, 0.3)",
           },
@@ -336,7 +372,7 @@ export const globalTheme = createTheme({
           borderColor: brandColors.primary,
           color: brandColors.primary,
           "&:hover": {
-            borderColor: "#1e4d33", // Adjusted to a darker navy
+            borderColor: "#1e4d33",
             backgroundColor: "rgba(30, 27, 75, 0.04)",
           },
         },
@@ -493,6 +529,8 @@ export const globalTheme = createTheme({
         root: {
           "& .MuiAlert-root": {
             borderRadius: 8,
+            backgroundColor: brandColors.background,
+            color: brandColors.text,
           },
         },
       },

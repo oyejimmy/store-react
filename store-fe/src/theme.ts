@@ -1,4 +1,11 @@
-import { createTheme, PaletteColor, PaletteColorOptions } from "@mui/material/styles";
+// theme.ts
+import {
+  createTheme,
+  PaletteColor,
+  PaletteColorOptions,
+} from "@mui/material/styles";
+import { keyframes } from "@emotion/react";
+import { COLORS } from "./utils/constant";
 
 // Define the core color variables for clarity
 const palette = {
@@ -7,14 +14,22 @@ const palette = {
   silver: "#94A3B8",
 };
 
+// Keyframe animation for background
+export const backgroundAnimation = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
+
 // Extend the palette to include other standard colors for better type safety
-declare module '@mui/material/styles' {
+declare module "@mui/material/styles" {
   interface Palette {
     info: PaletteColor;
     success: PaletteColor;
     warning: PaletteColor;
     error: PaletteColor;
     divider: string;
+    mode: "light" | "dark";
   }
   interface PaletteOptions {
     info?: PaletteColorOptions;
@@ -22,6 +37,7 @@ declare module '@mui/material/styles' {
     warning?: PaletteColorOptions;
     error?: PaletteColorOptions;
     divider?: string;
+    mode?: "light" | "dark";
   }
 }
 
@@ -31,45 +47,43 @@ export const lightTheme = createTheme({
     mode: "light",
     primary: {
       main: palette.deepNavy,
-      dark: "#141238", // A slightly darker navy
-      light: "#4C4A73", // A slightly lighter navy
+      dark: "#141238",
+      light: "#4C4A73",
     },
     secondary: {
       main: palette.silver,
-      light: "#CBD5E1", // Lighter silver
-      dark: "#64748B", // Darker silver
+      light: "#CBD5E1",
+      dark: "#64748B",
     },
     background: {
       default: palette.offWhite,
-      paper: "#FFFFFF", // Pure white for paper elements to make the navy stand out
+      paper: "#FFFFFF",
     },
     text: {
       primary: palette.deepNavy,
       secondary: palette.silver,
     },
-    // --- Added standard palette colors to resolve the error ---
     info: {
-      main: '#2196F3',
-      light: '#64B5F6',
-      dark: '#1565C0',
+      main: "#2196F3",
+      light: "#64B5F6",
+      dark: "#1565C0",
     },
     success: {
-      main: '#4CAF50',
-      light: '#81C784',
-      dark: '#2E7D32',
+      main: "#4CAF50",
+      light: "#81C784",
+      dark: "#2E7D32",
     },
     warning: {
-      main: '#FF9800',
-      light: '#FFB74D',
-      dark: '#EF6C00',
+      main: "#FF9800",
+      light: "#FFB74D",
+      dark: "#EF6C00",
     },
     error: {
-      main: '#F44336',
-      light: '#E57373',
-      dark: '#D32F2F',
+      main: "#F44336",
+      light: "#E57373",
+      dark: "#D32F2F",
     },
     divider: palette.silver,
-    // --- End of added colors ---
   },
   typography: {
     fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
@@ -85,6 +99,15 @@ export const lightTheme = createTheme({
     },
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: `linear-gradient(270deg, ${palette.offWhite}, ${palette.silver}, ${palette.offWhite})`,
+          backgroundSize: "200% 200%",
+          animation: `${backgroundAnimation} 15s ease infinite`,
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
@@ -131,36 +154,34 @@ export const darkTheme = createTheme({
       dark: "#141238",
     },
     background: {
-      default: palette.deepNavy, // Using deepNavy as the main background
-      paper: "#25204F", // A slightly lighter shade of deepNavy for paper elements
+      default: palette.deepNavy,
+      paper: "#25204F",
     },
     text: {
       primary: palette.offWhite,
       secondary: palette.silver,
     },
-    // --- Added standard palette colors to resolve the error ---
     info: {
-      main: '#2196F3',
-      light: '#64B5F6',
-      dark: '#1565C0',
+      main: "#2196F3",
+      light: "#64B5F6",
+      dark: "#1565C0",
     },
     success: {
-      main: '#4CAF50',
-      light: '#81C784',
-      dark: '#2E7D32',
+      main: "#4CAF50",
+      light: "#81C784",
+      dark: "#2E7D32",
     },
     warning: {
-      main: '#FF9800',
-      light: '#FFB74D',
-      dark: '#EF6C00',
+      main: "#FF9800",
+      light: "#FFB74D",
+      dark: "#EF6C00",
     },
     error: {
-      main: '#F44336',
-      light: '#E57373',
-      dark: '#D32F2F',
+      main: "#F44336",
+      light: "#E57373",
+      dark: "#D32F2F",
     },
-    divider: '#3E3E3E',
-    // --- End of added colors ---
+    divider: "#3E3E3E",
   },
   typography: {
     fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
@@ -176,6 +197,15 @@ export const darkTheme = createTheme({
     },
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: `linear-gradient(270deg, ${palette.deepNavy}, #0a1929, ${palette.deepNavy})`,
+          backgroundSize: "200% 200%",
+          animation: `${backgroundAnimation} 15s ease infinite`,
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {

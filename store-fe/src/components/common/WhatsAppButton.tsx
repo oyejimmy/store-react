@@ -1,13 +1,14 @@
 import React from "react";
 import { Fab, Tooltip } from '@mui/material';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import { BrandName } from "../../utils/constant";
 
 
 
 const WhatsAppButton: React.FC = () => {
   const handleWhatsAppClick = () => {
     const phoneNumber = "+919876543210"; // Replace with actual WhatsApp number
-    const message = "Hi! I need help with my order from Saiyaara.";
+    const message = `Hi! I need help with my order from ${BrandName.name}.`;
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
     )}`;

@@ -1,8 +1,17 @@
+// admin-theme.ts
 import { createTheme, responsiveFontSizes } from "@mui/material";
 import { Theme } from "@mui/material/styles";
+import { keyframes } from '@emotion/react';
+import { COLORS } from "../utils/constant";
+
+// Keyframe animation for background
+export const backgroundAnimation = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
 
 // This is the key change: Module augmentation to add the `divider` property
-// to Material-UI's built-in Palette and PaletteOptions interfaces.
 declare module "@mui/material/styles" {
   interface Palette {
     divider: string;
@@ -46,9 +55,21 @@ const getAdminTheme = (options: AdminThemeOptions): Theme => {
     shape: {
       borderRadius: 10,
     },
-    // Placeholders for shadows and components
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: {
+            background: options.mode === "light"
+              ? `linear-gradient(270deg, ${COLORS.offWhite}, ${COLORS.silver}, ${COLORS.offWhite})`
+              : `linear-gradient(270deg, ${COLORS.deepNavy}, #0a1929, ${COLORS.deepNavy})`,
+            backgroundSize: '200% 200%',
+            animation: `${backgroundAnimation} 15s ease infinite`,
+          },
+        },
+      },
+    },
+    // Placeholders for shadows
     shadows: createTheme().shadows,
-    components: {},
   });
 };
 

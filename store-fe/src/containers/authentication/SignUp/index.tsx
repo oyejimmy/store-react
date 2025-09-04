@@ -18,8 +18,9 @@ import {
 import { Person, Email, Phone, Lock } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { AppDispatch, RootState } from "../../store";
-import { signup } from "../../store/slices/authSlice";
+import { AppDispatch, RootState } from "../../../store";
+import { signup } from "../../../store/slices/authSlice";
+import { BrandName } from "../../../utils/constant";
 
 const SignupPage: React.FC = () => {
   const theme = useTheme();
@@ -134,7 +135,7 @@ const SignupPage: React.FC = () => {
                 transition: "color 0.3s ease",
               }}
             >
-              Join Gem-Heart
+            Join {BrandName.name}
             </Typography>
             <Typography
               variant="body2"

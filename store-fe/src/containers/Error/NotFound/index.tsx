@@ -10,6 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
+import { COLORS } from "../../../utils/constant";
 
 // ========== KEYFRAME ANIMATIONS ==========
 const floatAnimation = keyframes`
@@ -27,6 +28,13 @@ const glowAnimation = keyframes`
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+`;
+
+// Background animation for gradient
+const backgroundAnimation = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 `;
 
 // ========== STYLED COMPONENTS ==========
@@ -52,6 +60,24 @@ const FloatingNumber = styled(Typography, {
 
 const GlowingButton = styled(Button)`
   animation: ${glowAnimation} 2s ease-in-out infinite;
+`;
+
+// Styled component for animated background
+const AnimatedBackground = styled(Box)<{ mode: 'light' | 'dark' }>`
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${({ mode }) => 
+    mode === 'light' 
+      ? `linear-gradient(270deg, ${COLORS.offWhite}, ${COLORS.silver}, ${COLORS.offWhite})` 
+      : `linear-gradient(270deg, ${COLORS.deepNavy}, #0a1929, ${COLORS.deepNavy})`
+  };
+  background-size: 200% 200%;
+  animation: ${backgroundAnimation} 15s ease infinite;
+  overflow: "hidden";
+  transition: "background-color 0.3s ease";
+  px: 2; // Add horizontal padding for mobile
 `;
 
 // ========== STYLE CONSTANTS ==========
@@ -179,15 +205,7 @@ const NotFound = () => {
   };
 
   return (
-    <Box
-      sx={{
-        ...FULL_HEIGHT_STYLES,
-        backgroundColor: colors.background,
-        overflow: "hidden",
-        transition: "background-color 0.3s ease",
-        px: 2, // Add horizontal padding for mobile
-      }}
-    >
+    <AnimatedBackground mode={theme.palette.mode as 'light' | 'dark'}>
       <AnimatedContainer maxWidth="lg">
         <Box
           sx={{
@@ -300,7 +318,7 @@ const NotFound = () => {
           </Box>
         </Box>
       </AnimatedContainer>
-    </Box>
+    </AnimatedBackground>
   );
 };
 

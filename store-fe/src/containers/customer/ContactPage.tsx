@@ -25,7 +25,32 @@ import {
   Subject as SubjectIcon,
   Message,
 } from "@mui/icons-material";
-import { COLORS } from "../../utils/constant";
+import { BrandName, COLORS } from "../../utils/constant";
+import { keyframes } from "@emotion/react";
+import styled from "@emotion/styled";
+
+// ========== KEYFRAME ANIMATIONS ==========
+// Background animation for gradient
+const backgroundAnimation = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
+
+// ========== STYLED COMPONENTS ==========
+// Styled component for animated background
+const AnimatedBackground = styled(Box)<{ mode: "light" | "dark" }>`
+  min-height: 100vh;
+  background: ${({ mode }) =>
+    mode === "light"
+      ? `linear-gradient(270deg, ${COLORS.offWhite}, ${COLORS.silver}, ${COLORS.offWhite})`
+      : `linear-gradient(270deg, ${COLORS.deepNavy}, #0a1929, ${COLORS.deepNavy})`};
+  background-size: 200% 200%;
+  animation: ${backgroundAnimation} 15s ease infinite;
+  padding-top: 12;
+  padding-bottom: 8;
+  transition: background-color 0.3s ease;
+`;
 
 const ContactPage: React.FC = () => {
   const theme = useTheme();
@@ -94,23 +119,13 @@ const ContactPage: React.FC = () => {
     theme.palette.mode === "light" ? COLORS.deepNavy : COLORS.offWhite;
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        backgroundColor: theme.palette.background.default,
-        pt: 12,
-        pb: 8,
-        transition: "background-color 0.3s ease",
-      }}
-    >
+    <AnimatedBackground mode={theme.palette.mode as "light" | "dark"}>
       <Box
         sx={{
-          p: 3,
+          p: 8,
           maxWidth: 1200,
           mx: "auto",
           minHeight: "100vh",
-          backgroundColor: theme.palette.background.default,
-          transition: "background-color 0.3s ease",
         }}
       >
         <Fade in={true} timeout={800}>
@@ -473,7 +488,7 @@ const ContactPage: React.FC = () => {
                             variant="body2"
                             sx={{ color: theme.palette.text.secondary }}
                           >
-                            Saiyaara Jewelry Store
+                            {BrandName.name} Store
                             <br />
                             123 Jewelry Street
                             <br />
@@ -561,7 +576,7 @@ const ContactPage: React.FC = () => {
           </Grid>
         </Grid>
       </Box>
-    </Box>
+    </AnimatedBackground>
   );
 };
 

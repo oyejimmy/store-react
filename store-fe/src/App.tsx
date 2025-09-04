@@ -13,42 +13,43 @@ import WhatsAppButton from "./components/common/WhatsAppButton";
 import AdminLayout from "./components/layout/AdminLayout";
 
 // Customer Pages
-import HomePage from "./pages/customer/HomePage";
-import ShopPage from "./pages/customer/ShopPage";
-import CategoriesPage from "./pages/customer/CategoriesPage";
-import ProductDetailPage from "./pages/customer/ProductDetailPage";
-import CartPage from "./pages/customer/CartPage";
-import CheckoutPage from "./pages/customer/CheckoutPage";
-import OffersPage from "./pages/customer/OffersPage";
-import ContactPage from "./pages/customer/ContactPage";
-import AboutPage from "./pages/customer/AboutPage";
-import LoginPage from "./pages/customer/LoginPage";
-import SignupPage from "./pages/customer/SignupPage";
-import OrderConfirmationPage from "./pages/customer/OrderConfirmationPage";
-import UserOrdersPage from "./pages/customer/UserOrdersPage";
-import ProfilePage from "./pages/customer/ProfilePage";
-import ForgotPasswordPage from "./pages/customer/ForgotPasswordPage";
-import TermsPage from "./pages/customer/TermsPage";
-import PrivacyPage from "./pages/customer/PrivacyPage";
+import HomePage from "./containers/customer/HomePage";
+import ShopPage from "./containers/customer/ShopPage";
+import CategoriesPage from "./containers/customer/CategoriesPage";
+import ProductDetailPage from "./containers/customer/ProductDetailPage";
+import CartPage from "./containers/customer/CartPage";
+import CheckoutPage from "./containers/customer/CheckoutPage";
+import OffersPage from "./containers/customer/OffersPage";
+import ContactPage from "./containers/customer/ContactPage";
+import AboutPage from "./containers/customer/About";
+import LoginPage from "./containers/authentication/LogIn";
+import SignupPage from "./containers/authentication/SignUp";
+import OrderConfirmationPage from "./containers/customer/OrderConfirmationPage";
+import UserOrdersPage from "./containers/customer/UserOrdersPage";
+import ProfilePage from "./containers/customer/ProfilePage";
+import ForgotPasswordPage from "./containers/authentication/ForgotPassword";
+import PrivacyPage from "./containers/customer/components/Privacy/index";
+import TermsPage from "./containers/customer/components/Terms/index";
 
 // Admin Pages
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminProducts from "./pages/admin/AdminProducts";
-import AdminCollections from "./pages/admin/AdminCollections";
-import AdminOrders from "./pages/admin/AdminOrders";
-import AdminInventory from "./pages/admin/AdminInventory";
-import AdminOffers from "./pages/admin/AdminOffers";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminPayments from "./pages/admin/AdminPayments";
-import AdminSalesChannels from "./pages/admin/AdminSalesChannels";
-import AdminReports from "./pages/admin/AdminReports";
-import AdminLogin from "./pages/admin/AdminLogin";
-import TestPdf from "./pages/admin/TestPdf";
-import NotFound from "./pages/NotFound";
+import AdminDashboard from "./containers/admin/Dashboard";
+import AdminProducts from "./containers/admin/AdminProducts";
+import AdminCollections from "./containers/admin/AdminCollections";
+import AdminOrders from "./containers/admin/AdminOrders";
+import AdminInventory from "./containers/admin/AdminInventory";
+import AdminOffers from "./containers/admin/AdminOffers";
+import AdminUsers from "./containers/admin/AdminUsers";
+import AdminPayments from "./containers/admin/AdminPayments";
+import AdminSalesChannels from "./containers/admin/AdminSalesChannels";
+import AdminReports from "./containers/admin/AdminReports";
+import AdminLogin from "./containers/admin/AdminLogin";
+import TestPdf from "./containers/admin/TestPdf";
 
 // Protected Route Component
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminRoute from "./components/auth/AdminRoute";
+import NotFound from "./containers/Error/NotFound";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Layout Components
 const CustomerLayout = ({
@@ -166,215 +167,217 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Routes>
-        {/* Home Route */}
-        <Route
-          path="/"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <HomePage />
-            </CustomerLayout>
-          }
-        />
+      <ErrorBoundary>
+        <Routes>
+          {/* Home Route */}
+          <Route
+            path="/"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <HomePage />
+              </CustomerLayout>
+            }
+          />
 
-        {/* Admin Login Route */}
-        <Route path="/admin/login" element={<AdminLogin />} />
+          {/* Admin Login Route */}
+          <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Admin Routes */}
-        <Route
-          path="/admin/*"
-          element={
-            <AdminRoute>
-              <AdminLayout />
-            </AdminRoute>
-          }
-        >
-          <Route index element={<AdminDashboard />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="collections" element={<AdminCollections />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="inventory" element={<AdminInventory />} />
-          <Route path="offers" element={<AdminOffers />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="payments" element={<AdminPayments />} />
-          <Route path="sales-channels" element={<AdminSalesChannels />} />
-          <Route path="reports" element={<AdminReports />} />
-          <Route path="test-pdf" element={<TestPdf />} />
-          <Route path="profile" element={<ProfilePage />} />
-        </Route>
+          {/* Admin Routes */}
+          <Route
+            path="/admin/*"
+            element={
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }
+          >
+            <Route index element={<AdminDashboard />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="collections" element={<AdminCollections />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="inventory" element={<AdminInventory />} />
+            <Route path="offers" element={<AdminOffers />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="payments" element={<AdminPayments />} />
+            <Route path="sales-channels" element={<AdminSalesChannels />} />
+            <Route path="reports" element={<AdminReports />} />
+            <Route path="test-pdf" element={<TestPdf />} />
+            <Route path="profile" element={<ProfilePage />} />
+          </Route>
 
-        {/* Auth Routes */}
-        <Route
-          path="/login"
-          element={
-            <AuthLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <LoginPage />
-            </AuthLayout>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <AuthLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <SignupPage />
-            </AuthLayout>
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-            <AuthLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <ForgotPasswordPage />
-            </AuthLayout>
-          }
-        />
+          {/* Auth Routes */}
+          <Route
+            path="/login"
+            element={
+              <AuthLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <LoginPage />
+              </AuthLayout>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <AuthLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <SignupPage />
+              </AuthLayout>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <AuthLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <ForgotPasswordPage />
+              </AuthLayout>
+            }
+          />
 
-        {/* Customer Routes */}
-        <Route
-          path="/shop"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <ShopPage />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/shop/:category"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <ShopPage />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/categories"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <CategoriesPage
-                isDarkMode={false}
-                toggleTheme={function (): void {
-                  throw new Error("Function not implemented.");
-                }}
-              />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/terms"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <TermsPage />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/privacy"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <PrivacyPage />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/product/:id"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <ProductDetailPage />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/cart"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <CartPage />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/checkout"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <ProtectedRoute>
-                <CheckoutPage />
-              </ProtectedRoute>
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/offers"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <OffersPage />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/offers/:type"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <OffersPage />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/contact"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <ContactPage />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/about"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <AboutPage />
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/orders"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <ProtectedRoute>
-                <UserOrdersPage />
-              </ProtectedRoute>
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            </CustomerLayout>
-          }
-        />
-        <Route
-          path="/order-confirmation/:orderId"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <ProtectedRoute>
-                <OrderConfirmationPage />
-              </ProtectedRoute>
-            </CustomerLayout>
-          }
-        />
+          {/* Customer Routes */}
+          <Route
+            path="/shop"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <ShopPage />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/shop/:category"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <ShopPage />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <CategoriesPage
+                  isDarkMode={false}
+                  toggleTheme={function (): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/terms"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <TermsPage />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/privacy"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <PrivacyPage />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/product/:id"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <ProductDetailPage />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <CartPage />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <ProtectedRoute>
+                  <CheckoutPage />
+                </ProtectedRoute>
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/offers"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <OffersPage />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/offers/:type"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <OffersPage />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <ContactPage />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <AboutPage />
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <ProtectedRoute>
+                  <UserOrdersPage />
+                </ProtectedRoute>
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              </CustomerLayout>
+            }
+          />
+          <Route
+            path="/order-confirmation"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <ProtectedRoute>
+                  <OrderConfirmationPage />
+                </ProtectedRoute>
+              </CustomerLayout>
+            }
+          />
 
-        {/* 404 Route for all other unmatched routes */}
-        <Route
-          path="*"
-          element={
-            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
-              <NotFound />
-            </CustomerLayout>
-          }
-        />
-      </Routes>
+          {/* 404 Route for all other unmatched routes */}
+          <Route
+            path="*"
+            element={
+              <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+                <NotFound />
+              </CustomerLayout>
+            }
+          />
+        </Routes>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 }

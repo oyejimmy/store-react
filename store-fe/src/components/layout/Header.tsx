@@ -48,6 +48,7 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";
 import { logout } from "../../store/slices/authSlice";
+import { BrandName } from "../../utils/constant";
 
 interface HeaderProps {
   isDarkMode?: boolean;
@@ -315,7 +316,7 @@ const Header: React.FC<HeaderProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: isSmallMobile ? "6px" : "3.5px",
+            padding: isSmallMobile ? "7px" : "3.5px",
             gap: 1,
             transition: "top 0.3s ease",
             background: colors.bannerBg,
@@ -368,7 +369,7 @@ const Header: React.FC<HeaderProps> = ({
               },
             }}
           >
-            Gem-Heart
+            {BrandName.name}
           </Typography>
 
           {/* Desktop Navigation */}

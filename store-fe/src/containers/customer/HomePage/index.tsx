@@ -17,12 +17,12 @@ import {
   Fade,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useAppSelector, useAppDispatch } from "../../store/hooks";
+import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 // import { AppDispatch, RootState } from "../../store";
-import { fetchProducts } from "../../store/slices/productSlice";
-import { fetchOffersByType } from "../../store/slices/offerSlice";
+import { fetchProducts } from "../../../store/slices/productSlice";
+import { fetchOffersByType } from "../../../store/slices/offerSlice";
 import { ShoppingCart, FavoriteBorder, Visibility } from "@mui/icons-material";
-import { COLORS } from "../../utils/constant";
+import { COLORS } from "../../../utils/constant";
 
 const HomePage = () => {
   const theme = useTheme();

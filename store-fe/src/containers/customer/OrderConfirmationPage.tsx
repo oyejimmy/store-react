@@ -1,10 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import {
-  Card,
   Typography,
   Button,
   Box,
-  Divider,
   Stepper,
   Step,
   StepLabel,
@@ -31,6 +29,35 @@ import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import html2canvas from "html2canvas";
 import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
+import { keyframes } from "@emotion/react";
+import styled from "@emotion/styled";
+import { COLORS } from "../../utils/constant";
+
+// ========== KEYFRAME ANIMATIONS ==========
+// Background animation for gradient
+const backgroundAnimation = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
+
+// ========== STYLED COMPONENTS ==========
+// Styled component for animated background
+const AnimatedBackground = styled(Box)<{ mode: "light" | "dark" }>`
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: ${({ mode }) =>
+    mode === "light"
+      ? `linear-gradient(270deg, ${COLORS.offWhite}, ${COLORS.silver}, ${COLORS.offWhite})`
+      : `linear-gradient(270deg, ${COLORS.deepNavy}, #0a1929, ${COLORS.deepNavy})`};
+  background-size: 200% 200%;
+  animation: ${backgroundAnimation} 15s ease infinite;
+  position: relative;
+  overflow: hidden;
+  padding: 2;
+`;
 
 const OrderConfirmationPage: React.FC = () => {
   const navigate = useNavigate();
@@ -60,7 +87,8 @@ const OrderConfirmationPage: React.FC = () => {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: "#f5f8fa",
+        backgroundColor:
+          theme.palette.mode === "light" ? COLORS.offWhite : COLORS.deepNavy,
       }).then((canvas) => {
         const imgData = canvas.toDataURL("image/png");
         const link = document.createElement("a");
@@ -83,18 +111,7 @@ const OrderConfirmationPage: React.FC = () => {
   const steps = ["Order Confirmed", "Processing", "Shipped", "Delivered"];
 
   return (
-    <Box
-      sx={{
-        padding: 2,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #f5f8fa 0%, #e6eeff 100%)",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
+    <AnimatedBackground mode={theme.palette.mode as "light" | "dark"}>
       {showFireworks && (
         <Box
           sx={{
@@ -115,7 +132,7 @@ const OrderConfirmationPage: React.FC = () => {
         elevation={6}
         sx={{
           borderRadius: 3,
-          background: "white",
+          background: theme.palette.background.paper,
           padding: 4,
           width: "95%",
           maxWidth: "1200px",
@@ -129,7 +146,10 @@ const OrderConfirmationPage: React.FC = () => {
             left: 0,
             right: 0,
             height: 6,
-            background: "linear-gradient(90deg, #2c3e50 0%, #3498db 100%)",
+            background:
+              theme.palette.mode === "light"
+                ? "linear-gradient(90deg, #2c3e50 0%, #3498db 100%)"
+                : "linear-gradient(90deg, #3498db 0%, #2980b9 100%)",
           },
         }}
       >
@@ -149,7 +169,7 @@ const OrderConfirmationPage: React.FC = () => {
               <Typography
                 variant="h4"
                 sx={{
-                  color: "#2c3e50",
+                  color: theme.palette.text.primary,
                   mb: 1,
                   fontWeight: "bold",
                 }}
@@ -159,7 +179,7 @@ const OrderConfirmationPage: React.FC = () => {
               <Typography
                 variant="body1"
                 sx={{
-                  color: "#7f8c8d",
+                  color: theme.palette.text.secondary,
                   fontSize: 16,
                   maxWidth: 400,
                   mx: "auto",
@@ -178,22 +198,22 @@ const OrderConfirmationPage: React.FC = () => {
                 mb: 4,
                 p: 2,
                 borderRadius: 2,
-                background: "#f8f9fa",
-                border: "1px solid #e9ecef",
+                background: theme.palette.background.default,
+                border: `1px solid ${theme.palette.divider}`,
               }}
             >
               <Box sx={{ textAlign: "center", flex: 1 }}>
                 <Typography
                   variant="body2"
                   fontWeight="bold"
-                  sx={{ color: "#2c3e50" }}
+                  sx={{ color: theme.palette.text.primary }}
                 >
                   ORDER NUMBER
                 </Typography>
                 <Typography
                   variant="h6"
                   sx={{
-                    color: "#2980b9",
+                    color: theme.palette.primary.main,
                     fontWeight: "bold",
                     mt: 1,
                   }}
@@ -205,7 +225,7 @@ const OrderConfirmationPage: React.FC = () => {
                 <Typography
                   variant="body2"
                   fontWeight="bold"
-                  sx={{ color: "#2c3e50" }}
+                  sx={{ color: theme.palette.text.primary }}
                 >
                   ORDER DATE
                 </Typography>
@@ -218,9 +238,16 @@ const OrderConfirmationPage: React.FC = () => {
                   }}
                 >
                   <CalendarToday
-                    sx={{ color: "#2980b9", mr: 1, fontSize: 20 }}
+                    sx={{
+                      color: theme.palette.primary.main,
+                      mr: 1,
+                      fontSize: 20,
+                    }}
                   />
-                  <Typography variant="body1" sx={{ color: "#2c3e50" }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ color: theme.palette.text.primary }}
+                  >
                     {new Date().toLocaleDateString()}
                   </Typography>
                 </Box>
@@ -232,7 +259,7 @@ const OrderConfirmationPage: React.FC = () => {
               <Typography
                 variant="h6"
                 sx={{
-                  color: "#2c3e50",
+                  color: theme.palette.text.primary,
                   mb: 2,
                   display: "flex",
                   alignItems: "center",
@@ -247,14 +274,14 @@ const OrderConfirmationPage: React.FC = () => {
                 sx={{
                   "& .MuiStepLabel-label": {
                     fontWeight: 500,
-                    color: "#2c3e50 !important",
+                    color: `${theme.palette.text.primary} !important`,
                     fontSize: "0.75rem",
                   },
                   "& .Mui-completed": {
                     color: "#27ae60 !important",
                   },
                   "& .Mui-active": {
-                    color: "#2980b9 !important",
+                    color: `${theme.palette.primary.main} !important`,
                   },
                 }}
               >
@@ -284,11 +311,11 @@ const OrderConfirmationPage: React.FC = () => {
                   sx={{
                     px: 3,
                     py: 1,
-                    background: "#2c3e50",
+                    background: theme.palette.primary.main,
                     fontWeight: "bold",
                     borderRadius: 2,
                     "&:hover": {
-                      background: "#34495e",
+                      background: theme.palette.primary.dark,
                     },
                   }}
                 >
@@ -302,13 +329,13 @@ const OrderConfirmationPage: React.FC = () => {
                   sx={{
                     px: 3,
                     py: 1,
-                    borderColor: "#2980b9",
-                    color: "#2980b9",
+                    borderColor: theme.palette.primary.main,
+                    color: theme.palette.primary.main,
                     fontWeight: "bold",
                     borderRadius: 2,
                     "&:hover": {
-                      borderColor: "#2980b9",
-                      background: "rgba(41, 128, 185, 0.04)",
+                      borderColor: theme.palette.primary.main,
+                      background: theme.palette.action.hover,
                     },
                   }}
                 >
@@ -375,7 +402,7 @@ const OrderConfirmationPage: React.FC = () => {
               <Typography
                 variant="h5"
                 sx={{
-                  color: "#2c3e50",
+                  color: theme.palette.text.primary,
                   mb: 3,
                   textAlign: "center",
                   fontWeight: "bold",
@@ -386,7 +413,9 @@ const OrderConfirmationPage: React.FC = () => {
 
               <List sx={{ maxWidth: 500, margin: "0 auto" }}>
                 <ListItem sx={{ px: 0, py: 1.5 }}>
-                  <ListItemIcon sx={{ minWidth: 40, color: "#2980b9" }}>
+                  <ListItemIcon
+                    sx={{ minWidth: 40, color: theme.palette.primary.main }}
+                  >
                     <Email />
                   </ListItemIcon>
                   <ListItemText
@@ -394,13 +423,17 @@ const OrderConfirmationPage: React.FC = () => {
                     secondary="You will receive an email with your order details"
                     primaryTypographyProps={{
                       fontWeight: "medium",
-                      color: "#2c3e50",
+                      color: theme.palette.text.primary,
                     }}
-                    secondaryTypographyProps={{ color: "#7f8c8d" }}
+                    secondaryTypographyProps={{
+                      color: theme.palette.text.secondary,
+                    }}
                   />
                 </ListItem>
                 <ListItem sx={{ px: 0, py: 1.5 }}>
-                  <ListItemIcon sx={{ minWidth: 40, color: "#2980b9" }}>
+                  <ListItemIcon
+                    sx={{ minWidth: 40, color: theme.palette.primary.main }}
+                  >
                     <LocalShipping />
                   </ListItemIcon>
                   <ListItemText
@@ -408,9 +441,11 @@ const OrderConfirmationPage: React.FC = () => {
                     secondary="We'll send tracking info once your order ships"
                     primaryTypographyProps={{
                       fontWeight: "medium",
-                      color: "#2c3e50",
+                      color: theme.palette.text.primary,
                     }}
-                    secondaryTypographyProps={{ color: "#7f8c8d" }}
+                    secondaryTypographyProps={{
+                      color: theme.palette.text.secondary,
+                    }}
                   />
                 </ListItem>
                 <ListItem sx={{ px: 0, py: 1.5 }}>
@@ -422,9 +457,11 @@ const OrderConfirmationPage: React.FC = () => {
                     secondary="Estimated delivery time: 3-5 business days"
                     primaryTypographyProps={{
                       fontWeight: "medium",
-                      color: "#2c3e50",
+                      color: theme.palette.text.primary,
                     }}
-                    secondaryTypographyProps={{ color: "#7f8c8d" }}
+                    secondaryTypographyProps={{
+                      color: theme.palette.text.secondary,
+                    }}
                   />
                 </ListItem>
                 <ListItem sx={{ px: 0, py: 1.5 }}>
@@ -436,9 +473,11 @@ const OrderConfirmationPage: React.FC = () => {
                     secondary="Contact us for any questions about your order"
                     primaryTypographyProps={{
                       fontWeight: "medium",
-                      color: "#2c3e50",
+                      color: theme.palette.text.primary,
                     }}
-                    secondaryTypographyProps={{ color: "#7f8c8d" }}
+                    secondaryTypographyProps={{
+                      color: theme.palette.text.secondary,
+                    }}
                   />
                 </ListItem>
               </List>
@@ -448,13 +487,20 @@ const OrderConfirmationPage: React.FC = () => {
                   mt: 4,
                   p: 2,
                   borderRadius: 2,
-                  background: "#e8f4fc",
-                  border: "1px solid #bee5eb",
+                  background:
+                    theme.palette.mode === "light" ? "#e8f4fc" : "#0d3c61",
+                  border: `1px solid ${
+                    theme.palette.mode === "light" ? "#bee5eb" : "#1e5a8a"
+                  }`,
                 }}
               >
                 <Typography
                   variant="body2"
-                  sx={{ color: "#0c5460", textAlign: "center" }}
+                  sx={{
+                    color:
+                      theme.palette.mode === "light" ? "#0c5460" : "#e6f7ff",
+                    textAlign: "center",
+                  }}
                 >
                   <strong>Need help?</strong> Contact our support team at
                   support@example.com or call us at (800) 123-4567
@@ -464,7 +510,7 @@ const OrderConfirmationPage: React.FC = () => {
           </Grid>
         </Grid>
       </Paper>
-    </Box>
+    </AnimatedBackground>
   );
 };
 

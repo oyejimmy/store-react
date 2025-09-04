@@ -42,6 +42,7 @@ import {
   DarkMode,
 } from "@mui/icons-material";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { BrandName } from "../../utils/constant";
 
 const drawerWidth = { xs: 240, sm: 280 };
 const collapsedWidth = { xs: 56, sm: 64 };
@@ -194,7 +195,10 @@ const AdminLayout: React.FC = () => {
 
   // Update theme in localStorage and trigger theme change
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+    document.documentElement.setAttribute(
+      "data-theme",
+      isDarkMode ? "dark" : "light"
+    );
   }, [isDarkMode]);
 
   const navigate = useNavigate();
@@ -377,7 +381,7 @@ const AdminLayout: React.FC = () => {
                 backgroundClip: "text",
               }}
             >
-              {collapsed ? "G" : "Gem-Heart"}
+              {collapsed ? "G" : `${BrandName.name}`}
             </Typography>
             {!collapsed && (
               <Typography
@@ -502,7 +506,7 @@ const AdminLayout: React.FC = () => {
                 backgroundClip: "text",
               }}
             >
-              {collapsed ? "G" : "Gem-Heart"}
+              {collapsed ? "G" : `${BrandName.name}`}
             </Typography>
             {!collapsed && (
               <Typography

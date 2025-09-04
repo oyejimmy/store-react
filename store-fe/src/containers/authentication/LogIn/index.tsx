@@ -14,8 +14,9 @@ import {
 import { Lock, Email } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { AppDispatch, RootState } from "../../store";
-import { login } from "../../store/slices/authSlice";
+import { AppDispatch, RootState } from "../../../store";
+import { login } from "../../../store/slices/authSlice";
+import { BrandName } from "../../../utils/constant";
 
 const LoginPage: React.FC = () => {
   const theme = useTheme();
@@ -111,7 +112,7 @@ const LoginPage: React.FC = () => {
               Welcome Back
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Sign in to your Saiyaara account
+              Sign in to your {BrandName.name} account
             </Typography>
           </Box>
 
