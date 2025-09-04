@@ -3,13 +3,13 @@ import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import SwipeableViews, { SwipeableViewsProps } from "react-swipeable-views";
 import { autoPlay, AutoPlayProps } from "react-swipeable-views-utils";
 
-interface AutoPlaySwipeableViewsProps extends SwipeableViewsProps, AutoPlayProps {}
+interface AutoPlaySwipeableViewsProps
+  extends SwipeableViewsProps,
+    AutoPlayProps {}
 
 const AutoPlaySwipeableViews = autoPlay(
   ({ children, ...props }: AutoPlaySwipeableViewsProps) => (
-    <SwipeableViews {...props}>
-      {children}
-    </SwipeableViews>
+    <SwipeableViews {...props}>{children}</SwipeableViews>
   )
 );
 import {
@@ -604,9 +604,9 @@ const HomePage = () => {
             autoplay
             interval={5000}
             springConfig={{
-              duration: '0.7s',
-              easeFunction: 'cubic-bezier(0.15, 0.3, 0.25, 1)',
-              delay: '0s'
+              duration: "0.7s",
+              easeFunction: "cubic-bezier(0.15, 0.3, 0.25, 1)",
+              delay: "0s",
             }}
             style={{ height: "80vh" }}
           >
@@ -799,8 +799,8 @@ const HomePage = () => {
           Shop by Category →
         </Typography>
         <Grid container spacing={4}>
-          {categories.slice(0, 6).map((category) => (
-            <Grid item xs={12} sm={6} md={4} key={category.name}>
+          {categories.slice(0, 4).map((category) => (
+            <Grid item xs={12} sm={6} md={3} key={category.name}>
               <Box
                 component={Link}
                 to={category.link}
@@ -885,7 +885,7 @@ const HomePage = () => {
             </Grid>
           ))}
         </Grid>
-        <Box sx={{ textAlign: "center", mt: 8 }}>
+        <Box sx={{ textAlign: "center", mt: 8, width: "100%" }}>
           <Button
             component={Link}
             to="/categories"
@@ -906,6 +906,7 @@ const HomePage = () => {
                 background: primaryColor,
                 color: secondaryColor,
               },
+              transition: "all 0.3s ease",
             }}
           >
             EXPLORE COLLECTION
