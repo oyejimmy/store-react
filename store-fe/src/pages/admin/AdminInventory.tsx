@@ -56,7 +56,7 @@ interface Product {
 }
 
 const tableHeadingColor = {
-  backgroundColor: "#2c6e49",
+  backgroundColor: "#1E1B4B",
   color: "#ffffff",
   fontWeight: 600,
 };

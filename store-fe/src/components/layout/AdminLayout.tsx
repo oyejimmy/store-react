@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Drawer,
@@ -19,6 +20,9 @@ import {
   Link as MuiLink,
   Switch,
   FormControlLabel,
+  useTheme,
+  ThemeProvider,
+  createTheme,
 } from "@mui/material";
 import {
   Dashboard,
@@ -34,163 +38,150 @@ import {
   Public,
   Description,
   Collections,
-  Brightness4,
-  Brightness7,
+  LightMode,
+  DarkMode,
 } from "@mui/icons-material";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 
-// Brand colors
-const brandColors = {
-  primary: "#1E1B4B", // Deep navy blue
-  secondary: "#94A3B8", // Silver
-  background: "#F8FAFC", // Off-white
-  backgroundDark: "#0F172A", // Dark background for the dark theme
-  text: "#1E1B4B", // Default text color, deep navy
-  textLight: "#FFFFFF", // White text for dark backgrounds or primary buttons
+const drawerWidth = { xs: 240, sm: 280 };
+const collapsedWidth = { xs: 56, sm: 64 };
+
+// Define color scheme from the header
+const headerColors = {
+  light: {
+    background: "#F8FAFC",
+    text: "#1E1B4B",
+    accent: "#1E1B4B",
+    buttonText: "#F8FAFC",
+    bannerBg: "#000000",
+    bannerText: "#FFFFFF",
+  },
+  dark: {
+    background: "#1E1B4B",
+    text: "#F8FAFC",
+    accent: "#F8FAFC",
+    buttonText: "#1E1B4B",
+    bannerBg: "#000000",
+    bannerText: "#FFFFFF",
+  },
 };
 
-// Admin Light Theme
-export const adminLightTheme = {
+// Create custom themes based on header colors
+const lightTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: brandColors.primary,
-      light: "#4C4A73",
-      dark: "#141238",
-      contrastText: brandColors.textLight,
+      main: "#1E1B4B", // Navy blue from header
+      contrastText: "#F8FAFC",
     },
     secondary: {
-      main: brandColors.secondary,
-      light: "#CBD5E1",
-      dark: "#64748B",
-      contrastText: brandColors.text,
+      main: "#2d2a6b", // Lighter navy blue
+      contrastText: "#F8FAFC",
     },
     background: {
-      default: brandColors.background,
+      default: "#F8FAFC",
       paper: "#FFFFFF",
     },
     text: {
-      primary: brandColors.text,
-      secondary: "#64748B",
-    },
-  },
-  typography: {
-    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 800,
-      letterSpacing: "-0.5px",
-    },
-    h2: {
-      fontWeight: 700,
-    },
-    h3: {
-      fontWeight: 600,
+      primary: "#1E1B4B",
+      secondary: "#4B5563",
     },
   },
   components: {
-    MuiAppBar: {
+    MuiDrawer: {
       styleOverrides: {
-        root: {
-          backgroundColor: "rgba(255, 255, 255, 0.95)",
-          backdropFilter: "blur(10px)",
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
-          borderBottom: `1px solid ${brandColors.secondary}`,
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: "none",
-          fontWeight: 500,
-        },
-        contained: {
-          backgroundColor: brandColors.primary,
-          color: brandColors.textLight,
-          boxShadow: "0 4px 12px rgba(30, 27, 75, 0.3)",
-          "&:hover": {
-            backgroundColor: "#141238",
-            boxShadow: "0 6px 16px rgba(30, 27, 75, 0.4)",
+        paper: {
+          backgroundColor: "#1E1B4B", // Navy blue for light theme sidebar
+          color: "#F8FAFC",
+          "& .MuiListItemButton-root": {
+            color: "rgba(255, 255, 255, 0.8)",
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              color: "#FFFFFF",
+            },
+            "&.Mui-selected": {
+              backgroundColor: "rgba(255, 255, 255, 0.15)",
+              color: "#FFFFFF",
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.2)",
+              },
+            },
           },
         },
       },
     },
   },
-};
+  typography: {
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    h5: {
+      fontWeight: 700,
+    },
+    h6: {
+      fontWeight: 600,
+    },
+  },
+  shape: {
+    borderRadius: 8,
+  },
+});
 
-// Admin Dark Theme
-export const adminDarkTheme = {
+const darkTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: brandColors.secondary,
-      light: "#CBD5E1",
-      dark: "#64748B",
-      contrastText: brandColors.primary,
+      main: "#2d2a6b", // Lighter navy blue for dark theme
+      contrastText: "#F8FAFC",
     },
     secondary: {
-      main: brandColors.primary,
-      light: "#4C4A73",
-      dark: "#141238",
-      contrastText: brandColors.textLight,
+      main: "#3d3a8b", // Even lighter blue for dark theme
+      contrastText: "#F8FAFC",
     },
     background: {
-      default: brandColors.backgroundDark,
+      default: "#0F172A",
       paper: "#1E293B",
     },
     text: {
-      primary: "#E2E8F0",
-      secondary: brandColors.secondary,
-    },
-  },
-  typography: {
-    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 800,
-      letterSpacing: "-0.5px",
-    },
-    h2: {
-      fontWeight: 700,
-    },
-    h3: {
-      fontWeight: 600,
+      primary: "#F8FAFC",
+      secondary: "#CBD5E1",
     },
   },
   components: {
-    MuiAppBar: {
+    MuiDrawer: {
       styleOverrides: {
-        root: {
-          backgroundColor: "rgba(15, 23, 42, 0.95)",
-          backdropFilter: "blur(10px)",
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.6)",
-          borderBottom: `1px solid ${brandColors.secondary}`,
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: "none",
-          fontWeight: 500,
-        },
-        contained: {
-          backgroundColor: brandColors.secondary,
-          color: brandColors.primary,
-          boxShadow: "0 4px 12px rgba(148, 163, 184, 0.3)",
-          "&:hover": {
-            backgroundColor: "#CBD5E1",
-            boxShadow: "0 6px 16px rgba(148, 163, 184, 0.4)",
+        paper: {
+          backgroundColor: "#0F172A", // Darker blue for dark theme sidebar
+          color: "#F8FAFC",
+          "& .MuiListItemButton-root": {
+            color: "rgba(255, 255, 255, 0.8)",
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.08)",
+              color: "#FFFFFF",
+            },
+            "&.Mui-selected": {
+              backgroundColor: "rgba(255, 255, 255, 0.12)",
+              color: "#FFFFFF",
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.15)",
+              },
+            },
           },
         },
       },
     },
   },
-};
-
-const drawerWidth = 280;
-const collapsedWidth = 64;
+  typography: {
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    h5: {
+      fontWeight: 700,
+    },
+    h6: {
+      fontWeight: 600,
+    },
+  },
+  shape: {
+    borderRadius: 8,
+  },
+});
 
 const AdminLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -200,11 +191,61 @@ const AdminLayout: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("admin-theme") === "dark";
   });
+
+  // Update theme in localStorage and trigger theme change
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
 
-  // Mock user data
-  const [user] = useState({ full_name: "Admin" });
+  // Create a theme instance based on the current mode
+  const adminTheme = createTheme(isDarkMode ? darkTheme : lightTheme);
+
+  // User data state
+  const [user, setUser] = useState<{
+    full_name: string;
+    profile_image?: string;
+    role?: string;
+  }>({
+    full_name: "Loading...",
+    role: "Administrator",
+  });
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        });
+
+        if (response.data) {
+          setUser({
+            full_name:
+              response.data.full_name || response.data.email || "Admin User",
+            profile_image: response.data.profile_image,
+            role: response.data.role || "Administrator",
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+        // Fallback to default values
+        setUser({
+          full_name: "Admin User",
+          role: "Administrator",
+        });
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleLogout = () => {
     navigate("/login");
@@ -237,332 +278,543 @@ const AdminLayout: React.FC = () => {
     navigate(path);
   };
 
-  const getBreadcrumbTitle = () => {
+  const getBreadcrumbItems = () => {
     const path = location.pathname;
-    const item = menuItems.find((item) => item.path === path);
-    return item ? item.label : "Dashboard";
+    const pathParts = path.split("/").filter(Boolean);
+
+    // Skip the first 'admin' part for cleaner breadcrumbs
+    const relevantParts = pathParts.slice(1);
+
+    if (relevantParts.length === 0) {
+      return [
+        <Typography
+          key="dashboard"
+          color="text.primary"
+          sx={{ fontSize: "0.9rem", fontWeight: 600 }}
+        >
+          Dashboard
+        </Typography>,
+      ];
+    }
+
+    return relevantParts.map((part, index) => {
+      const routeTo = `/${pathParts.slice(0, index + 2).join("/")}`;
+      const isLast = index === relevantParts.length - 1;
+      const label =
+        part.charAt(0).toUpperCase() + part.slice(1).replace(/-/g, " ");
+
+      if (isLast) {
+        return (
+          <Typography
+            key={part}
+            color="text.primary"
+            sx={{ fontSize: "0.9rem", fontWeight: 600 }}
+          >
+            {label}
+          </Typography>
+        );
+      }
+
+      return (
+        <MuiLink
+          key={part}
+          component="button"
+          onClick={() => navigate(routeTo)}
+          underline="hover"
+          sx={{
+            color: "text.secondary",
+            fontSize: "0.9rem",
+            fontWeight: 500,
+            "&:hover": {
+              color: "primary.main",
+              cursor: "pointer",
+            },
+          }}
+        >
+          {label}
+        </MuiLink>
+      );
+    });
   };
 
-  // Create theme based on current mode
-  const theme = isDarkMode ? adminDarkTheme : adminLightTheme;
-
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
-      {/* Sidebar */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: collapsed ? collapsedWidth : drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: collapsed ? collapsedWidth : drawerWidth,
-            boxSizing: "border-box",
-            backgroundColor: theme.palette.primary.main,
-            borderRight: `2px solid ${theme.palette.secondary.main}`,
-            transition: "width 0.3s ease",
-            overflowX: "hidden",
-          },
-        }}
-      >
-        {/* Logo Section */}
-        <Box
+    <ThemeProvider theme={adminTheme}>
+      <Box sx={{ display: "flex", height: "100vh" }}>
+        {/* Sidebar - Always navy blue */}
+        <Drawer
+          variant="permanent"
           sx={{
-            p: 2,
-            textAlign: "center",
-            backgroundColor: theme.palette.secondary.main,
-            borderBottom: `2px solid ${theme.palette.primary.main}`,
+            display: { xs: "none", sm: "block" },
+            width: collapsed ? collapsedWidth.sm : drawerWidth.sm,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: collapsed ? collapsedWidth.sm : drawerWidth.sm,
+              boxSizing: "border-box",
+              borderRight: "none",
+              transition: "width 0.3s ease, background-color 0.3s ease",
+              overflowX: "hidden",
+            },
           }}
         >
-          <Typography
-            variant="h5"
+          {/* Logo Section */}
+          <Box
             sx={{
-              color: theme.palette.primary.contrastText,
-              fontWeight: 800,
-              m: 0,
-              fontSize: collapsed ? "1.5rem" : "1.75rem",
+              p: 2,
+              textAlign: "center",
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
             }}
           >
-            {collapsed ? "G" : "Gem-Heart"}
-          </Typography>
-          {!collapsed && (
             <Typography
-              variant="caption"
+              variant="h5"
               sx={{
-                color: theme.palette.primary.contrastText,
-                fontWeight: 600,
-                opacity: 0.9,
-                display: "block",
-                mt: 0.5,
+                fontWeight: 800,
+                m: 0,
+                fontSize: collapsed ? "1.5rem" : "1.75rem",
+                background: `linear-gradient(135deg, #F8FAFC, #E2E8F0)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
               }}
             >
-              Admin Panel
+              {collapsed ? "G" : "Gem-Heart"}
             </Typography>
-          )}
-        </Box>
-
-        {/* Menu Items */}
-        <List sx={{ pt: 1, flexGrow: 1 }}>
-          {menuItems.map((item) => (
-            <ListItem key={item.path} disablePadding sx={{ px: 1 }}>
-              <ListItemButton
-                selected={location.pathname === item.path}
-                onClick={() => handleMenuClick(item.path)}
-                sx={{
-                  borderRadius: 2,
-                  mx: 1,
-                  mb: 0.5,
-                  color: theme.palette.primary.contrastText,
-                  "&:hover": {
-                    backgroundColor: theme.palette.secondary.main,
-                    color: theme.palette.secondary.contrastText,
-                    transform: "translateX(4px)",
-                  },
-                  "&.Mui-selected": {
-                    backgroundColor: theme.palette.secondary.main,
-                    color: theme.palette.secondary.contrastText,
-                    fontWeight: 600,
-                    "&:hover": {
-                      backgroundColor: theme.palette.secondary.dark,
-                    },
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    color: "inherit",
-                    minWidth: collapsed ? 0 : 40,
-                    justifyContent: "center",
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                {!collapsed && (
-                  <ListItemText
-                    primary={item.label}
-                    sx={{
-                      "& .MuiTypography-root": {
-                        fontSize: "0.9rem",
-                        fontWeight: 500,
-                      },
-                    }}
-                  />
-                )}
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-
-      {/* Main Content */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
-          backgroundColor: theme.palette.secondary.main,
-        }}
-      >
-        {/* Header */}
-        <AppBar
-          position="static"
-          sx={{
-            backgroundColor: theme.palette.background.paper,
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-            // borderBottom: `1px solid ${
-            //   theme.palette.divider || "rgba(0, 0, 0, 0.12)"
-            // }`,
-          }}
-        >
-          <Toolbar sx={{ justifyContent: "space-between", gap: 2 }}>
-            {/* Theme Toggle in Sidebar */}
-
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <IconButton
-                onClick={() => setCollapsed(!collapsed)}
-                sx={{ color: theme.palette.text.primary }}
-              >
-                {collapsed ? <MenuIcon /> : <ChevronLeft />}
-              </IconButton>
+            {!collapsed && (
               <Typography
-                variant="h6"
+                variant="caption"
                 sx={{
-                  color: theme.palette.text.primary,
-                  fontWeight: 600,
-                  display: { xs: "none", sm: "block" },
+                  fontWeight: 500,
+                  opacity: 0.8,
+                  display: "block",
+                  mt: 0.5,
+                  color: "#E2E8F0",
                 }}
               >
-                Admin Dashboard
+                Admin Panel
               </Typography>
-            </Box>
+            )}
+          </Box>
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              {/* Theme Toggle in Header for mobile */}
-              <IconButton
-                onClick={toggleTheme}
-                sx={{
-                  color: theme.palette.text.primary,
-                  display: { xs: "flex", md: "none" },
-                }}
-              >
-                {isDarkMode ? <Brightness7 /> : <Brightness4 />}
-              </IconButton>
-              {!collapsed && (
-                <Box
+          {/* Menu Items */}
+          <List sx={{ pt: 2, flexGrow: 1 }}>
+            {menuItems.map((item) => (
+              <ListItem key={item.path} disablePadding sx={{ px: 1 }}>
+                <ListItemButton
+                  selected={location.pathname === item.path}
+                  onClick={() => handleMenuClick(item.path)}
                   sx={{
-                    p: 2,
-                    borderTop: `1px solid ${theme.palette.secondary.main}`,
+                    borderRadius: 2,
+                    mx: 1,
+                    mb: 0.5,
+                    color: "rgba(255, 255, 255, 0.8)",
+                    "&:hover": {
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      color: "#FFFFFF",
+                    },
+                    "&.Mui-selected": {
+                      backgroundColor: "rgba(255, 255, 255, 0.15)",
+                      color: "#FFFFFF",
+                      fontWeight: 600,
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.2)",
+                      },
+                    },
                   }}
                 >
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={isDarkMode}
-                        onChange={toggleTheme}
-                        icon={
-                          <Brightness7
-                            sx={{ color: theme.palette.primary.contrastText }}
-                          />
-                        }
-                        checkedIcon={
-                          <Brightness4
-                            sx={{ color: theme.palette.primary.contrastText }}
-                          />
-                        }
-                      />
-                    }
-                    label={
-                      <Typography
-                        variant="body2"
-                        sx={{ color: theme.palette.primary.contrastText }}
-                      >
-                        {isDarkMode ? "Dark" : "Light"} Mode
-                      </Typography>
-                    }
-                    sx={{ m: 0 }}
-                  />
-                </Box>
-              )}
+                  <ListItemIcon
+                    sx={{
+                      color: "inherit",
+                      minWidth: collapsed ? 0 : 40,
+                      justifyContent: "center",
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  {!collapsed && (
+                    <ListItemText
+                      primary={item.label}
+                      sx={{
+                        "& .MuiTypography-root": {
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                        },
+                      }}
+                    />
+                  )}
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
 
-              <Box
-                onClick={(e) => setUserMenuAnchor(e.currentTarget)}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  cursor: "pointer",
-                  p: 1,
-                  borderRadius: 2,
-                  background:
-                    theme.palette.mode === "light"
-                      ? "rgba(148, 163, 184, 0.1)"
-                      : "rgba(30, 27, 75, 0.1)",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    background:
-                      theme.palette.mode === "light"
-                        ? "rgba(148, 163, 184, 0.2)"
-                        : "rgba(30, 27, 75, 0.2)",
-                  },
-                }}
-              >
-                <Avatar
-                  sx={{
-                    bgcolor: theme.palette.primary.main,
-                    color: theme.palette.primary.contrastText,
-                    width: 32,
-                    height: 32,
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  {user?.full_name?.charAt(0) || "A"}
-                </Avatar>
-                <Box sx={{ display: { xs: "none", md: "block" } }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 600, color: theme.palette.text.primary }}
-                  >
-                    {user?.full_name || "Admin"}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: theme.palette.text.secondary }}
-                  >
-                    Administrator
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-            <Menu
-              anchorEl={userMenuAnchor}
-              open={Boolean(userMenuAnchor)}
-              onClose={() => setUserMenuAnchor(null)}
-              PaperProps={{
-                sx: {
-                  mt: 1,
-                  minWidth: 200,
-                  backgroundColor: theme.palette.background.paper,
+          {/* Collapse Button at Bottom */}
+          <Box sx={{ p: 2, borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}>
+            <IconButton
+              onClick={() => setCollapsed(!collapsed)}
+              sx={{
+                color: "rgba(255, 255, 255, 0.7)",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
                 },
               }}
             >
-              <MenuItem
-                onClick={() => {
-                  navigate("/admin/profile");
-                  setUserMenuAnchor(null);
-                }}
-              >
-                <Person sx={{ mr: 1, fontSize: 20 }} /> Profile Settings
-              </MenuItem>
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  handleLogout();
-                  setUserMenuAnchor(null);
-                }}
-                sx={{ color: "error.main" }}
-              >
-                <Logout sx={{ mr: 1, fontSize: 20 }} /> Logout
-              </MenuItem>
-            </Menu>
-          </Toolbar>
-        </AppBar>
+              {collapsed ? <MenuIcon /> : <ChevronLeft />}
+            </IconButton>
+          </Box>
+        </Drawer>
 
-        {/* Content Area */}
+        {/* Mobile Drawer */}
+        <Drawer
+          variant="temporary"
+          open={!collapsed}
+          onClose={() => setCollapsed(true)}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              width: drawerWidth.xs,
+              boxSizing: "border-box",
+              borderRight: "none",
+              backgroundColor: "#1E1B4B",
+            },
+          }}
+        >
+          {/* Logo Section */}
+          <Box
+            sx={{
+              p: 2,
+              textAlign: "center",
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 800,
+                m: 0,
+                fontSize: collapsed ? "1.5rem" : "1.75rem",
+                background: `linear-gradient(135deg, #F8FAFC, #E2E8F0)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              {collapsed ? "G" : "Gem-Heart"}
+            </Typography>
+            {!collapsed && (
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 500,
+                  opacity: 0.8,
+                  display: "block",
+                  mt: 0.5,
+                  color: "#E2E8F0",
+                }}
+              >
+                Admin Panel
+              </Typography>
+            )}
+          </Box>
+
+          {/* Menu Items */}
+          <List sx={{ pt: 2, flexGrow: 1 }}>
+            {menuItems.map((item) => (
+              <ListItem key={item.path} disablePadding sx={{ px: 1 }}>
+                <ListItemButton
+                  selected={location.pathname === item.path}
+                  onClick={() => handleMenuClick(item.path)}
+                  sx={{
+                    borderRadius: 2,
+                    mx: 1,
+                    mb: 0.5,
+                    color: "rgba(255, 255, 255, 0.8)",
+                    "&:hover": {
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      color: "#FFFFFF",
+                    },
+                    "&.Mui-selected": {
+                      backgroundColor: "rgba(255, 255, 255, 0.15)",
+                      color: "#FFFFFF",
+                      fontWeight: 600,
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.2)",
+                      },
+                    },
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      color: "inherit",
+                      minWidth: collapsed ? 0 : 40,
+                      justifyContent: "center",
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  {!collapsed && (
+                    <ListItemText
+                      primary={item.label}
+                      sx={{
+                        "& .MuiTypography-root": {
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                        },
+                      }}
+                    />
+                  )}
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+
+          {/* Collapse Button at Bottom */}
+          <Box sx={{ p: 2, borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}>
+            <IconButton
+              onClick={() => setCollapsed(true)}
+              sx={{
+                color: "rgba(255, 255, 255, 0.7)",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                },
+              }}
+            >
+              <ChevronLeft />
+            </IconButton>
+          </Box>
+        </Drawer>
+
+        {/* Main Content */}
         <Box
           sx={{
             flexGrow: 1,
-            bgcolor: theme.palette.background.default,
-            overflow: "auto",
-            maxHeight: "calc(100vh - 64px)",
+            display: "flex",
+            flexDirection: "column",
+            backgroundColor: "background.default",
           }}
         >
-          <Box sx={{ p: 3, minHeight: "100%" }}>
-            <Breadcrumbs sx={{ mb: 3 }}>
-              <MuiLink
-                component="button"
-                onClick={() => navigate("/admin")}
-                underline="hover"
-                sx={{
-                  color: theme.palette.text.primary,
-                  fontSize: "0.9rem",
+          {/* Header */}
+          <AppBar
+            position="static"
+            color="default"
+            elevation={0}
+            sx={{
+              backgroundColor: "background.paper",
+              borderBottom: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <Toolbar
+              sx={{
+                justifyContent: "space-between",
+                gap: 2,
+                minHeight: { xs: "56px !important", sm: "72px !important" },
+                px: { xs: 1, sm: 2 },
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={() => setCollapsed(!collapsed)}
+                  sx={{ mr: 1, display: { sm: "none" } }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="div"
+                  sx={{
+                    color: "text.primary",
+                    fontWeight: 600,
+                    fontSize: { xs: "1rem", sm: "1.25rem" },
+                    display: { xs: "none", sm: "block" },
+                  }}
+                >
+                  Admin Dashboard
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                {/* Theme Toggle */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: { xs: 0.5, sm: 1 },
+                  }}
+                >
+                  <IconButton
+                    onClick={toggleTheme}
+                    sx={{
+                      color: theme.palette.text.primary,
+                      bgcolor: theme.palette.primary.main,
+                      "&:hover": {
+                        bgcolor: isDarkMode ? "#E2E8F0" : "#2d2a6b",
+                      },
+                      width: { xs: 32, sm: 40 },
+                      height: { xs: 32, sm: 40 },
+                    }}
+                  >
+                    {isDarkMode ? (
+                      <LightMode
+                        sx={{
+                          color: theme.palette.primary.contrastText,
+                          fontSize: { xs: "18px", sm: "24px" },
+                        }}
+                      />
+                    ) : (
+                      <DarkMode
+                        sx={{
+                          color: theme.palette.primary.contrastText,
+                          fontSize: { xs: "18px", sm: "24px" },
+                        }}
+                      />
+                    )}
+                  </IconButton>
+                </Box>
+
+                {/* User Menu */}
+                <Box
+                  onClick={(e) => setUserMenuAnchor(e.currentTarget)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    cursor: "pointer",
+                    p: 1,
+                    borderRadius: 2,
+                    bgcolor: "action.hover",
+                    "&:hover": {
+                      bgcolor: "action.selected",
+                    },
+                  }}
+                >
+                  <Avatar
+                    src={user?.profile_image || ""}
+                    alt={user?.full_name || "Admin"}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      bgcolor: user?.profile_image
+                        ? "transparent"
+                        : "primary.main",
+                      color: user?.profile_image
+                        ? "inherit"
+                        : "primary.contrastText",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      "& .MuiAvatar-img": {
+                        objectFit: "cover",
+                      },
+                    }}
+                  >
+                    {!user?.profile_image &&
+                      (user?.full_name?.charAt(0) || "A")}
+                  </Avatar>
+                  <Box>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 600, color: "text.primary" }}
+                    >
+                      {user?.full_name || "Admin"}
+                    </Typography>
+                    <Typography variant="h6" noWrap component="div">
+                      Admin Panel
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {user.role}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+
+              <Menu
+                anchorEl={userMenuAnchor}
+                open={Boolean(userMenuAnchor)}
+                onClose={() => setUserMenuAnchor(null)}
+                PaperProps={{
+                  sx: {
+                    mt: 1,
+                    minWidth: 200,
+                  },
                 }}
               >
-                Admin
-              </MuiLink>
-              <Typography
-                sx={{
-                  color: theme.palette.text.primary,
-                  fontSize: "0.9rem",
-                  fontWeight: 500,
-                }}
-              >
-                {getBreadcrumbTitle()}
-              </Typography>
-            </Breadcrumbs>
-            <Outlet />
+                <MenuItem
+                  onClick={() => {
+                    navigate("/admin/profile");
+                    setUserMenuAnchor(null);
+                  }}
+                >
+                  <Person sx={{ mr: 1, fontSize: 20 }} /> Profile Settings
+                </MenuItem>
+                <Divider />
+                <MenuItem
+                  onClick={() => {
+                    handleLogout();
+                    setUserMenuAnchor(null);
+                  }}
+                  sx={{ color: "error.main" }}
+                >
+                  <Logout sx={{ mr: 1, fontSize: 20 }} /> Logout
+                </MenuItem>
+              </Menu>
+            </Toolbar>
+          </AppBar>
+
+          {/* Content Area */}
+          <Box
+            sx={{
+              flexGrow: 1,
+              bgcolor: "background.default",
+              overflow: "auto",
+              maxHeight: "calc(100vh - 128px)",
+            }}
+          >
+            {/* Breadcrumbs */}
+            <Box sx={{ px: { xs: 1.5, sm: 3 }, pt: 2, pb: 1 }}>
+              <Breadcrumbs aria-label="breadcrumb">
+                <MuiLink
+                  component="button"
+                  onClick={() => navigate("/admin")}
+                  underline="hover"
+                  sx={{
+                    color: "text.secondary",
+                    fontSize: "0.9rem",
+                    fontWeight: 500,
+                    "&:hover": {
+                      color: "primary.main",
+                      cursor: "pointer",
+                    },
+                  }}
+                >
+                  Admin
+                </MuiLink>
+                {getBreadcrumbItems()}
+              </Breadcrumbs>
+            </Box>
+
+            <Box
+              sx={{
+                pt: 1,
+                minHeight: "100%",
+                overflowX: "auto",
+              }}
+            >
+              <Outlet />
+            </Box>
           </Box>
         </Box>
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 };
 

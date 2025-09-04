@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ThemeProvider, CssBaseline, Box } from "@mui/material";
@@ -34,7 +34,7 @@ import PrivacyPage from "./pages/customer/PrivacyPage";
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
-import AdminCollections from "./pages/admin/collections/AdminCollections";
+import AdminCollections from "./pages/admin/AdminCollections";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminInventory from "./pages/admin/AdminInventory";
 import AdminOffers from "./pages/admin/AdminOffers";
@@ -50,13 +50,88 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminRoute from "./components/auth/AdminRoute";
 
+// Layout Components
+const CustomerLayout = ({
+  children,
+  isDarkMode,
+  toggleTheme,
+}: {
+  children: React.ReactNode;
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+}) => (
+  <Box
+    sx={{
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: "#ffffff",
+    }}
+  >
+    <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+    <Box
+      component="main"
+      sx={{
+        flex: 1,
+        pt: "70px",
+        backgroundColor: "#ffffff",
+      }}
+    >
+      {children}
+    </Box>
+    <Footer />
+    <WhatsAppButton />
+  </Box>
+);
+
+const AuthLayout = ({
+  children,
+  isDarkMode,
+  toggleTheme,
+}: {
+  children: React.ReactNode;
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+}) => (
+  <Box
+    sx={{
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: "#ffffff",
+    }}
+  >
+    <Header
+      isDarkMode={isDarkMode}
+      toggleTheme={toggleTheme}
+      showBanner={false}
+    />
+    <Box
+      component="main"
+      sx={{
+        flex: 1,
+        pt: "70px",
+        backgroundColor: "#ffffff",
+      }}
+    >
+      {children}
+    </Box>
+  </Box>
+);
+
 function App() {
   const dispatch = useDispatch<AppDispatch>();
   const { isAuthenticated, token } = useSelector(
     (state: RootState) => state.auth
   );
+
+  // Initialize theme from localStorage or system preference
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      return savedTheme === "dark";
+    }
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
   useEffect(() => {
@@ -65,31 +140,49 @@ function App() {
         try {
           await dispatch(getCurrentUser()).unwrap();
         } catch (error) {
-          console.error('Failed to load user data:', error);
+          console.error("Failed to load user data:", error);
           // Clear invalid token if user data can't be loaded
-          localStorage.removeItem('token');
+          localStorage.removeItem("token");
         }
       }
     };
-    
+
     loadUser();
   }, [dispatch, token]);
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    localStorage.setItem("theme", !isDarkMode ? "dark" : "light");
-  };
+  const toggleTheme = useCallback(() => {
+    setIsDarkMode((prevMode) => {
+      const newMode = !prevMode;
+      localStorage.setItem("theme", newMode ? "dark" : "light");
+      return newMode;
+    });
+  }, []);
+
+  const theme = useMemo(
+    () => (isDarkMode ? darkTheme : lightTheme),
+    [isDarkMode]
+  );
 
   return (
-    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Routes>
+        {/* Home Route */}
+        <Route
+          path="/"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <HomePage />
+            </CustomerLayout>
+          }
+        />
+
         {/* Admin Login Route */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* Admin Routes */}
         <Route
-          path="/admin"
+          path="/admin/*"
           element={
             <AdminRoute>
               <AdminLayout />
@@ -111,217 +204,174 @@ function App() {
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 
-        {/* Auth Routes without footer */}
+        {/* Auth Routes */}
         <Route
           path="/login"
           element={
-            <Box
-              sx={{
-                minHeight: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                backgroundColor: "#ffffff",
-              }}
-            >
-              <Header
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                showBanner={false}
-              />
-              <Box
-                component="main"
-                sx={{
-                  flex: 1,
-                  pt: "70px",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <LoginPage />
-              </Box>
-            </Box>
+            <AuthLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <LoginPage />
+            </AuthLayout>
           }
         />
         <Route
           path="/signup"
           element={
-            <Box
-              sx={{
-                minHeight: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                backgroundColor: "#ffffff",
-              }}
-            >
-              <Header
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                showBanner={false}
-              />
-              <Box
-                component="main"
-                sx={{
-                  flex: 1,
-                  pt: "70px",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <SignupPage />
-              </Box>
-            </Box>
+            <AuthLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <SignupPage />
+            </AuthLayout>
           }
         />
         <Route
           path="/forgot-password"
           element={
-            <Box
-              sx={{
-                minHeight: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                backgroundColor: "#ffffff",
-              }}
-            >
-              <Header
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                showBanner={false}
-              />
-              <Box
-                component="main"
-                sx={{
-                  flex: 1,
-                  pt: "70px",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <ForgotPasswordPage />
-              </Box>
-            </Box>
-          }
-        />
-        <Route
-          path="/terms"
-          element={
-            <Box
-              sx={{
-                minHeight: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden",
-                backgroundColor: "#ffffff",
-              }}
-            >
-              <Header
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                showBanner={false}
-              />
-              <Box
-                component="main"
-                sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}
-              >
-                <TermsPage />
-              </Box>
-            </Box>
-          }
-        />
-        <Route
-          path="/privacy"
-          element={
-            <Box
-              sx={{
-                minHeight: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden",
-                backgroundColor: "#ffffff",
-              }}
-            >
-              <Header
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                showBanner={false}
-              />
-              <Box
-                component="main"
-                sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}
-              >
-                <PrivacyPage />
-              </Box>
-            </Box>
+            <AuthLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <ForgotPasswordPage />
+            </AuthLayout>
           }
         />
 
         {/* Customer Routes */}
         <Route
-          path="/*"
+          path="/shop"
           element={
-            <Box
-              sx={{
-                minHeight: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                backgroundColor: "#ffffff",
-              }}
-            >
-              <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
-              <Box
-                component="main"
-                sx={{ flex: 1, pt: "70px", backgroundColor: "#ffffff" }}
-              >
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<HomePage />} />
-                  <Route
-                    path="/categories"
-                    element={
-                      <CategoriesPage
-                        isDarkMode={false}
-                        toggleTheme={function (): void {
-                          throw new Error("Function not implemented.");
-                        }}
-                      />
-                    }
-                  />
-                  <Route path="/shop" element={<ShopPage />} />
-                  <Route path="/shop/:category" element={<ShopPage />} />
-                  <Route path="/product/:id" element={<ProductDetailPage />} />
-                  <Route path="/offers/:type" element={<OffersPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/about" element={<AboutPage />} />
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <ShopPage />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/shop/:category"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <ShopPage />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/categories"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <CategoriesPage
+                isDarkMode={false}
+                toggleTheme={function (): void {
+                  throw new Error("Function not implemented.");
+                }}
+              />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/terms"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <TermsPage />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/privacy"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <PrivacyPage />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/product/:id"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <ProductDetailPage />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <CartPage />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <ProtectedRoute>
+                <CheckoutPage />
+              </ProtectedRoute>
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/offers"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <OffersPage />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/offers/:type"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <OffersPage />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <ContactPage />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <AboutPage />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <ProtectedRoute>
+                <UserOrdersPage />
+              </ProtectedRoute>
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/order-confirmation/:orderId"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <ProtectedRoute>
+                <OrderConfirmationPage />
+              </ProtectedRoute>
+            </CustomerLayout>
+          }
+        />
 
-                  <Route path="/cart" element={<CartPage />} />
-                  <Route path="/checkout" element={<CheckoutPage />} />
-                  <Route
-                    path="/order-confirmation"
-                    element={<OrderConfirmationPage />}
-                  />
-
-                  {/* Protected Customer Routes */}
-                  <Route
-                    path="my-orders"
-                    element={
-                      <ProtectedRoute>
-                        <UserOrdersPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="profile"
-                    element={
-                      <ProtectedRoute>
-                        <ProfilePage />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* 404 Route */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Box>
-              <Footer />
-              <WhatsAppButton />
-            </Box>
+        {/* 404 Route for all other unmatched routes */}
+        <Route
+          path="*"
+          element={
+            <CustomerLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme}>
+              <NotFound />
+            </CustomerLayout>
           }
         />
       </Routes>

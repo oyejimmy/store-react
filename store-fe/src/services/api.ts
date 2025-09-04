@@ -18,31 +18,21 @@ const api = axios.create({
   validateStatus: (status) => status < 500, // Reject only if status is 500 or higher
 });
 
-// Add a request interceptor to add auth token to headers if it exists in localStorage
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token && !config.headers.Authorization) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
 // Request interceptor to add auth token and log requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
-        data: config.data
-      });
-    } else {
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url} (No token)`);
     }
+    
+    // Log the request
+    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
+      headers: config.headers,
+      data: config.data,
+      params: config.params
+    });
+    
     return config;
   },
   (error) => {
@@ -141,9 +131,9 @@ export const productAPI = {
       .then((res) => res.data),
   getProductsByCategory: (category: string, subcategory?: string, signal?: AbortSignal) =>
     api
-      .get(`/api/products/category/${category}`, { 
-        params: { subcategory },
-        signal 
+      .get(`/api/products`, { 
+        params: { category, subcategory },
+        signal
       })
       .then((res) => res.data),
 };
@@ -182,101 +172,106 @@ export const offerAPI = {
   getAllOffers: () => api.get("/offers").then((res) => res.data),
 };
 
+// Helper function to get config with params
+const getConfig = (params?: any) => ({
+  params,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
 // Admin API
 export const adminAPI = {
   // Dashboard
-  getDashboardStats: () => api.get("/admin/dashboard").then((res) => res.data),
+  getDashboardStats: () => api.get("/api/admin/dashboard").then((res) => res.data),
 
-  // Products - temporarily use debug endpoint
-  getAllProducts: (params?: any) => api.get("/admin/products/temp", { params }).then((res) => res.data),
+  // Products
+  getAllProducts: (params?: any) => 
+    api.get("/api/admin/products", getConfig({
+      ...params,
+      limit: 1000 // Get more items by default for admin
+    })).then((res) => res.data),
   createProduct: (productData: any) =>
-    api.post("/admin/products", productData).then((res) => res.data),
+    api.post("/api/admin/products", productData).then((res) => res.data),
   updateProduct: (id: number, productData: any) =>
-    api.put(`/admin/products/${id}`, productData).then((res) => res.data),
+    api.put(`/api/admin/products/${id}`, productData).then((res) => res.data),
   deleteProduct: (id: number) =>
-    api.delete(`/admin/products/${id}`).then((res) => res.data),
-  getProductAnalytics: () => api.get("/admin/products/analytics").then((res) => res.data),
+    api.delete(`/api/admin/products/${id}`).then((res) => res.data),
+  getProductAnalytics: () => 
+    api.get("/api/admin/analytics/products").then((res) => res.data),
   getProductsByCategory: (category: string, subcategory?: string) =>
-    api
-      .get(`/admin/products/category/${category}`, { params: { subcategory } })
+    api.get("/api/admin/products", getConfig({ category, subcategory }))
       .then((res) => res.data),
 
   // Categories
-  getAllCategories: () => api.get("/admin/categories").then((res) => res.data),
+  getAllCategories: () => api.get("/api/admin/categories").then((res) => res.data),
 
   // Orders
-  getAllOrders: () => api.get("/admin/orders").then((res) => res.data),
+  getAllOrders: () => api.get("/api/admin/orders").then((res) => res.data),
   getOrderDetails: (id: number) =>
-    api.get(`/admin/orders/${id}`).then((res) => res.data),
+    api.get(`/api/admin/orders/${id}`).then((res) => res.data),
   updateOrderStatus: (id: number, statusData: any) =>
-    api.put(`/admin/orders/${id}`, statusData).then((res) => res.data),
+    api.put(`/api/admin/orders/${id}`, statusData).then((res) => res.data),
   deleteOrder: (id: number) =>
-    api.delete(`/admin/orders/${id}`).then((res) => res.data),
+    api.delete(`/api/admin/orders/${id}`).then((res) => res.data),
 
   // Inventory
-  getInventoryStatus: () => api.get("/admin/inventory").then((res) => res.data),
+  getInventoryStatus: () => api.get("/api/admin/inventory").then((res) => res.data),
   updateStock: (id: number, stockQuantity: number) =>
-    api
-      .put(`/admin/inventory/${id}`, { stock_quantity: stockQuantity })
+    api.put(`/api/admin/inventory/${id}`, { stock_quantity: stockQuantity })
       .then((res) => res.data),
 
   // Users
-  getAllUsers: () => api.get("/admin/users").then((res) => res.data),
+  getAllUsers: () => api.get("/api/admin/users").then((res) => res.data),
   updateUser: (id: number, userData: any) =>
-    api.put(`/admin/users/${id}`, userData).then((res) => res.data),
+    api.put(`/api/admin/users/${id}`, userData).then((res) => res.data),
   toggleUserStatus: (id: number) =>
-    api.put(`/admin/users/${id}/toggle`).then((res) => res.data),
+    api.patch(`/api/admin/users/${id}/toggle-status`, {}).then((res) => res.data),
 
   // Offers
   createOffer: (offerData: any) =>
-    api.post("/offers", offerData).then((res) => res.data),
+    api.post("/api/offers", offerData).then((res) => res.data),
   updateOffer: (id: number, offerData: any) =>
-    api.put(`/offers/${id}`, offerData).then((res) => res.data),
+    api.put(`/api/offers/${id}`, offerData).then((res) => res.data),
   deleteOffer: (id: number) =>
-    api.delete(`/offers/${id}`).then((res) => res.data),
+    api.delete(`/api/offers/${id}`).then((res) => res.data),
   addProductToOffer: (offerId: number, productId: number) =>
-    api
-      .post(`/offers/${offerId}/products/${productId}`)
+    api.post(`/api/offers/${offerId}/products/${productId}`, {})
       .then((res) => res.data),
   removeProductFromOffer: (offerId: number, productId: number) =>
-    api
-      .delete(`/offers/${offerId}/products/${productId}`)
+    api.delete(`/api/offers/${offerId}/products/${productId}`)
       .then((res) => res.data),
 
   // Collections
   getAllCollections: () =>
-    api.get("/admin/collections").then((res) => res.data),
+    api.get("/api/admin/collections").then((res) => res.data),
   createCollection: (collectionData: any) =>
-    api.post("/admin/collections", collectionData).then((res) => res.data),
+    api.post("/api/admin/collections", collectionData).then((res) => res.data),
   updateCollection: (id: number, collectionData: any) =>
-    api.put(`/admin/collections/${id}`, collectionData).then((res) => res.data),
+    api.put(`/api/admin/collections/${id}`, collectionData).then((res) => res.data),
   deleteCollection: (id: number) =>
-    api.delete(`/admin/collections/${id}`).then((res) => res.data),
+    api.delete(`/api/admin/collections/${id}`).then((res) => res.data),
   getCollection: (id: number) =>
-    api.get(`/admin/collections/${id}`).then((res) => res.data),
+    api.get(`/api/admin/collections/${id}`).then((res) => res.data),
   uploadCollectionImage: (id: number, file: File) => {
     const formData = new FormData();
-    formData.append("file", file);
-    return api
-      .post(`/admin/collections/${id}/upload-image`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((res) => res.data);
+    formData.append('file', file);
+    return api.post(
+      `/api/admin/collections/${id}/upload-image`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    ).then((res) => res.data);
   },
-  
+
   // Product Image Upload
   uploadProductImage: (id: number, file: File) => {
     const formData = new FormData();
-    formData.append("file", file);
-    return api
-      .post(`/admin/products/${id}/upload-image`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((res) => res.data);
+    formData.append('file', file);
+    return api.post(
+      `/api/admin/products/${id}/upload`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    ).then((res) => res.data);
   },
 };
 

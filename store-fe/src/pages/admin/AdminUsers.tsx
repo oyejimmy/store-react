@@ -31,9 +31,16 @@ import {
 import { Refresh, Visibility, Person } from "@mui/icons-material";
 import { adminAPI } from "../../services/api";
 
+// Color constants
+const COLORS = {
+  offWhite: "#F8FAFC",
+  deepNavy: "#1E1B4B",
+  silver: "#94A3B8",
+};
+
 const tableHeadingColor = {
-  backgroundColor: "#2c6e49",
-  color: "#ffffff",
+  backgroundColor: COLORS.deepNavy,
+  color: COLORS.offWhite,
   fontWeight: 600,
 };
 
@@ -89,12 +96,12 @@ const AdminUsers: React.FC = () => {
     setIsModalVisible(true);
   };
 
-  const handleToggleStatus = (userId: number, active: boolean) => {
+  const handleToggleStatus = (userId: any, active: boolean) => {
     setUserToUpdate({ id: userId, field: "is_active", value: active });
     setConfirmDialogOpen(true);
   };
 
-  const handleToggleAdmin = (userId: number, currentAdminStatus: boolean) => {
+  const handleToggleAdmin = (userId: any, currentAdminStatus: boolean) => {
     setUserToUpdate({
       id: userId,
       field: "is_admin",
@@ -158,6 +165,7 @@ const AdminUsers: React.FC = () => {
       sx={{
         p: { xs: 1, sm: 2, md: 3 },
         minHeight: "100vh",
+        backgroundColor: theme.palette.mode === "dark" ? "#0f172a" : COLORS.offWhite,
       }}
     >
       {/* Header with Refresh Button */}
@@ -168,9 +176,9 @@ const AdminUsers: React.FC = () => {
           alignItems: "center",
           mb: 4,
           p: 3,
-          background: "linear-gradient(135deg, #2c6e49 0%, #4a8b6a 100%)",
+          background: `linear-gradient(135deg, ${COLORS.deepNavy} 0%, #3730a3 100%)`,
           borderRadius: 3,
-          boxShadow: "0 8px 32px rgba(44, 110, 73, 0.2)",
+          boxShadow: "0 8px 32px rgba(30, 27, 75, 0.2)",
         }}
       >
         <Typography
@@ -178,8 +186,9 @@ const AdminUsers: React.FC = () => {
           component="h1"
           sx={{
             fontWeight: 700,
-            color: "white",
+            color: COLORS.offWhite,
             textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
           }}
         >
           User Management
@@ -187,15 +196,16 @@ const AdminUsers: React.FC = () => {
         <Button
           variant="outlined"
           startIcon={<Refresh />}
+          onClick={fetchUsers}
           disabled={loading}
           size={isMobile ? "small" : "medium"}
           sx={{
-            borderColor: "#2c6e49",
-            color: "black",
-            backgroundColor: "white",
+            borderColor: COLORS.offWhite,
+            color: COLORS.offWhite,
+            backgroundColor: "rgba(248, 250, 252, 0.1)",
             "&:hover": {
-              borderColor: "#2c6e49",
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              borderColor: COLORS.offWhite,
+              backgroundColor: "rgba(248, 250, 252, 0.2)",
             },
           }}
         >
@@ -205,7 +215,12 @@ const AdminUsers: React.FC = () => {
 
       <TableContainer
         component={Paper}
-        sx={{ overflowX: "auto", borderRadius: 2, boxShadow: 3 }}
+        sx={{ 
+          overflowX: "auto", 
+          borderRadius: 2, 
+          boxShadow: 3,
+          backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#ffffff",
+        }}
       >
         <Table size={isMobile ? "small" : "medium"}>
           <TableHead>
@@ -235,7 +250,20 @@ const AdminUsers: React.FC = () => {
               users
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((user) => (
-                  <TableRow key={user.id} hover>
+                  <TableRow 
+                    key={user.id} 
+                    hover
+                    sx={{
+                      backgroundColor: theme.palette.mode === "dark" 
+                        ? "#1e293b" 
+                        : "#ffffff",
+                      "&:hover": {
+                        backgroundColor: theme.palette.mode === "dark" 
+                          ? "#2d3748" 
+                          : "#f8fafc",
+                      },
+                    }}
+                  >
                     <TableCell>
                       <Typography variant="body2" fontWeight="bold">
                         {user.full_name}
@@ -328,6 +356,9 @@ const AdminUsers: React.FC = () => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          sx={{
+            backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#f8fafc",
+          }}
         />
       </TableContainer>
 
@@ -337,15 +368,27 @@ const AdminUsers: React.FC = () => {
         onClose={() => setIsModalVisible(false)}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#ffffff",
+          },
+        }}
       >
-        <DialogTitle>User Details</DialogTitle>
+        <DialogTitle sx={{ 
+          color: theme.palette.mode === "dark" ? COLORS.offWhite : COLORS.deepNavy,
+          backgroundColor: theme.palette.mode === "dark" ? COLORS.deepNavy : "#f8fafc",
+        }}>
+          User Details
+        </DialogTitle>
         <DialogContent>
           {selectedUser && (
             <Box>
               <Card
                 sx={{
                   marginBottom: 2,
-                  background: "linear-gradient(135deg, #f8f9fa, #e9ecef)",
+                  background: theme.palette.mode === "dark" 
+                    ? "linear-gradient(135deg, #1e293b, #2d3748)" 
+                    : "linear-gradient(135deg, #f8f9fa, #e9ecef)",
                   p: 2,
                 }}
               >
@@ -355,19 +398,19 @@ const AdminUsers: React.FC = () => {
                       width: 64,
                       height: 64,
                       marginRight: 2,
-                      backgroundColor: "#d4af37",
+                      backgroundColor: COLORS.deepNavy,
                     }}
                   >
-                    <Person sx={{ fontSize: 32 }} />
+                    <Person sx={{ fontSize: 32, color: COLORS.offWhite }} />
                   </Avatar>
                   <Box>
                     <Typography
                       variant="h5"
-                      sx={{ color: "#d4af37", fontWeight: "bold" }}
+                      sx={{ color: COLORS.deepNavy, fontWeight: "bold" }}
                     >
                       {selectedUser.full_name || "N/A"}
                     </Typography>
-                    <Typography variant="body1" sx={{ color: "#666", mt: 0.5 }}>
+                    <Typography variant="body1" sx={{ color: COLORS.silver, mt: 0.5 }}>
                       {selectedUser.email}
                     </Typography>
                     <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
@@ -386,53 +429,53 @@ const AdminUsers: React.FC = () => {
                 </Box>
               </Card>
 
-              <Card sx={{ p: 2 }}>
-                <Typography variant="h6" gutterBottom>
+              <Card sx={{ p: 2, backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#ffffff" }}>
+                <Typography variant="h6" gutterBottom sx={{ color: theme.palette.mode === "dark" ? COLORS.offWhite : COLORS.deepNavy }}>
                   Complete User Information
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       User ID:
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 2, color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
                       {selectedUser.id}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Username:
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 2, color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
                       {selectedUser.username || "N/A"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Full Name:
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 2, color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
                       {selectedUser.full_name || "N/A"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Email Address:
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 2, color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
                       {selectedUser.email}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Phone Number:
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 2, color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
                       {selectedUser.phone || "N/A"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Account Status:
                     </Typography>
                     <Box sx={{ mb: 2 }}>
@@ -444,7 +487,7 @@ const AdminUsers: React.FC = () => {
                     </Box>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       User Role:
                     </Typography>
                     <Box sx={{ mb: 2 }}>
@@ -458,42 +501,42 @@ const AdminUsers: React.FC = () => {
                     </Box>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Admin Privileges:
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 2, color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
                       {selectedUser.is_admin ? "✅ Yes" : "❌ No"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Account Created:
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 2, color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
                       {new Date(selectedUser.created_at).toLocaleString()}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Registration Date:
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 2, color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
                       {new Date(selectedUser.created_at).toLocaleDateString()}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Registration Time:
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 2, color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
                       {new Date(selectedUser.created_at).toLocaleTimeString()}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Account Age:
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 2, color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
                       {calculateAccountAge(selectedUser.created_at)} days
                     </Typography>
                   </Grid>
@@ -504,14 +547,14 @@ const AdminUsers: React.FC = () => {
                     sx={{
                       mt: 2,
                       p: 2,
-                      backgroundColor: "#f8f9fa",
+                      backgroundColor: theme.palette.mode === "dark" ? "#2d3748" : "#f8f9fa",
                       borderRadius: 1,
                     }}
                   >
-                    <Typography variant="subtitle2" sx={{ color: "#d4af37" }}>
+                    <Typography variant="subtitle2" sx={{ color: COLORS.deepNavy }}>
                       Security Information:
                     </Typography>
-                    <Typography variant="caption" sx={{ color: "#666" }}>
+                    <Typography variant="caption" sx={{ color: theme.palette.mode === "dark" ? COLORS.offWhite : COLORS.silver }}>
                       Password Hash:{" "}
                       {selectedUser.hashed_password.substring(0, 20)}...
                     </Typography>
@@ -521,7 +564,7 @@ const AdminUsers: React.FC = () => {
             </Box>
           )}
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#f8fafc" }}>
           <Button onClick={() => setIsModalVisible(false)}>Close</Button>
         </DialogActions>
       </Dialog>
@@ -530,11 +573,18 @@ const AdminUsers: React.FC = () => {
       <Dialog
         open={confirmDialogOpen}
         onClose={() => setConfirmDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#ffffff",
+          },
+        }}
       >
-        <DialogTitle>Confirm Change</DialogTitle>
+        <DialogTitle sx={{ color: theme.palette.mode === "dark" ? COLORS.offWhite : COLORS.deepNavy }}>
+          Confirm Change
+        </DialogTitle>
         <DialogContent>
           {userToUpdate && (
-            <Typography>
+            <Typography sx={{ color: theme.palette.mode === "dark" ? COLORS.offWhite : "inherit" }}>
               Are you sure you want to{" "}
               {userToUpdate.field === "is_admin"
                 ? `${userToUpdate.value ? "grant" : "remove"} admin privileges`
@@ -543,7 +593,7 @@ const AdminUsers: React.FC = () => {
             </Typography>
           )}
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#f8fafc" }}>
           <Button onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
           <Button color="primary" variant="contained" onClick={confirmUpdate}>
             Confirm

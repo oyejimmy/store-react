@@ -29,6 +29,7 @@ import {
   useMediaQuery,
   useTheme,
   Stack,
+  Snackbar,
 } from "@mui/material";
 import {
   Add,
@@ -41,7 +42,7 @@ import {
   Category,
   Inventory,
 } from "@mui/icons-material";
-import { adminAPI } from "../../../services/api";
+import { adminAPI } from "../../services/api";
 
 interface Collection {
   id: number;
@@ -57,7 +58,7 @@ interface Collection {
 }
 
 const tableHeadingColor = {
-  backgroundColor: "#2c6e49",
+  backgroundColor: "#1E1B4B",
   color: "#ffffff",
   fontWeight: 600,
 };
@@ -83,6 +84,8 @@ const AdminCollections: React.FC = () => {
   const [collectionToDelete, setCollectionToDelete] = useState<number | null>(
     null
   );
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -100,6 +103,11 @@ const AdminCollections: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const showSnackbar = (message: string) => {
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
   const fetchCollections = async () => {
     try {
       setLoading(true);
@@ -107,7 +115,7 @@ const AdminCollections: React.FC = () => {
       setCollections(data);
     } catch (error) {
       console.error("Failed to fetch collections:", error);
-      alert("Failed to fetch collections");
+      showSnackbar("Failed to fetch collections");
     } finally {
       setLoading(false);
     }
@@ -168,12 +176,12 @@ const AdminCollections: React.FC = () => {
 
     try {
       await adminAPI.deleteCollection(collectionToDelete);
-      alert("Collection deleted successfully");
+      showSnackbar("Collection deleted successfully");
       fetchCollections();
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.detail || "Failed to delete collection";
-      alert(errorMessage);
+      showSnackbar(errorMessage);
     } finally {
       setDeleteDialogOpen(false);
       setCollectionToDelete(null);
@@ -210,7 +218,7 @@ const AdminCollections: React.FC = () => {
         );
       }
 
-      alert(
+      showSnackbar(
         editingCollection
           ? "Collection updated successfully"
           : "Collection added successfully"
@@ -220,7 +228,7 @@ const AdminCollections: React.FC = () => {
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.detail || "Failed to save collection";
-      alert(errorMessage);
+      showSnackbar(errorMessage);
     } finally {
       setIsUploading(false);
     }
@@ -244,14 +252,14 @@ const AdminCollections: React.FC = () => {
         "image/webp",
       ];
       if (!allowedTypes.includes(file.type)) {
-        alert("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
+        showSnackbar("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
         return;
       }
 
       // Validate file size (max 5MB)
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        alert("File size must be less than 5MB");
+        showSnackbar("File size must be less than 5MB");
         return;
       }
 
@@ -308,6 +316,7 @@ const AdminCollections: React.FC = () => {
       sx={{
         p: { xs: 1, sm: 2, md: 3 },
         minHeight: "100vh",
+        backgroundColor: "#F8FAFC",
       }}
     >
       {/* Header with Add Button */}
@@ -318,9 +327,9 @@ const AdminCollections: React.FC = () => {
           alignItems: "center",
           mb: 4,
           p: 3,
-          background: "linear-gradient(135deg, #2c6e49 0%, #4a8b6a 100%)",
+          background: "#1E1B4B",
           borderRadius: 3,
-          boxShadow: "0 8px 32px rgba(44, 110, 73, 0.2)",
+          boxShadow: "0 8px 32px rgba(30, 27, 75, 0.2)",
         }}
       >
         <Typography
@@ -342,12 +351,12 @@ const AdminCollections: React.FC = () => {
             disabled={loading}
             size={isMobile ? "small" : "medium"}
             sx={{
-              borderColor: "#2c6e49",
-              color: "#2c6e49",
-              backgroundColor: "rgb(224, 220, 220)",
+              borderColor: "#94A3B8",
+              color: "#94A3B8",
+              backgroundColor: "#F8FAFC",
               "&:hover": {
-                borderColor: "#2c6e49",
-                backgroundColor: "rgb(230, 232, 210)",
+                borderColor: "#1E1B4B",
+                backgroundColor: "#E2E8F0",
               },
             }}
           >
@@ -358,158 +367,187 @@ const AdminCollections: React.FC = () => {
             startIcon={<Add />}
             onClick={handleAdd}
             size={isMobile ? "small" : "medium"}
+            sx={{
+              backgroundColor: "#1E1B4B",
+              "&:hover": {
+                backgroundColor: "#2D2A6B",
+              },
+            }}
           >
             Add Collection
           </Button>
         </Box>
       </Box>
-      <TableContainer
-        component={Paper}
-        sx={{ overflowX: "auto", borderRadius: 2, boxShadow: 3 }}
-      >
-        <Table size={isMobile ? "small" : "medium"}>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={tableHeadingColor}>Image</TableCell>
-              <TableCell sx={tableHeadingColor}>Name</TableCell>
-              {!isMobile && (
-                <TableCell sx={tableHeadingColor}>Description</TableCell>
-              )}
-              <TableCell sx={tableHeadingColor}>Products</TableCell>
-              {!isTablet && (
-                <TableCell sx={tableHeadingColor}>Conditions</TableCell>
-              )}
-              <TableCell sx={tableHeadingColor}>Status</TableCell>
-              <TableCell sx={tableHeadingColor}>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
+
+      {collections.length === 0 && !loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "300px",
+            backgroundColor: "#F8FAFC",
+            borderRadius: 2,
+            p: 4,
+          }}
+        >
+          <Typography
+            variant="h6"
+            color="#94A3B8"
+            sx={{ textAlign: "center" }}
+          >
+            This product is currently out of stock or not available
+          </Typography>
+        </Box>
+      ) : (
+        <TableContainer
+          component={Paper}
+          sx={{ overflowX: "auto", borderRadius: 2, boxShadow: 3 }}
+        >
+          <Table size={isMobile ? "small" : "medium"}>
+            <TableHead>
               <TableRow>
-                <TableCell
-                  colSpan={isMobile ? 5 : isTablet ? 6 : 7}
-                  sx={{ textAlign: "center", py: 4 }}
-                >
-                  <CircularProgress />
-                </TableCell>
+                <TableCell sx={tableHeadingColor}>Image</TableCell>
+                <TableCell sx={tableHeadingColor}>Name</TableCell>
+                {!isMobile && (
+                  <TableCell sx={tableHeadingColor}>Description</TableCell>
+                )}
+                <TableCell sx={tableHeadingColor}>Products</TableCell>
+                {!isTablet && (
+                  <TableCell sx={tableHeadingColor}>Conditions</TableCell>
+                )}
+                <TableCell sx={tableHeadingColor}>Status</TableCell>
+                <TableCell sx={tableHeadingColor}>Actions</TableCell>
               </TableRow>
-            ) : (
-              collections
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((collection) => (
-                  <TableRow key={collection.id} hover>
-                    <TableCell>
-                      <Avatar
-                        src={getImageUrl(collection.image)}
-                        sx={{ width: 40, height: 40 }}
-                      >
-                        {!collection.image && <Category />}
-                      </Avatar>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight="bold">
-                        {collection.name}
-                      </Typography>
-                      {collection.icon && (
-                        <Typography variant="caption" color="textSecondary">
-                          {collection.icon}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    {!isMobile && (
+            </TableHead>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={isMobile ? 5 : isTablet ? 6 : 7}
+                    sx={{ textAlign: "center", py: 4 }}
+                  >
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                collections
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((collection) => (
+                    <TableRow key={collection.id} hover>
                       <TableCell>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            maxWidth: 200,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
+                        <Avatar
+                          src={getImageUrl(collection.image)}
+                          sx={{ width: 40, height: 40 }}
                         >
-                          {collection.description || "No description"}
-                        </Typography>
+                          {!collection.image && <Category />}
+                        </Avatar>
                       </TableCell>
-                    )}
-                    <TableCell>
-                      <Chip
-                        icon={<Inventory />}
-                        label={`${collection.total_products}`}
-                        color="primary"
-                        variant="outlined"
-                        size="small"
-                      />
-                    </TableCell>
-                    {!isTablet && (
                       <TableCell>
-                        {collection.conditions ? (
-                          <Chip
-                            label={collection.conditions}
-                            color={
-                              getConditionsColor(collection.conditions) as any
-                            }
-                            size="small"
-                          />
-                        ) : (
-                          <Typography variant="caption" color="textSecondary">
-                            Not specified
+                        <Typography variant="body2" fontWeight="bold">
+                          {collection.name}
+                        </Typography>
+                        {collection.icon && (
+                          <Typography variant="caption" color="#94A3B8">
+                            {collection.icon}
                           </Typography>
                         )}
                       </TableCell>
-                    )}
-                    <TableCell>
-                      <Chip
-                        label={collection.is_active ? "ACTIVE" : "INACTIVE"}
-                        color={getStatusColor(collection.is_active)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={0.5}>
-                        <Tooltip title="View Details">
-                          <IconButton
-                            color="info"
-                            onClick={() => handleView(collection)}
-                            size="small"
+                      {!isMobile && (
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              maxWidth: 200,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
                           >
-                            <Visibility />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Edit Collection">
-                          <IconButton
-                            color="primary"
-                            onClick={() => handleEdit(collection)}
-                            size="small"
-                          >
-                            <Edit />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete Collection">
-                          <IconButton
-                            color="error"
-                            onClick={() => handleDelete(collection.id)}
-                            size="small"
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Tooltip>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))
-            )}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={collections.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+                            {collection.description || "No description"}
+                          </Typography>
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        <Chip
+                          icon={<Inventory />}
+                          label={`${collection.total_products}`}
+                          color="primary"
+                          variant="outlined"
+                          size="small"
+                        />
+                      </TableCell>
+                      {!isTablet && (
+                        <TableCell>
+                          {collection.conditions ? (
+                            <Chip
+                              label={collection.conditions}
+                              color={
+                                getConditionsColor(collection.conditions) as any
+                              }
+                              size="small"
+                            />
+                          ) : (
+                            <Typography variant="caption" color="#94A3B8">
+                              Not specified
+                            </Typography>
+                          )}
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        <Chip
+                          label={collection.is_active ? "ACTIVE" : "INACTIVE"}
+                          color={getStatusColor(collection.is_active)}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={0.5}>
+                          <Tooltip title="View Details">
+                            <IconButton
+                              color="info"
+                              onClick={() => handleView(collection)}
+                              size="small"
+                            >
+                              <Visibility />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Edit Collection">
+                            <IconButton
+                              color="primary"
+                              onClick={() => handleEdit(collection)}
+                              size="small"
+                            >
+                              <Edit />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete Collection">
+                            <IconButton
+                              color="error"
+                              onClick={() => handleDelete(collection.id)}
+                              size="small"
+                            >
+                              <Delete />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={collections.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
 
       {/* Add/Edit Collection Dialog */}
       <Dialog
@@ -609,7 +647,7 @@ const AdminCollections: React.FC = () => {
                     component="span"
                     startIcon={<Upload />}
                     fullWidth
-                    sx={{ py: 2 }}
+                    sx={{ py: 2, borderColor: "#94A3B8", color: "#94A3B8" }}
                   >
                     {selectedImageFile
                       ? "Change Image"
@@ -618,7 +656,7 @@ const AdminCollections: React.FC = () => {
                 </label>
                 <Typography
                   variant="caption"
-                  color="textSecondary"
+                  color="#94A3B8"
                   display="block"
                   sx={{ mt: 1 }}
                 >
@@ -637,6 +675,12 @@ const AdminCollections: React.FC = () => {
             onClick={handleSubmit}
             disabled={isUploading}
             startIcon={isUploading ? <CircularProgress size={20} /> : null}
+            sx={{
+              backgroundColor: "#1E1B4B",
+              "&:hover": {
+                backgroundColor: "#2D2A6B",
+              },
+            }}
           >
             {isUploading ? "Saving..." : editingCollection ? "Update" : "Add"}{" "}
             Collection
@@ -669,7 +713,7 @@ const AdminCollections: React.FC = () => {
                 </Typography>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="body2" color="textSecondary" paragraph>
+                <Typography variant="body2" color="#94A3B8" paragraph>
                   {viewingCollection.description || "No description provided"}
                 </Typography>
               </Grid>
@@ -699,13 +743,13 @@ const AdminCollections: React.FC = () => {
                     }
                   />
                 ) : (
-                  <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="#94A3B8">
                     Not specified
                   </Typography>
                 )}
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="caption" color="textSecondary">
+                <Typography variant="caption" color="#94A3B8">
                   Created:{" "}
                   {new Date(viewingCollection.created_at).toLocaleDateString()}
                   {viewingCollection.updated_at && (
@@ -732,6 +776,12 @@ const AdminCollections: React.FC = () => {
                 setIsViewModalOpen(false);
                 handleEdit(viewingCollection);
               }}
+              sx={{
+                backgroundColor: "#1E1B4B",
+                "&:hover": {
+                  backgroundColor: "#2D2A6B",
+                },
+              }}
             >
               Edit Collection
             </Button>
@@ -753,11 +803,44 @@ const AdminCollections: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button color="error" variant="contained" onClick={confirmDelete}>
+          <Button 
+            color="error" 
+            variant="contained" 
+            onClick={confirmDelete}
+            sx={{
+              backgroundColor: "#1E1B4B",
+              "&:hover": {
+                backgroundColor: "#2D2A6B",
+              },
+            }}
+          >
             Delete
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Custom Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Box
+          sx={{
+            backgroundColor: "#1E1B4B",
+            color: "white",
+            padding: "12px 24px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <Typography variant="body1">{snackbarMessage}</Typography>
+        </Box>
+      </Snackbar>
     </Box>
   );
 };
