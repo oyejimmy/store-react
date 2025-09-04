@@ -1,4 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import SwipeableViews, { SwipeableViewsProps } from "react-swipeable-views";
+import { autoPlay, AutoPlayProps } from "react-swipeable-views-utils";
+
+interface AutoPlaySwipeableViewsProps extends SwipeableViewsProps, AutoPlayProps {}
+
+const AutoPlaySwipeableViews = autoPlay(
+  ({ children, ...props }: AutoPlaySwipeableViewsProps) => (
+    <SwipeableViews {...props}>
+      {children}
+    </SwipeableViews>
+  )
+);
 import {
   Box,
   Grid,
@@ -29,6 +42,121 @@ const HomePage = () => {
   const dispatch = useAppDispatch();
   const { products, loading } = useAppSelector((state) => state.products);
 
+  // Banner slides data - Jewelry Collection
+  const bannerSlides = [
+    {
+      title: "Elegant Rings",
+      subtitle: "Discover our exquisite collection of rings",
+      cta: "Shop Rings",
+      link: "/shop?category=rings",
+      image:
+        "https://images.unsplash.com/photo-1700062409662-756e8c4bcc73?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      buttonStyle: {
+        bg: "rgba(0, 0, 0, 0.8)",
+        text: "#ffffff",
+      },
+    },
+    {
+      title: "Chic Earrings",
+      subtitle: "Enhance your beauty with our earrings",
+      cta: "View Earrings",
+      link: "/shop?category=earrings",
+      image:
+        "https://images.unsplash.com/photo-1608613381851-6a058de0dc11?q=80&w=1211&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      buttonStyle: {
+        bg: "rgba(255, 255, 255, 0.9)",
+        text: "#000000",
+      },
+    },
+    {
+      title: "Luxury Bangles",
+      subtitle: "Adorn your wrists with elegance",
+      cta: "Explore Bangles",
+      link: "/shop?category=bangles",
+      image:
+        "https://images.unsplash.com/photo-1724720790533-160d6280fd81?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      buttonStyle: {
+        bg: "rgba(0, 0, 0, 0.8)",
+        text: "#ffffff",
+      },
+    },
+    {
+      title: "Delicate Anklets",
+      subtitle: "Subtle beauty for your feet",
+      cta: "Discover Anklets",
+      link: "/shop?category=anklets",
+      image:
+        "https://images.unsplash.com/photo-1588658163621-f853df4bbe86?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      buttonStyle: {
+        bg: "rgba(255, 255, 255, 0.9)",
+        text: "#000000",
+      },
+    },
+    {
+      title: "Stylish Bracelets",
+      subtitle: "Timeless pieces for every occasion",
+      cta: "View Bracelets",
+      link: "/shop?category=bracelets",
+      image:
+        "https://images.unsplash.com/photo-1663243821443-2b8cb9e48265?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      buttonStyle: {
+        bg: "rgba(0, 0, 0, 0.8)",
+        text: "#ffffff",
+      },
+    },
+    {
+      title: "Elegant Pendants",
+      subtitle: "Make a statement with our pendants",
+      cta: "Shop Pendants",
+      link: "/shop?category=pendants",
+      image:
+        "https://images.unsplash.com/photo-1718903540435-82dc0fb4138d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      buttonStyle: {
+        bg: "rgba(255, 255, 255, 0.9)",
+        text: "#000000",
+      },
+    },
+    {
+      title: "Chic Hoops",
+      subtitle: "Classic hoops for every style",
+      cta: "View Hoops",
+      link: "/shop?category=hoops",
+      image:
+        "https://images.unsplash.com/photo-1710552524021-a8dc68c2a8dc?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      buttonStyle: {
+        bg: "rgba(0, 0, 0, 0.8)",
+        text: "#ffffff",
+      },
+    },
+    {
+      title: "Dainty Ear Studs",
+      subtitle: "Subtle sparkle for everyday wear",
+      cta: "Shop Studs",
+      link: "/shop?category=ear-studs",
+      image:
+        "https://images.unsplash.com/photo-1677737774935-4b849e887bc2?q=80&w=1331&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      buttonStyle: {
+        bg: "rgba(255, 255, 255, 0.9)",
+        text: "#000000",
+      },
+    },
+  ];
+
+  const [activeStep, setActiveStep] = useState(0);
+  const maxSteps = bannerSlides.length;
+
+  const handleNext = () => {
+    setActiveStep((prevStep) => (prevStep + 1) % maxSteps);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevStep) => (prevStep - 1 + maxSteps) % maxSteps);
+  };
+
+  const handleStepChange = (step: number) => {
+    setActiveStep(step);
+  };
+
   // Define color variables based on the current theme mode
   const primaryColor =
     theme.palette.mode === "light" ? COLORS.deepNavy : COLORS.offWhite;
@@ -45,15 +173,15 @@ const HomePage = () => {
       try {
         // Fetch products with a limit of 8 items
         await dispatch(fetchProducts({ limit: 8 }));
-        
+
         // Fetch special offers
         await Promise.all([
           dispatch(fetchOffersByType("under_299")),
           dispatch(fetchOffersByType("special_deals")),
-          dispatch(fetchOffersByType("deal_of_month"))
+          dispatch(fetchOffersByType("deal_of_month")),
         ]);
       } catch (error) {
-        console.error('Error fetching initial data:', error);
+        console.error("Error fetching initial data:", error);
       }
     };
 
@@ -64,81 +192,78 @@ const HomePage = () => {
   //   dispatch(fetchProducts({ limit: 8 }));
   // };
 
-  const bannerSlides = [
-    {
-      image:
-        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200",
-      title: "Elegant Jewelry Collection",
-      subtitle: "Discover our stunning collection of handcrafted jewelry",
-      cta: "Shop Now",
-      link: "/shop",
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=1200",
-      title: "Special Offers Under PKR 299",
-      subtitle: "Limited time deals on selected jewelry pieces",
-      cta: "View Offers",
-      link: "/offers/under-299",
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200",
-      title: "New Arrivals",
-      subtitle: "Latest designs in rings, earrings, and more",
-      cta: "Explore",
-      link: "/shop",
-    },
-  ];
+  // Keep the bannerSlides array with the first declaration only
+  //     title: "Elegant Jewelry Collection",
+  //     subtitle: "Discover our stunning collection of handcrafted jewelry",
+  //     cta: "Shop Now",
+  //     link: "/shop",
+  //   },
+  //   {
+  //     image:
+  //       "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=1200",
+  //     title: "Special Offers Under PKR 299",
+  //     subtitle: "Limited time deals on selected jewelry pieces",
+  //     cta: "View Offers",
+  //     link: "/offers/under-299",
+  //   },
+  //   {
+  //     image:
+  //       "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200",
+  //     title: "New Arrivals",
+  //     subtitle: "Latest designs in rings, earrings, and more",
+  //     cta: "Explore",
+  //     link: "/shop",
+  //   },
+  // ];
 
   const categories = [
     {
       name: "Rings",
       icon: "💍",
       link: "/shop?category=rings",
-      gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      gradient: "linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)",
       image:
-        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=200&fit=crop",
+        "https://images.unsplash.com/photo-1572635149010-ffd9c657c5f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&fit=crop",
     },
     {
       name: "Earrings",
       icon: "👂",
       link: "/shop?category=earrings",
-      gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+      gradient: "linear-gradient(135deg, #fff1eb 0%, #ace0f9 100%)",
       image:
-        "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop",
+        "https://images.unsplash.com/photo-1602173576902-6bc1c0155b7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&fit=crop",
     },
     {
       name: "Bangles",
       icon: "💫",
       link: "/shop?category=bangles",
-      gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+      gradient: "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)",
       image:
-        "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=300&h=200&fit=crop",
+        "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&fit=crop",
     },
     {
       name: "Anklets",
       icon: "🦶",
       link: "/shop?category=anklets",
-      gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+      gradient: "linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)",
       image:
-        "https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?w=300&h=200&fit=crop",
+        "https://images.unsplash.com/photo-1611591437281-4608be1ad011?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&fit=crop",
     },
     {
       name: "Bracelets",
       icon: "💎",
       link: "/shop?category=bracelets",
-      gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+      gradient: "linear-gradient(135deg, #fff1eb 0%, #ace0f9 100%)",
       image:
-        "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=300&h=200&fit=crop",
+        "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&fit=crop",
     },
     {
       name: "Pendants",
       icon: "✨",
       link: "/shop?category=pendants",
-      gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+      gradient: "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)",
       image:
-        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=300&h=200&fit=crop",
+        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&fit=crop",
     },
   ];
 
@@ -470,68 +595,178 @@ const HomePage = () => {
       }}
     >
       {/* Banner Section */}
-      <Box sx={{ mb: 10 }}>
-        <Box
-          sx={{
-            height: "80vh",
-            background: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url(${bannerSlides[0].image})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            textAlign: "center",
-            position: "relative",
-            "&::after": {
-              content: '""',
+      <Box sx={{ mb: 10, position: "relative" }}>
+        <Box sx={{ position: "relative" }}>
+          <AutoPlaySwipeableViews
+            index={activeStep}
+            onChangeIndex={handleStepChange}
+            enableMouseEvents
+            autoplay
+            interval={5000}
+            springConfig={{
+              duration: '0.7s',
+              easeFunction: 'cubic-bezier(0.15, 0.3, 0.25, 1)',
+              delay: '0s'
+            }}
+            style={{ height: "80vh" }}
+          >
+            {bannerSlides.map((slide, index) => (
+              <Box
+                key={index}
+                sx={{
+                  height: "80vh",
+                  background: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url(${slide.image})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  textAlign: "center",
+                  position: "relative",
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: "2px",
+                    background:
+                      "linear-gradient(90deg, transparent, #d4af37, transparent)",
+                  },
+                }}
+              >
+                <Box>
+                  <Typography
+                    variant="h1"
+                    sx={{
+                      color: "#ffffff",
+                      mb: 2,
+                      fontSize: { xs: "2rem", md: "3.5rem" },
+                      fontWeight: 700,
+                      textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
+                      opacity: 0,
+                      transform: "translateY(20px)",
+                      animation: "fadeInUp 0.8s ease forwards",
+                      animationDelay: "0.3s",
+                      "@keyframes fadeInUp": {
+                        to: {
+                          opacity: 1,
+                          transform: "translateY(0)",
+                        },
+                      },
+                    }}
+                  >
+                    {slide.title}
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "#ffffff",
+                      mb: 3,
+                      fontSize: { xs: "1rem", md: "1.25rem" },
+                      textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
+                      opacity: 0,
+                      transform: "translateY(20px)",
+                      animation: "fadeInUp 0.8s ease forwards",
+                      animationDelay: "0.5s",
+                    }}
+                  >
+                    {slide.subtitle}
+                  </Typography>
+                  <Button
+                    component={Link}
+                    to={slide.link}
+                    variant="contained"
+                    size="large"
+                    sx={{
+                      px: 4,
+                      py: 1.5,
+                      fontSize: "1.1rem",
+                      backgroundColor: primaryColor,
+                      color: secondaryColor,
+                      opacity: 0,
+                      transform: "translateY(20px)",
+                      animation: "fadeInUp 0.8s ease forwards",
+                      animationDelay: "0.7s",
+                    }}
+                  >
+                    {slide.cta}
+                  </Button>
+                </Box>
+              </Box>
+            ))}
+          </AutoPlaySwipeableViews>
+
+          {/* Navigation Arrows */}
+          <IconButton
+            onClick={handleBack}
+            sx={{
               position: "absolute",
-              bottom: 0,
+              left: 20,
+              top: "50%",
+              transform: "translateY(-50%)",
+              backgroundColor: "rgba(0,0,0,0.3)",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "rgba(0,0,0,0.5)",
+              },
+              zIndex: 2,
+            }}
+          >
+            <KeyboardArrowLeft fontSize="large" />
+          </IconButton>
+          <IconButton
+            onClick={handleNext}
+            sx={{
+              position: "absolute",
+              right: 20,
+              top: "50%",
+              transform: "translateY(-50%)",
+              backgroundColor: "rgba(0,0,0,0.3)",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "rgba(0,0,0,0.5)",
+              },
+              zIndex: 2,
+            }}
+          >
+            <KeyboardArrowRight fontSize="large" />
+          </IconButton>
+
+          {/* Dots Indicator */}
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 20,
               left: 0,
               right: 0,
-              height: "2px",
-              background:
-                "linear-gradient(90deg, transparent, #d4af37, transparent)",
-            },
-          }}
-        >
-          <Box>
-            <Typography
-              variant="h1"
-              sx={{
-                color: "#ffffff",
-                mb: 2,
-                fontSize: { xs: "2rem", md: "3.5rem" },
-                fontWeight: 300,
-              }}
-            >
-              {bannerSlides[0].title}
-            </Typography>
-            <Typography
-              variant="h6"
-              sx={{
-                color: "#ffffff",
-                mb: 3,
-                fontSize: { xs: "1rem", md: "1.25rem" },
-              }}
-            >
-              {bannerSlides[0].subtitle}
-            </Typography>
-            <Button
-              component={Link}
-              to={bannerSlides[0].link}
-              variant="contained"
-              size="large"
-              sx={{
-                px: 4,
-                py: 1.5,
-                fontSize: "1.1rem",
-                backgroundColor: primaryColor,
-                color: secondaryColor,
-              }}
-            >
-              {bannerSlides[0].cta}
-            </Button>
+              display: "flex",
+              justifyContent: "center",
+              gap: 1,
+              zIndex: 2,
+            }}
+          >
+            {bannerSlides.map((_, index) => (
+              <Box
+                key={index}
+                onClick={() => handleStepChange(index)}
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  backgroundColor:
+                    activeStep === index
+                      ? primaryColor
+                      : "rgba(255,255,255,0.5)",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform: "scale(1.2)",
+                  },
+                }}
+              />
+            ))}
           </Box>
         </Box>
       </Box>
