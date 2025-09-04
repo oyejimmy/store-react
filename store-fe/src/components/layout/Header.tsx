@@ -33,17 +33,22 @@ import {
   DarkMode,
   ExpandLess,
   ExpandMore,
-  Diamond,
   LocalOffer,
   MonetizationOn,
   CropLandscape,
-  Favorite,
-  Watch,
-  Link,
-  AutoAwesome,
   Hearing,
-  Lens,
-} from "@mui/icons-material";
+  Store as StoreIcon,
+  Diamond as RingIcon,
+  Spa as AnkhIcon,
+  Circle as CircleIcon,
+  Link as LinkIcon,
+  CardGiftcard as GiftIcon,
+  Headset as EarListenIcon,
+  DonutLarge as CircleNotchIcon,
+  Diamond as GemIcon,
+  Landscape as ImageFrameIcon,
+  Face as FaceIcon,
+} from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";
@@ -99,22 +104,16 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const shopCategories = [
-    { name: "Anklets", path: "/shop/anklets", icon: <Favorite /> },
-    { name: "Bangles", path: "/shop/bangles", icon: <Watch /> },
-    { name: "Bracelets", path: "/shop/bracelets", icon: <Link /> },
-    { name: "Combos", path: "/shop/combos", icon: <AutoAwesome /> },
-    { name: "Ear Studs", path: "/shop/ear-studs", icon: <Hearing /> },
-    { name: "Earrings", path: "/shop/earrings", icon: <Diamond /> },
-    { name: "Hoops", path: "/shop/hoops", icon: <Lens /> },
-    { name: "Pendants", path: "/shop/pendants", icon: <Favorite /> },
-    { name: "Rings", path: "/shop/rings", icon: <Diamond /> },
-    { name: "Wall frames", path: "/shop/wall-frames", icon: <CropLandscape /> },
-    {
-      name: "Hair Accessories",
-      path: "/shop/hair-accessories",
-      icon: <Store />,
-    },
-    { name: "All Products", path: "/shop", icon: <Store /> },
+    { name: "All Products", path: "/shop", icon: <StoreIcon /> },
+    { name: "Rings", path: "/shop/rings", icon: <RingIcon /> },
+    { name: "Anklets", path: "/shop/anklets", icon: <AnkhIcon /> },
+    { name: "Bangles", path: "/shop/bangles", icon: <CircleIcon /> },
+    { name: "Bracelets", path: "/shop/bracelets", icon: <LinkIcon /> },
+    { name: "Combos", path: "/shop/combos", icon: <GiftIcon /> },
+    { name: "Ear Studs", path: "/shop/ear-studs", icon: <EarListenIcon /> },
+    { name: "Earrings", path: "/shop/earrings", icon: <Hearing /> },
+    { name: "Hoops", path: "/shop/hoops", icon: <CircleNotchIcon /> },
+    { name: "Pendants", path: "/shop/pendants", icon: <GemIcon /> },
   ];
 
   const offers = [
@@ -169,7 +168,7 @@ const Header: React.FC<HeaderProps> = ({
             onClick={() => setMobileDrawerOpen(false)}
           >
             <ListItemIcon>
-              <Home sx={{ color: colors.text }} />
+              <FaceIcon style={{ color: colors.text }} />
             </ListItemIcon>
             <ListItemText primary="Home" sx={{ color: colors.text }} />
           </ListItem>
@@ -218,7 +217,7 @@ const Header: React.FC<HeaderProps> = ({
             onClick={() => setOffersMobileMenuOpen(!offersMobileMenuOpen)}
           >
             <ListItemIcon>
-              <CardGiftcard sx={{ color: colors.text }} />
+              <CropLandscape style={{ color: colors.text }} />
             </ListItemIcon>
             <ListItemText
               primary="Special Offers"
@@ -316,7 +315,7 @@ const Header: React.FC<HeaderProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: isSmallMobile ? "7px" : "3.5px",
+            padding: isSmallMobile ? "6px" : "4px",
             gap: 1,
             transition: "top 0.3s ease",
             background: colors.bannerBg,
@@ -438,7 +437,6 @@ const Header: React.FC<HeaderProps> = ({
                   </MenuItem>
                 ))}
               </Menu>
-
               <Button
                 color="inherit"
                 onClick={(e) => setOffersMenuAnchor(e.currentTarget)}
@@ -483,6 +481,43 @@ const Header: React.FC<HeaderProps> = ({
                   </MenuItem>
                 ))}
               </Menu>
+              <Button
+                component={RouterLink}
+                to="/shop/hair-accessories"
+                color="inherit"
+                startIcon={
+                  <FaceIcon
+                    style={{ color: colors.text, fontSize: "20px" }}
+                  />
+                }
+                sx={{
+                  color: colors.text,
+                  fontSize: "0.875rem",
+                  minWidth: "auto",
+                  px: 1,
+                }}
+              >
+                Hair Accessories
+              </Button>
+
+              <Button
+                component={RouterLink}
+                to="/shop/wall-frames"
+                color="inherit"
+                startIcon={
+                  <ImageFrameIcon
+                    style={{ color: colors.text, fontSize: "20px" }}
+                  />
+                }
+                sx={{
+                  color: colors.text,
+                  fontSize: "0.875rem",
+                  minWidth: "auto",
+                  px: 1,
+                }}
+              >
+                Wall Frames
+              </Button>
 
               <Button
                 color="inherit"
