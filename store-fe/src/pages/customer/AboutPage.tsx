@@ -33,7 +33,7 @@ import {
   Celebration,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import { COLORS } from "../../utils/contstant";
+import { COLORS } from "../../utils/constant";
 
 const AboutPage: React.FC = () => {
   const theme = useTheme();

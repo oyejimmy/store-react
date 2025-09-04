@@ -25,7 +25,7 @@ import {
   Subject as SubjectIcon,
   Message,
 } from "@mui/icons-material";
-import { COLORS } from "../../utils/contstant";
+import { COLORS } from "../../utils/constant";
 
 const ContactPage: React.FC = () => {
   const theme = useTheme();

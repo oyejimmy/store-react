@@ -1,4 +1,4 @@
-import { COLORS } from "./contstant";
+import { COLORS } from "./constant";
 import { useTheme } from "@mui/material";
 
 export const accentColor = () => {

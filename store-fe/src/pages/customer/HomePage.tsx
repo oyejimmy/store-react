@@ -22,7 +22,7 @@ import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { fetchProducts } from "../../store/slices/productSlice";
 import { fetchOffersByType } from "../../store/slices/offerSlice";
 import { ShoppingCart, FavoriteBorder, Visibility } from "@mui/icons-material";
-import { COLORS } from "../../utils/contstant";
+import { COLORS } from "../../utils/constant";
 
 const HomePage = () => {
   const theme = useTheme();

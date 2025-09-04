@@ -16,7 +16,7 @@ import {
   Cookie,
   AccountBox,
 } from "@mui/icons-material";
-import { COLORS } from "../../utils/contstant";
+import { COLORS } from "../../utils/constant";
 
 const PrivacyPage: React.FC = () => {
   const theme = useTheme();

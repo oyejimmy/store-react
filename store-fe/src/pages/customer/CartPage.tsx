@@ -49,7 +49,7 @@ import {
   Inventory,
   Discount,
 } from "@mui/icons-material";
-import { COLORS } from "../../utils/contstant";
+import { COLORS } from "../../utils/constant";
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();

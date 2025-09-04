@@ -55,7 +55,7 @@ import {
   CheckCircle,
   Refresh,
 } from "@mui/icons-material";
-import { COLORS } from "../../utils/contstant";
+import { COLORS } from "../../utils/constant";
 
 type AvailabilityFilter = "in_stock" | "out_of_stock";
 
