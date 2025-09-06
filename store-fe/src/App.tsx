@@ -14,19 +14,19 @@ import AdminLayout from "./components/layout/AdminLayout";
 
 // Customer Pages
 import HomePage from "./containers/customer/HomePage";
-import ShopPage from "./containers/customer/Shop/ShopPage";
-import CategoriesPage from "./containers/customer/Categories/CategoriesPage";
-import ProductDetailPage from "./containers/customer/ProductDetail/ProductDetailPage";
-import CartPage from "./containers/customer/Cart/CartPage";
-import CheckoutPage from "./containers/customer/CheckOut/CheckoutPage";
-import OffersPage from "./containers/customer/Offers/OffersPage";
-import ContactPage from "./containers/customer/Contact/ContactPage";
+import ShopPage from "./containers/customer/Shop";
+import CategoriesPage from "./containers/customer/Categories";
+import ProductDetailPage from "./containers/customer/ProductDetail";
+import CartPage from "./containers/customer/Cart";
+import CheckoutPage from "./containers/customer/CheckOut";
+import OffersPage from "./containers/customer/Offers";
+import ContactPage from "./containers/customer/Contact";
 import AboutPage from "./containers/customer/About";
 import LoginPage from "./containers/authentication/LogIn";
 import SignupPage from "./containers/authentication/SignUp";
-import OrderConfirmationPage from "./containers/customer/OrderConfirmation/OrderConfirmationPage";
-import UserOrdersPage from "./containers/customer/UserOrders/UserOrdersPage";
-import ProfilePage from "./containers/customer/Profile/ProfilePage";
+import OrderConfirmationPage from "./containers/customer/OrderConfirmation";
+import UserOrdersPage from "./containers/customer/UserOrders";
+import ProfilePage from "./containers/customer/Profile";
 import ForgotPasswordPage from "./containers/authentication/ForgotPassword";
 
 // Admin Pages

@@ -33,9 +33,11 @@ import {
   PictureAsPdf as PictureAsPdfIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
-import { adminAPI } from "../../services/api";
-import OrderReceipt from "../../components/admin/OrderReceipt";
-import PdfDownloadButton, { generateOrderFileName } from "../../components/PdfDownloadButton";
+import { adminAPI } from "../../../services/api";
+import PdfDownloadButton, {
+  generateOrderFileName,
+} from "../../../components/PdfDownloadButton";
+import OrderReceipt from "../../../components/admin/OrderReceipt";
 
 const tableHeadingColor = {
   backgroundColor: "#2c6e49",
