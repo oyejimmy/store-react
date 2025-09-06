@@ -32,16 +32,16 @@ import PrivacyPage from "./containers/customer/components/Privacy/index";
 import TermsPage from "./containers/customer/components/Terms/index";
 
 // Admin Pages
-import AdminDashboard from "./containers/admin/Dashboard";
-import AdminProducts from "./containers/admin/AdminProducts";
-import AdminCollections from "./containers/admin/AdminCollections";
-import AdminOrders from "./containers/admin/AdminOrders";
-import AdminInventory from "./containers/admin/AdminInventory";
-import AdminOffers from "./containers/admin/AdminOffers";
-import AdminUsers from "./containers/admin/AdminUsers";
-import AdminPayments from "./containers/admin/AdminPayments";
-import AdminSalesChannels from "./containers/admin/AdminSalesChannels";
-import AdminReports from "./containers/admin/AdminReports";
+import AdminDashboard from "./containers/admin/Dashboard/Dashboard";
+import AdminProducts from "./containers/admin/Products/AdminProducts";
+import AdminCollections from "./containers/admin/Collections/AdminCollections";
+import AdminOrders from "./containers/admin/Orders/AdminOrders";
+import AdminInventory from "./containers/admin/Inventory/AdminInventory";
+import AdminOffers from "./containers/admin/Offers/AdminOffers";
+import AdminUsers from "./containers/admin/Users/AdminUsers";
+import AdminPayments from "./containers/admin/Payments/AdminPayments";
+import AdminSalesChannels from "./containers/admin/SalesChannels/AdminSalesChannels";
+import AdminReports from "./containers/admin/Reports/AdminReports";
 import AdminLogin from "./containers/admin/AdminLogin";
 import TestPdf from "./containers/admin/TestPdf";
 

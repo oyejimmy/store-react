@@ -57,7 +57,7 @@ import {
   CheckCircle,
   Info,
 } from "@mui/icons-material";
-import { adminAPI } from "../../services/api";
+import { adminAPI } from "../../../services/api";
 
 // Color constants
 const COLORS = {

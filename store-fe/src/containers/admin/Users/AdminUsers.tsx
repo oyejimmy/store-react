@@ -29,7 +29,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import { Refresh, Visibility, Person } from "@mui/icons-material";
-import { adminAPI } from "../../services/api";
+import { adminAPI } from "../../../services/api";
 
 // Color constants
 const COLORS = {

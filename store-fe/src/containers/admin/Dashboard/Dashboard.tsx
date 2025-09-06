@@ -67,7 +67,7 @@ import {
   ExpandMore,
   ExpandLess
 } from "@mui/icons-material";
-import { adminAPI } from "../../services/api";
+import { adminAPI } from "../../../services/api";
 
 const AdminDashboard: React.FC = () => {
   const theme = useTheme();

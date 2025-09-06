@@ -38,7 +38,7 @@ import {
   CloudUpload as CloudUploadIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
-import { adminAPI, productAPI } from "../../services/api";
+import { adminAPI, productAPI } from "../../../services/api";
 
 interface Product {
   id: number;

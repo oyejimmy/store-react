@@ -40,7 +40,7 @@ import {
   Receipt,
   AccountBalance,
 } from "@mui/icons-material";
-import { adminAPI } from "../../services/api";
+import { adminAPI } from "../../../services/api";
 
 interface Payment {
   id: number;
