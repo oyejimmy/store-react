@@ -1,12 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
+import { AppDispatch, RootState } from "../../../store";
 import {
   removeFromCart,
   updateQuantity,
   clearCart,
-} from "../../store/slices/cartSlice";
+} from "../../../store/slices/cartSlice";
 import {
   Box,
   Card,
@@ -49,7 +49,7 @@ import {
   Inventory,
   Discount,
 } from "@mui/icons-material";
-import { COLORS } from "../../utils/constant";
+import { COLORS } from "../../../utils/constant";
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();

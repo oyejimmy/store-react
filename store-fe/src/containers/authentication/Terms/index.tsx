@@ -16,10 +16,10 @@ import {
   Verified,
   ContactSupport,
 } from "@mui/icons-material";
-import { BrandName, COLORS } from "../../../../utils/constant";
-import { getSharedStyles, backgroundAnimation } from "../styles";
 import ReactCanvasConfetti from "react-canvas-confetti";
 import type { CreateTypes } from "canvas-confetti";
+import { BrandName, COLORS } from "../../../utils/constant";
+import { getSharedStyles, backgroundAnimation } from "../components/styles";
 
 // Create a typed version of Confetti with forwardRef
 const Confetti = React.forwardRef<CreateTypes>((props, ref) => (

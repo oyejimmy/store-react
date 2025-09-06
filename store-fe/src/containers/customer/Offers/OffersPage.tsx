@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
-import { fetchOffersByType } from "../../store/slices/offerSlice";
+import { AppDispatch, RootState } from "../../../store";
+import { fetchOffersByType } from "../../../store/slices/offerSlice";
 import {
   Container,
   Grid,
@@ -31,7 +31,7 @@ import {
   LocalOffer,
   AccessTime,
 } from "@mui/icons-material";
-import { accentColor } from "../../utils/helpers";
+import { accentColor } from "../../../utils/helpers";
 
 const OffersPage: React.FC = () => {
   const { type } = useParams<{ type: string }>();

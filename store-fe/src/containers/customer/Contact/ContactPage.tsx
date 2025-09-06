@@ -25,7 +25,7 @@ import {
   Subject as SubjectIcon,
   Message,
 } from "@mui/icons-material";
-import { BrandName, COLORS } from "../../utils/constant";
+import { BrandName, COLORS } from "../../../utils/constant";
 import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
 

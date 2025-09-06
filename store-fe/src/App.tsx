@@ -14,22 +14,20 @@ import AdminLayout from "./components/layout/AdminLayout";
 
 // Customer Pages
 import HomePage from "./containers/customer/HomePage";
-import ShopPage from "./containers/customer/ShopPage";
-import CategoriesPage from "./containers/customer/CategoriesPage";
-import ProductDetailPage from "./containers/customer/ProductDetailPage";
-import CartPage from "./containers/customer/CartPage";
-import CheckoutPage from "./containers/customer/CheckoutPage";
-import OffersPage from "./containers/customer/OffersPage";
-import ContactPage from "./containers/customer/ContactPage";
+import ShopPage from "./containers/customer/Shop/ShopPage";
+import CategoriesPage from "./containers/customer/Categories/CategoriesPage";
+import ProductDetailPage from "./containers/customer/ProductDetail/ProductDetailPage";
+import CartPage from "./containers/customer/Cart/CartPage";
+import CheckoutPage from "./containers/customer/CheckOut/CheckoutPage";
+import OffersPage from "./containers/customer/Offers/OffersPage";
+import ContactPage from "./containers/customer/Contact/ContactPage";
 import AboutPage from "./containers/customer/About";
 import LoginPage from "./containers/authentication/LogIn";
 import SignupPage from "./containers/authentication/SignUp";
-import OrderConfirmationPage from "./containers/customer/OrderConfirmationPage";
-import UserOrdersPage from "./containers/customer/UserOrdersPage";
-import ProfilePage from "./containers/customer/ProfilePage";
+import OrderConfirmationPage from "./containers/customer/OrderConfirmation/OrderConfirmationPage";
+import UserOrdersPage from "./containers/customer/UserOrders/UserOrdersPage";
+import ProfilePage from "./containers/customer/Profile/ProfilePage";
 import ForgotPasswordPage from "./containers/authentication/ForgotPassword";
-import PrivacyPage from "./containers/customer/components/Privacy/index";
-import TermsPage from "./containers/customer/components/Terms/index";
 
 // Admin Pages
 import AdminDashboard from "./containers/admin/Dashboard/Dashboard";
@@ -50,6 +48,8 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminRoute from "./components/auth/AdminRoute";
 import NotFound from "./containers/Error/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
+import PrivacyPage from "./containers/authentication/Privacy";
+import TermsPage from "./containers/authentication/Terms";
 
 // Layout Components
 const CustomerLayout = ({

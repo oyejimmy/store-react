@@ -31,7 +31,7 @@ import html2canvas from "html2canvas";
 import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
 import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
-import { COLORS } from "../../utils/constant";
+import { COLORS } from "../../../utils/constant";
 
 // ========== KEYFRAME ANIMATIONS ==========
 // Background animation for gradient

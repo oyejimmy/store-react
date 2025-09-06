@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
+import { AppDispatch, RootState } from "../../../store";
 import {
   createGuestOrder,
   createUserOrder,
-} from "../../store/slices/orderSlice";
-import { clearCart } from "../../store/slices/cartSlice";
+} from "../../../store/slices/orderSlice";
+import { clearCart } from "../../../store/slices/cartSlice";
 import {
   Box,
   Card,

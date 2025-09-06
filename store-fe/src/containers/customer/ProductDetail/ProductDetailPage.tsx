@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
-import { fetchProductById } from "../../store/slices/productSlice";
-import { addToCart } from "../../store/slices/cartSlice";
+import { AppDispatch, RootState } from "../../../store";
+import { fetchProductById } from "../../../store/slices/productSlice";
+import { addToCart } from "../../../store/slices/cartSlice";
 import {
   addToWishlist,
   removeFromWishlist,
-} from "../../store/slices/wishlistSlice";
+} from "../../../store/slices/wishlistSlice";
 import {
   Box,
   Card,

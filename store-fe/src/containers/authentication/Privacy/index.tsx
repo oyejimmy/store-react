@@ -17,10 +17,10 @@ import {
   Cookie,
   AccountBox,
 } from "@mui/icons-material";
-import { getSharedStyles, backgroundAnimation } from "../styles";
 import Confetti from "react-canvas-confetti";
 import PolicyCard from "./PolicyCard";
-import { COLORS } from "../../../../utils/constant";
+import { COLORS } from "../../../utils/constant";
+import { getSharedStyles, backgroundAnimation } from "../components/styles";
 
 // Styled component for animated background
 const AnimatedBox = styled(Box)(({ theme }) => ({

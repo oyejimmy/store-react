@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState, AppDispatch } from "../../store";
-import { useAppDispatch } from "../../hooks/useAppDispatch";
+import type { RootState, AppDispatch } from "../../../store";
+import { useAppDispatch } from "../../../hooks/useAppDispatch";
 import {
   fetchProducts,
   fetchProductsByCategory,
-} from "../../store/slices/productSlice";
-import { addToCart } from "../../store/slices/cartSlice";
-import { productAPI } from "../../services/api";
+} from "../../../store/slices/productSlice";
+import { addToCart } from "../../../store/slices/cartSlice";
+import { productAPI } from "../../../services/api";
 import {
   Box,
   Card,
@@ -55,7 +55,7 @@ import {
   CheckCircle,
   Refresh,
 } from "@mui/icons-material";
-import { COLORS } from "../../utils/constant";
+import { COLORS } from "../../../utils/constant";
 
 type AvailabilityFilter = "in_stock" | "out_of_stock";
 

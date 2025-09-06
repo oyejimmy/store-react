@@ -39,10 +39,10 @@ import {
   Badge,
 } from "@mui/icons-material";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../store";
-import { getCurrentUser } from "../../store/slices/authSlice";
-import api, { orderAPI } from "../../services/api";
-import { accentColor } from "../../utils/helpers";
+import { RootState } from "../../../store";
+import { getCurrentUser } from "../../../store/slices/authSlice";
+import api, { orderAPI } from "../../../services/api";
+import { accentColor } from "../../../utils/helpers";
 
 const ProfilePage: React.FC = () => {
   const dispatch = useDispatch();
